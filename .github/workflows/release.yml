@@ -1,0 +1,73 @@
+name: Release
+
+on: 
+  push: 
+    tags: 
+      - "v*.*.*"
+
+jobs: 
+  call-maven-build: 
+    uses: ./.github/workflows/maven-build.yml
+  create-release: 
+    needs: call-maven-build
+    runs-on: ubuntu-latest
+    steps: 
+      - uses: actions/checkout@v3
+      - name: Download a single artifact
+        uses: actions/download-artifact@v3
+        with: 
+          name: target-jar
+          path: artifact
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          # artifact/gateway-session-*.jar
+          # artifact/micro-common-*.jar
+          # artifact/micro-common-cloud-*.jar
+          # artifact/micro-auth-*.jar
+          # artifact/micro-auth-cloud-*.jar
+          # artifact/micro-sql-*.jar
+          # artifact/micro-sql-jooq-*.jar
+          # artifact/micro-test-*.jar
+          # artifact/micro-test-cloud-*.jar
+          files: |
+            artifact/system-server-*.jar
+            artifact/sba-server-*.jar
+            artifact/core-server-*.jar
+
+  push-packages:
+    runs-on: ubuntu-latest
+    steps: 
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with: 
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+      - name: Deploy with Maven
+        run: mvn deploy -P github,lib
+        env: 
+          GITHUB_TOKEN: ${{ github.token }}
+
+  push-central-packages:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Apache Maven Central
+        uses: actions/setup-java@v4
+        with: # running setup-java again overwrites the settings.xml
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+          server-id: central # Value of the distributionManagement/repository/id field of the pom.xml
+          server-username: MAVEN_USERNAME # env variable for username in deploy
+          server-password: MAVEN_CENTRAL_TOKEN # env variable for token in deploy
+          gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }} # Value of the GPG private key to import
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE # env variable for GPG private key passphrase
+      - name: Publish to Apache Maven Central
+        run: mvn deploy -P central,lib
+        env:
+          MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+          MAVEN_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}

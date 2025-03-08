@@ -1,0 +1,6 @@
+{
+    "nodejs.editor.formatOnSave.prettier.glob": "{**/*,*}.{js,ts,jsx,tsx,vue}",
+    "nodejs.editor.formatOnSave.eslint.glob": "{**/*,*}.{js,ts,jsx,tsx,vue}",
+    "nodejs.editor.formatOnSave.stylelint.glob": "{**/*,*}.{css, less, scss,vue}",
+    "editor.tabSize": 2
+}

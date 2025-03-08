@@ -1,0 +1,24 @@
+@use 'element-plus/theme-chalk/dark/css-vars.css';
+
+html.dark {
+  --main-setting-panel-btn-color: #ffffff;
+  --main-setting-panel-btn-bg-color: #545c64;
+  --main-setting-panel-btn-hover-bg-color: #858d96;
+
+  .main-aside-menu {
+    --el-menu-bg-color: var(--el-bg-color);
+    --el-menu-text-color: var(--el-text-color);
+    --el-menu-hover-bg-color: var(--el-color-info-light-7);
+  }
+
+  .main-layout-aside {
+    --main-aside-bg-color: var(--el-bg-color);
+    --main-aside-collapse-color: var(--el-text-color);
+    --main-aside-collapse-bg-color: #85806f45;
+    --main-aside-collapse-bg-hover-color: #858d9645;
+  }
+
+  .main-layout-aside {
+    border-right: 1px solid var(--el-border-color-light);
+  }
+}

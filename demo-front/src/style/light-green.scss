@@ -1,0 +1,26 @@
+html.light .theme-light-green {
+  .main-aside-menu {
+    --el-menu-bg-color: #545c64;
+    --el-menu-text-color: #ffffff;
+    --el-menu-active-color: #2cb671;
+    --el-menu-hover-bg-color: #858d96;
+  }
+
+  .main-layout-aside {
+    --main-aside-bg-color: #545c64;
+    --main-aside-collapse-color: #ffffff;
+    --main-aside-collapse-bg-color: #2cb67145;
+    --main-aside-collapse-bg-hover-color: #858d9645;
+  }
+
+  .main-layout-header,
+  .main-setting-panel,
+  .main-setting-panel-btn {
+    --el-color-primary: var(--el-color-success);
+    --el-color-primary-light-3: var(--el-color-success-light-3);
+    --el-color-primary-light-5: var(--el-color-success-light-5);
+    --el-color-primary-light-7: var(--el-color-success-light-7);
+    --el-color-primary-light-8: var(--el-color-success-light-8);
+    --el-color-primary-light-9: var(--el-color-success-light-9);
+  }
+}
