@@ -43,12 +43,13 @@ class Test {
     WebTestClient client;
 
     @Test
-    @WithMockUser(subject="?", roles = {"?","?"})
+    @WithMockUser(subject = "?", roles = {"?", "?"})
     void getRole() {
         client.build().get().uri("/")
             .exchange()
             .expectStatus().isOk();
     }
+}
 ```
 
 ### 自定义注解
