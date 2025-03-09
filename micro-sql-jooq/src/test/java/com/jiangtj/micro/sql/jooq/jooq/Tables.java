@@ -5,7 +5,6 @@ package com.jiangtj.micro.sql.jooq.jooq;
 
 
 import com.jiangtj.micro.sql.jooq.jooq.tables.*;
-import com.jiangtj.platform.sql.jooq.jooq.tables.*;
 
 
 /**
