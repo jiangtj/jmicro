@@ -79,7 +79,7 @@
                 <repository>
                     <id>github</id>
                     <name>GitHub OWNER Apache Maven Packages</name>
-                    <url>https://maven.pkg.github.com/jiangtj/jc-platform</url>
+                    <url>https://maven.pkg.github.com/jiangtj/jmicro</url>
                 </repository>
             </distributionManagement>
             <activation>
