@@ -1,7 +1,6 @@
 package com.jiangtj.platform.baseservlet;
 
-import com.jiangtj.platform.test.JMicroMvcTest;
-import com.jiangtj.platform.test.JMicroTest;
+import com.jiangtj.micro.test.JMicroMvcTest;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;

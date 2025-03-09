@@ -1,7 +1,7 @@
 package com.jiangtj.platform.baseservlet;
 
-import com.jiangtj.platform.auth.casdoor.CasdoorUserContextImpl;
-import com.jiangtj.platform.auth.servlet.AuthHolder;
+import com.jiangtj.micro.auth.casdoor.CasdoorUserContextImpl;
+import com.jiangtj.micro.auth.servlet.AuthHolder;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.casbin.casdoor.entity.User;

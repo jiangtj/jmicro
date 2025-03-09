@@ -1,6 +1,6 @@
 package com.jiangtj.platform.baseservlet;
 
-import com.jiangtj.platform.common.validation.MobilePhone;
+import com.jiangtj.micro.common.validation.MobilePhone;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;

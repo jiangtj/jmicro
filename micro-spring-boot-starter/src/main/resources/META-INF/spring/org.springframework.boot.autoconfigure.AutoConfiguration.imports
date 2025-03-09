@@ -1,2 +1,2 @@
-com.jiangtj.platform.spring.boot.reactive.ReactiveExceptionAutoConfiguration
-com.jiangtj.platform.spring.boot.servlet.ServletExceptionAutoConfiguration
+com.jiangtj.micro.spring.boot.reactive.ReactiveExceptionAutoConfiguration
+com.jiangtj.micro.spring.boot.servlet.ServletExceptionAutoConfiguration

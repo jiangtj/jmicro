@@ -1,6 +1,6 @@
 package com.jiangtj.platform.baseservlet;
 
-import com.jiangtj.platform.web.BaseExceptionUtils;
+import com.jiangtj.micro.web.BaseExceptionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 

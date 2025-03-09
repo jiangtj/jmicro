@@ -122,7 +122,7 @@ public class GenerateTest {
         GenerationTool.generate(new Configuration()
             .withJdbc(GenerateHelper.getJdbc())
             .withGenerator(new Generator()
-                    .withName("com.jiangtj.platform.sql.jooq.ExtendGenerator")
+                    .withName("com.jiangtj.micro.sql.jooq.ExtendGenerator")
                     .withDatabase(GenerateHelper.getDatabase(".*"))
                     .withTarget(GenerateHelper.getTarget("com.jiangtj.platform.system.jooq"))
                     .withGenerate(new Generate()

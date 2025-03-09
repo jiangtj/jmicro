@@ -1,6 +1,6 @@
 package com.jiangtj.platform.baseservlet;
 
-import com.jiangtj.platform.auth.servlet.ServletLoginFilter;
+import com.jiangtj.micro.auth.servlet.ServletLoginFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
