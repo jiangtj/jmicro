@@ -42,7 +42,7 @@ public class JsonAuthContextConverter implements AuthContextConverter {
             .build();
         Claims body = parser.parseSignedClaims(token).getPayload();
         Subject subject = this.subject();
-        subject.setId(user.id);
+        subject.setId(body.sub);
         return AuthContext.create(subject);
     }
 
@@ -52,6 +52,24 @@ public class JsonAuthContextConverter implements AuthContextConverter {
 只需要配置好转换器，你就可以在项目使用鉴权功能，可以使用过滤器(todo)或者通过注解方式(`@HasLogin` `@HasRole` `@HasPermission`)管理你的应用
 
 我们同样提供了测试模块`micro-test`方便用户模拟登录用户进行集成测试，很简单使用`@WithMockUser`注解(todo 完善中)即可
+
+```java
+@JMicroTest
+@AutoConfigureWebTestClient
+class Test {
+
+    @Resource
+    WebTestClient client;
+
+    @Test
+    @WithMockUser(subject = "user", roles = {"roleA", "roleB"})
+    void getRole() {
+        client.build().get().uri("/")
+            .exchange()
+            .expectStatus().isOk();
+    }
+}
+```
 
 `micro-auth-casdoor` 是这个鉴权模块的扩展，用于支持casdoor的token认证，你可以参考他创建自己的鉴权模块
 
