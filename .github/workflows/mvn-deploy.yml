@@ -20,10 +20,10 @@ jobs:
           cache: maven
       - name: Test with Maven
         run: mvn test
-      - name: Deploy with Maven
-        run: mvn deploy -P github,lib
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
+#      - name: Deploy with Maven
+#        run: mvn deploy -P github,lib
+#        env:
+#          GITHUB_TOKEN: ${{ github.token }}
 
       - name: Set up Apache Maven Central
         uses: actions/setup-java@v4
