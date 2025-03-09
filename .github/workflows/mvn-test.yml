@@ -6,7 +6,7 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Java CI with Maven Test
+name: Maven Test
 
 on:
   workflow_dispatch:
@@ -18,24 +18,7 @@ on:
 
 jobs:
   test:
-
     runs-on: ubuntu-latest
-
-    services:
-      # Label used to access the service container
-      mysql:
-        image: mysql:9.0
-        env:
-          MYSQL_DATABASE: jc_admin
-          MYSQL_ROOT_PASSWORD: bressdfthytdbttgy
-          CHARACTER_SET_SERVER: utf8mb4
-          COLLATION_SERVER: utf8mb4_unicode_ci
-        # Set health checks to wait until postgres has started
-#        options: >-
-#          --character-set-server=utf8mb4
-#          --collation-server=utf8mb4_unicode_ci
-        ports:
-          - 3311:3306
 
     steps:
     - uses: actions/checkout@v3

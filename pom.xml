@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.4</version>
+        <version>3.4.3</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -40,10 +40,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>17</java.version>
-        <spring-cloud.version>2023.0.0</spring-cloud.version>
-        <spring-cloud-tencent.version>1.13.1-2023.0.0</spring-cloud-tencent.version>
-        <spring-boot-admin.version>3.2.3</spring-boot-admin.version>
         <jjwt.version>0.12.5</jjwt.version>
+        <casdoor.version>1.15.0</casdoor.version>
         <!-- <maven.test.skip>true</maven.test.skip> -->
     </properties>
 
@@ -132,12 +130,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- https://mvnrepository.com/artifact/org.casbin/casdoor-spring-boot-starter -->
-            <dependency>
-                <groupId>org.casbin</groupId>
-                <artifactId>casdoor-spring-boot-starter</artifactId>
-                <version>1.15.0</version>
-            </dependency>
             <dependency>
                 <groupId>com.jiangtj.micro</groupId>
                 <artifactId>micro-auth</artifactId>
@@ -174,6 +166,11 @@
                 <version>0.0.10</version>
             </dependency>
             <dependency>
+                <groupId>org.casbin</groupId>
+                <artifactId>casdoor-spring-boot-starter</artifactId>
+                <version>${casdoor.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>io.jsonwebtoken</groupId>
                 <artifactId>jjwt-api</artifactId>
                 <version>${jjwt.version}</version>
@@ -187,27 +184,6 @@
                 <groupId>io.jsonwebtoken</groupId>
                 <artifactId>jjwt-jackson</artifactId>
                 <version>${jjwt.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-dependencies</artifactId>
-                <version>${spring-cloud.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>de.codecentric</groupId>
-                <artifactId>spring-boot-admin-dependencies</artifactId>
-                <version>${spring-boot-admin.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.tencent.cloud</groupId>
-                <artifactId>spring-cloud-tencent-dependencies</artifactId>
-                <version>${spring-cloud-tencent.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
