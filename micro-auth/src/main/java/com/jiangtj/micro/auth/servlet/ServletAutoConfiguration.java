@@ -5,15 +5,15 @@ package com.jiangtj.micro.auth.servlet;
 import com.jiangtj.micro.auth.annotations.HasLogin;
 import com.jiangtj.micro.auth.annotations.HasPermission;
 import com.jiangtj.micro.auth.annotations.HasRole;
-import com.jiangtj.micro.auth.annotations.TokenType;
+import com.jiangtj.micro.auth.core.AuthService;
 import com.jiangtj.micro.auth.servlet.rbac.HasLoginAdvice;
 import com.jiangtj.micro.auth.servlet.rbac.HasPermissionAdvice;
 import com.jiangtj.micro.auth.servlet.rbac.HasRoleAdvice;
-import com.jiangtj.micro.auth.servlet.rbac.HasTokenTypeAdvice;
 import com.jiangtj.micro.web.aop.AnnotationPointcut;
 import org.springframework.aop.Advisor;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
 
@@ -22,13 +22,14 @@ import org.springframework.context.annotation.Bean;
 public class ServletAutoConfiguration {
 
     @Bean
+    @ConditionalOnMissingBean
     public AuthService authService() {
-        return new AuthService();
+        return new ServletAuthService();
     }
 
     @Bean
-    public ServletAuthContextFilter servletAuthContextFilter() {
-        return new ServletAuthContextFilter();
+    public AuthHolder authHolder() {
+        return new AuthHolder();
     }
 
     @Bean
@@ -36,10 +37,6 @@ public class ServletAutoConfiguration {
         return new HasLoginAdvice();
     }
 
-    @Bean
-    public HasTokenTypeAdvice hasTokenTypeAdvice() {
-        return new HasTokenTypeAdvice();
-    }
 
     @Bean
     public HasRoleAdvice hasRoleAdvice() {
@@ -54,11 +51,6 @@ public class ServletAutoConfiguration {
     @Bean
     public Advisor hasLoginAdvisor(HasLoginAdvice advice) {
         return new DefaultPointcutAdvisor(new AnnotationPointcut<>(HasLogin.class), advice);
-    }
-
-    @Bean
-    public Advisor hasTokenTypeAdvisor(HasTokenTypeAdvice advice) {
-        return new DefaultPointcutAdvisor(new AnnotationPointcut<>(TokenType.class), advice);
     }
 
     @Bean

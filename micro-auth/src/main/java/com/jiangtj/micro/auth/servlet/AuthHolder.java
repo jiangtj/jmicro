@@ -2,29 +2,34 @@ package com.jiangtj.micro.auth.servlet;
 
 import com.jiangtj.micro.auth.AuthRequestAttributes;
 import com.jiangtj.micro.auth.context.AuthContext;
-import jakarta.annotation.Nullable;
+import com.jiangtj.micro.auth.context.AuthContextFactory;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 
 import java.util.Objects;
-import java.util.Optional;
 
-public interface AuthHolder {
+public class AuthHolder {
 
-    @Nullable
-    static AuthContext getAuthContext() {
+    @Resource
+    private HttpServletRequest request;
+    @Resource
+    private AuthContextFactory factory;
+
+    public AuthContext getAuthContext() {
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         Objects.requireNonNull(requestAttributes);
-        return (AuthContext) requestAttributes.getAttribute(AuthRequestAttributes.AUTH_CONTEXT_ATTRIBUTE, RequestAttributes.SCOPE_REQUEST);
+        AuthContext context = (AuthContext) requestAttributes.getAttribute(AuthRequestAttributes.AUTH_CONTEXT_ATTRIBUTE, RequestAttributes.SCOPE_REQUEST);
+        if (context == null) {
+            context = factory.getAuthContext(new ServletServerHttpRequest(request));
+            setAuthContext(context);
+        }
+        return context;
     }
 
-    static Optional<AuthContext> getAuthContextOptional() {
-        return Optional.ofNullable(RequestContextHolder.getRequestAttributes())
-            .map(requestAttributes -> requestAttributes.getAttribute(AuthRequestAttributes.AUTH_CONTEXT_ATTRIBUTE, RequestAttributes.SCOPE_REQUEST))
-            .map(AuthContext.class::cast);
-    }
-
-    static void setAuthContext(AuthContext ctx) {
+    public void setAuthContext(AuthContext ctx) {
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         Objects.requireNonNull(requestAttributes);
         requestAttributes.setAttribute(AuthRequestAttributes.AUTH_CONTEXT_ATTRIBUTE, ctx, RequestAttributes.SCOPE_REQUEST);

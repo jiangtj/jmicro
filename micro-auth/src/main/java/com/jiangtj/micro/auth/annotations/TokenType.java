@@ -8,6 +8,7 @@ import java.lang.annotation.Target;
 @HasLogin
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
+@Deprecated
 public @interface TokenType {
     Class<?> value();
 }

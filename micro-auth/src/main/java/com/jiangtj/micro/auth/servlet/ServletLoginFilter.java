@@ -1,7 +1,9 @@
 package com.jiangtj.micro.auth.servlet;
 
 import com.jiangtj.micro.auth.AntPathMatcherUtils;
+import com.jiangtj.micro.auth.core.AuthService;
 import com.jiangtj.micro.web.Orders;
+import jakarta.annotation.Resource;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,6 +19,9 @@ import java.util.List;
 @Deprecated
 @Order(Orders.BASE_EXCEPTION_FILTER + 30)
 public class ServletLoginFilter extends OncePerRequestFilter {
+
+    @Resource
+    private AuthService authService;
 
     private final List<String> withPatterns;
     private final List<String> withoutPatterns;
@@ -39,7 +44,7 @@ public class ServletLoginFilter extends OncePerRequestFilter {
             return;
         }
 
-        AuthUtils.hasLogin();
+        authService.hasLogin();
         filterChain.doFilter(request, response);
     }
 

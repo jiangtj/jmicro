@@ -1,11 +1,11 @@
 package com.jiangtj.platform.baseservlet;
 
+import com.jiangtj.micro.auth.casdoor.CasdoorAuthService;
 import com.jiangtj.micro.auth.casdoor.CasdoorUserContextImpl;
 import com.jiangtj.micro.auth.servlet.AuthHolder;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.casbin.casdoor.entity.User;
-import org.casbin.casdoor.service.AuthService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class CasdoorController {
 
     @Resource
-    private AuthService casdoorAuthService;
+    private CasdoorAuthService casdoorAuthService;
+    @Resource
+    private AuthHolder authHolder;
 
     @GetMapping("toLogin")
     public String toLogin(String redirectUrl) {
@@ -25,7 +27,7 @@ public class CasdoorController {
 
     @GetMapping("user")
     public User user() {
-        return ((CasdoorUserContextImpl)AuthHolder.getAuthContext()).getCasdoorUser();
+        return ((CasdoorUserContextImpl)authHolder.getAuthContext()).getCasdoorUser();
     }
 
     @PostMapping("login")
