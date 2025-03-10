@@ -19,28 +19,12 @@ public class JMicroExtension implements BeforeEachCallback,
     @Override
     public void beforeTestExecution(ExtensionContext extensionContext) throws Exception {
         ApplicationContext applicationContext = SpringExtension.getApplicationContext(extensionContext);
-        TestAnnotationConverterFactory factory = applicationContext.getBean(TestAnnotationConverterFactory.class);
-        Method method = extensionContext.getRequiredTestMethod();
-
-        Class<?> testClass = extensionContext.getRequiredTestClass();
-        AnnotationUtils.findAnnotation(testClass, WithMockRoleProvider.class)
-            .ifPresent(annotation -> {
-                applicationContext.getBeanProvider(annotation.value())
-                    .ifAvailable(TestAuthContextHolder::setProvider);
-            });
-        AnnotationUtils.findAnnotation(method, WithMockRoleProvider.class)
-            .ifPresent(annotation -> {
-                applicationContext.getBeanProvider(annotation.value())
-                    .ifAvailable(TestAuthContextHolder::setProvider);
-            });
-
-        factory.setAuthContext(method, applicationContext);
+        TestAnnotationConverterFactory.setAuthContext(extensionContext, applicationContext);
     }
 
     @Override
     public void afterTestExecution(ExtensionContext extensionContext) throws Exception {
         TestAuthContextHolder.clearAuthContext();
-        TestAuthContextHolder.clearProvider();
     }
 
     @Override

@@ -7,8 +7,8 @@ import java.lang.annotation.*;
 @Documented
 @Inherited
 @WithMockAuth(SimpleTestAuthHandler.class)
-public @interface WithMockUser {
-    String subject() default "";
-    String[] roles() default {};
-    String[] permissions() default {};
+public @interface WithMockSubject {
+    String id();
+    String name() default "";
+    String displayName() default "";
 }

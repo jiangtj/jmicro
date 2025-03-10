@@ -2,32 +2,29 @@ package com.jiangtj.micro.test;
 
 import com.jiangtj.micro.auth.context.AuthContext;
 import com.jiangtj.micro.web.AnnotationUtils;
-import org.springframework.beans.factory.ObjectProvider;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.springframework.context.ApplicationContext;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.List;
 import java.util.Optional;
 
-@SuppressWarnings({"rawtypes", "unchecked"})
 public class TestAnnotationConverterFactory {
 
-    private final ObjectProvider<TestAnnotationConverter> op;
-
-    public TestAnnotationConverterFactory(ObjectProvider<TestAnnotationConverter> op) {
-        this.op = op;
-    }
-
-    public void setAuthContext(Method method, ApplicationContext context) {
-        List<TestAnnotationConverter> list = op.orderedStream().toList();
-        for (TestAnnotationConverter converter : list) {
-            Optional<? extends Annotation> annotation = AnnotationUtils.findAnnotation(method, converter.getAnnotationClass());
-            if (annotation.isPresent()) {
-                AuthContext ctx = converter.convert(annotation.get(), context);
-                TestAuthContextHolder.setAuthContext(ctx);
-                return;
-            }
+    public static void setAuthContext(ExtensionContext extensionContext, ApplicationContext applicationContext) {
+        Class<?> testClass = extensionContext.getRequiredTestClass();
+        Method testMethod = extensionContext.getRequiredTestMethod();
+        Optional<WithMockAuth> methodAuthHandler = AnnotationUtils.findAnnotation(testMethod, WithMockAuth.class);
+        if (methodAuthHandler.isPresent()) {
+            TestAuthHandler handler = applicationContext.getBean(methodAuthHandler.get().value());
+            AuthContext context = handler.convert(testMethod, applicationContext);
+            TestAuthContextHolder.setAuthContext(context);
+            return;
+        }
+        Optional<WithMockAuth> classAuthHandler = AnnotationUtils.findAnnotation(testClass, WithMockAuth.class);
+        if (classAuthHandler.isPresent()) {
+            TestAuthHandler handler = applicationContext.getBean(classAuthHandler.get().value());
+            AuthContext context = handler.convert(testClass, applicationContext);
+            TestAuthContextHolder.setAuthContext(context);
         }
     }
 

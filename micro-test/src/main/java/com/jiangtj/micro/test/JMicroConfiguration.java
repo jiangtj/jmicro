@@ -16,14 +16,8 @@ public class JMicroConfiguration {
     }
 
     @Bean
-    public SimpleTestAuthContextConverter simpleTestAuthContextConverter() {
-        return new SimpleTestAuthContextConverter();
-    }
-
-    @Bean
-    @SuppressWarnings("rawtypes")
-    public TestAnnotationConverterFactory testAnnotationConverterFactory(ObjectProvider<TestAnnotationConverter> converters) {
-        return new TestAnnotationConverterFactory(converters);
+    public SimpleTestAuthHandler simpleTestAuthContextConverter() {
+        return new SimpleTestAuthHandler();
     }
 
 }
