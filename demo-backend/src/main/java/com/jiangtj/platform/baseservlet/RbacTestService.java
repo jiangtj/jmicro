@@ -3,30 +3,27 @@ package com.jiangtj.platform.baseservlet;
 import com.jiangtj.micro.auth.annotations.HasLogin;
 import com.jiangtj.micro.auth.annotations.HasPermission;
 import com.jiangtj.micro.auth.annotations.HasRole;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Service;
 
-@RestController
-@RequestMapping("/anno")
-public class RBACController {
+@Service
+public class RbacTestService {
 
     @HasLogin
-    @GetMapping("/hasLogin")
     public String hasLogin(){
         return "hasLogin !!";
     }
 
     @HasRole("roleA")
-    @GetMapping("/hasRoleA")
     public String hasRoleA(){
         return "hasRoleA !!";
     }
 
-    @HasPermission("hasPermissionB")
-    @GetMapping("/hasPermissionB")
+    @HasPermission("permissionB")
     public String hasPermissionB(){
         return "hasPermissionB !!";
     }
 
+    @HasRole("admin")
+    public void hasAdmin(){
+    }
 }

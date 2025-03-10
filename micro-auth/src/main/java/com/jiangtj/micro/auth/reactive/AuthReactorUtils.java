@@ -1,8 +1,8 @@
 package com.jiangtj.micro.auth.reactive;
 
-import com.jiangtj.micro.auth.AuthExceptionUtils;
 import com.jiangtj.micro.auth.KeyUtils;
 import com.jiangtj.micro.auth.context.AuthContext;
+import com.jiangtj.micro.auth.exceptions.AuthExceptionUtils;
 import com.jiangtj.micro.web.BaseExceptionUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -18,7 +18,7 @@ public interface AuthReactorUtils {
 
     static Mono<AuthContext> isTokenType(Class<?> type) {
         return AuthReactorHolder.deferAuthContext()
-                .flatMap(tokenTypeHandler(type));
+            .flatMap(tokenTypeHandler(type));
     }
 
     static Function<AuthContext, Mono<AuthContext>> tokenTypeHandler(Class<?> type) {
@@ -40,12 +40,12 @@ public interface AuthReactorUtils {
 
     static Mono<AuthContext> hasLogin() {
         return AuthReactorHolder.deferAuthContext()
-                .flatMap(AuthReactorUtils.hasLoginHandler());
+            .flatMap(AuthReactorUtils.hasLoginHandler());
     }
 
     static Function<AuthContext, Mono<AuthContext>> hasLoginHandler() {
         return ctx -> {
-            if (ctx == null) {
+            if (!ctx.isLogin()) {
                 return Mono.error(AuthExceptionUtils.unLogin());
             }
             return Mono.just(ctx);
@@ -58,21 +58,21 @@ public interface AuthReactorUtils {
 
     static Mono<AuthContext> hasRole(String... roles) {
         return AuthReactorHolder.deferAuthContext()
-                .cast(AuthContext.class)
-                .flatMap(hasRoleHandler(roles));
+            .cast(AuthContext.class)
+            .flatMap(hasRoleHandler(roles));
     }
 
     static Function<AuthContext, Mono<AuthContext>> hasRoleHandler(String... roles) {
         return ctx -> {
             List<String> userRoles = ctx.authorization().roles();
             return Flux.just(roles)
-                    .map(KeyUtils::toKey)
-                    .doOnNext(role -> {
-                        if (!userRoles.contains(role)) {
-                            throw AuthExceptionUtils.noRole(role);
-                        }
-                    })
-                    .then(Mono.just(ctx));
+                .map(KeyUtils::toKey)
+                .doOnNext(role -> {
+                    if (!userRoles.contains(role)) {
+                        throw AuthExceptionUtils.noRole(role);
+                    }
+                })
+                .then(Mono.just(ctx));
         };
     }
 
@@ -82,19 +82,20 @@ public interface AuthReactorUtils {
 
     static Mono<AuthContext> hasPermission(String... permissions) {
         return AuthReactorHolder.deferAuthContext()
-                .flatMap(hasPermissionHandler(permissions));
+            .flatMap(hasPermissionHandler(permissions));
     }
 
     static Function<AuthContext, Mono<AuthContext>> hasPermissionHandler(String... permissions) {
         return ctx -> {
             List<String> userPermissions = ctx.authorization().permissions();
             return Flux.just(permissions)
-                    .doOnNext(perm -> {
-                        if (!userPermissions.contains(perm)) {
-                            throw AuthExceptionUtils.noPermission(perm);
-                        }
-                    })
-                    .then(Mono.just(ctx));
+                .map(KeyUtils::toKey)
+                .doOnNext(perm -> {
+                    if (!userPermissions.contains(perm)) {
+                        throw AuthExceptionUtils.noPermission(perm);
+                    }
+                })
+                .then(Mono.just(ctx));
         };
     }
 

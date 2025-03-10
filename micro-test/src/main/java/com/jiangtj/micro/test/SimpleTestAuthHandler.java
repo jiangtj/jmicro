@@ -1,5 +1,6 @@
 package com.jiangtj.micro.test;
 
+import com.jiangtj.micro.auth.KeyUtils;
 import com.jiangtj.micro.auth.context.AuthContext;
 import com.jiangtj.micro.auth.context.Authorization;
 import com.jiangtj.micro.auth.context.Subject;
@@ -11,6 +12,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public class SimpleTestAuthHandler implements TestAuthHandler{
 
@@ -34,8 +36,8 @@ public class SimpleTestAuthHandler implements TestAuthHandler{
         if (mockUser.isPresent()) {
             WithMockUser user = mockUser.get();
             subject.setId(user.subject());
-            roles = List.of(user.roles());
-            permissions = List.of(user.permissions());
+            roles = Stream.of(user.roles()).map(KeyUtils::toKey).toList();
+            permissions = Stream.of(user.permissions()).map(KeyUtils::toKey).toList();
         }
 
         AnnotationUtils.findAnnotation(element, WithMockSubject.class)
@@ -47,12 +49,12 @@ public class SimpleTestAuthHandler implements TestAuthHandler{
 
         Optional<WithMockRole> mockRole = AnnotationUtils.findAnnotation(element, WithMockRole.class);
         if (mockRole.isPresent()) {
-            permissions = List.of(mockRole.get().value());
+            roles = Stream.of(mockRole.get().value()).map(KeyUtils::toKey).toList();
         }
 
         Optional<WithMockPermission> mockPermission = AnnotationUtils.findAnnotation(element, WithMockPermission.class);
         if (mockPermission.isPresent()) {
-            permissions = List.of(mockPermission.get().value());
+            permissions = Stream.of(mockPermission.get().value()).map(KeyUtils::toKey).toList();
         }
 
         return AuthContext.create(subject, Authorization.create(roles, permissions));

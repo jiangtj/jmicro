@@ -1,6 +1,5 @@
 package com.jiangtj.micro.auth.context;
 
-import jakarta.annotation.Nullable;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.http.HttpRequest;
 
@@ -24,7 +23,6 @@ public class AuthContextFactory {
             .collect(Collectors.toList());
     }
 
-    @Nullable
     public AuthContext getAuthContext(HttpRequest request) {
         if (this.converters == null || this.converters.isEmpty()) {
             this.init();
@@ -37,7 +35,7 @@ public class AuthContextFactory {
             }
         }
 
-        return null;
+        return AuthContext.unLogin();
     }
 
 }

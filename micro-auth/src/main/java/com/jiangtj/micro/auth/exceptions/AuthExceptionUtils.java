@@ -1,4 +1,4 @@
-package com.jiangtj.micro.auth;
+package com.jiangtj.micro.auth.exceptions;
 
 import com.jiangtj.micro.web.BaseException;
 import com.jiangtj.micro.web.BaseExceptionUtils;
@@ -11,9 +11,7 @@ public class AuthExceptionUtils {
      * 401 未登录
      */
     public static BaseException unLogin() {
-        BaseException exception = BaseExceptionUtils.unauthorized("You have to take a token for this request.");
-        exception.setTitle("No Login");
-        return exception;
+        return new UnLoginException();
     }
 
     /**

@@ -1,10 +1,11 @@
 package com.jiangtj.micro.auth.servlet;
 
-import com.jiangtj.micro.auth.AuthExceptionUtils;
 import com.jiangtj.micro.auth.KeyUtils;
 import com.jiangtj.micro.auth.context.AuthContext;
+import com.jiangtj.micro.auth.exceptions.AuthExceptionUtils;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 public interface AuthUtils {
@@ -17,14 +18,15 @@ public interface AuthUtils {
     }
 
     static void hasLogin() {
-        getLoginAuthContext();
+        AuthContext ctx = getLoginAuthContext();
+        if (!ctx.isLogin()) {
+            throw AuthExceptionUtils.unLogin();
+        }
     }
 
     static AuthContext getLoginAuthContext() {
         AuthContext ctx = AuthHolder.getAuthContext();
-        if (ctx == null) {
-            throw AuthExceptionUtils.unLogin();
-        }
+        Objects.requireNonNull(ctx);
         return ctx;
     }
 
@@ -32,23 +34,24 @@ public interface AuthUtils {
         AuthContext ctx = getLoginAuthContext();
         List<String> userRoles = ctx.authorization().roles();
         Stream.of(roles)
-                .map(KeyUtils::toKey)
-                .forEach(role -> {
-                    if (!userRoles.contains(role)) {
-                        throw AuthExceptionUtils.noRole(role);
-                    }
-                });
+            .map(KeyUtils::toKey)
+            .forEach(role -> {
+                if (!userRoles.contains(role)) {
+                    throw AuthExceptionUtils.noRole(role);
+                }
+            });
     }
 
     static void hasPermission(String... permissions) {
         AuthContext ctx = getLoginAuthContext();
         List<String> userPermissions = ctx.authorization().permissions();
         Stream.of(permissions)
-                .forEach(perm -> {
-                    if (!userPermissions.contains(perm)) {
-                        throw AuthExceptionUtils.noPermission(perm);
-                    }
-                });
+            .map(KeyUtils::toKey)
+            .forEach(perm -> {
+                if (!userPermissions.contains(perm)) {
+                    throw AuthExceptionUtils.noPermission(perm);
+                }
+            });
     }
 
 }

@@ -8,6 +8,14 @@ public interface AuthContext {
     Authorization authorization();
     void setAuthorization(Authorization authorization);
 
+    default boolean isLogin() {
+        return true;
+    }
+
+    static AuthContext unLogin() {
+        return UnLoginContextImpl.self;
+    }
+
     static AuthContext create(Subject subject) {
         return new DefaultAuthContext(subject);
     }
