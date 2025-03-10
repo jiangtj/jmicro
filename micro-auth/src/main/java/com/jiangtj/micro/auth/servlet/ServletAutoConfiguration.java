@@ -22,6 +22,11 @@ import org.springframework.context.annotation.Bean;
 public class ServletAutoConfiguration {
 
     @Bean
+    public AuthService authService() {
+        return new AuthService();
+    }
+
+    @Bean
     public ServletAuthContextFilter servletAuthContextFilter() {
         return new ServletAuthContextFilter();
     }

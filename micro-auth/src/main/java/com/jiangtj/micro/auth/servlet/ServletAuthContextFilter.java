@@ -1,7 +1,5 @@
 package com.jiangtj.micro.auth.servlet;
 
-import com.jiangtj.micro.auth.context.AuthContext;
-import com.jiangtj.micro.auth.context.AuthContextFactory;
 import com.jiangtj.micro.web.Orders;
 import jakarta.annotation.Resource;
 import jakarta.servlet.FilterChain;
@@ -21,7 +19,7 @@ import java.io.IOException;
 public class ServletAuthContextFilter extends OncePerRequestFilter {
 
     @Resource
-    private AuthContextFactory factory;
+    private AuthService authService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -29,9 +27,7 @@ public class ServletAuthContextFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-
-        AuthContext authContext = factory.getAuthContext(new ServletServerHttpRequest(request));
-        AuthHolder.setAuthContext(authContext);
+        authService.initAuthContext(new ServletServerHttpRequest(request));
         filterChain.doFilter(request, response);
     }
 }
