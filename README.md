@@ -51,7 +51,7 @@ public class JsonAuthContextConverter implements AuthContextConverter {
 
 只需要配置好转换器，你就可以在项目使用鉴权功能，可以使用过滤器(todo)或者通过注解方式(`@HasLogin` `@HasRole` `@HasPermission`)管理你的应用
 
-我们同样提供了测试模块`micro-test`方便用户模拟登录用户进行集成测试，很简单使用`@WithMockUser`注解(todo 完善中)即可
+我们同样提供了测试模块`micro-test`方便用户模拟登录用户进行集成测试，很简单使用`@WithMockUser`注解即可
 
 ```java
 @JMicroTest
@@ -67,6 +67,21 @@ class Test {
         client.build().get().uri("/")
             .exchange()
             .expectStatus().isOk();
+    }
+}
+```
+
+在响应式中，service层需要权限时，可以使用`AuthStepVerifier`替换掉`StepVerifier`，`AuthStepVerifier`会提供授权的上下文，当然你也可以通过`TestAuthContextHolder`获取上下文自己添加
+
+```java
+@JMicroTest
+class Test {
+    @Test
+    @WithMockUser(subject = "user", roles = {"roleA", "roleB"})
+    void getRole() {
+        AuthStepVerifier.create(someService.call())
+            .expectComplete()
+            .verify();
     }
 }
 ```
