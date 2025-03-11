@@ -50,6 +50,7 @@
             <id>server</id>
             <modules>
                 <module>demo-backend</module>
+                <module>demo-reactive</module>
             </modules>
             <activation>
                 <activeByDefault>true</activeByDefault>

@@ -4,24 +4,28 @@ import com.jiangtj.micro.auth.KeyUtils;
 import com.jiangtj.micro.auth.context.AuthContext;
 import com.jiangtj.micro.auth.exceptions.AuthExceptionUtils;
 import com.jiangtj.micro.web.BaseExceptionUtils;
+import jakarta.annotation.Resource;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.function.Function;
 
-public interface AuthReactorUtils {
+public class AuthReactorService {
 
-    static <T> Function<T, Mono<T>> tokenTypeInterceptor(Class<?> type) {
+    @Resource
+    private AuthReactorHolder authReactorHolder;
+
+    public <T> Function<T, Mono<T>> tokenTypeInterceptor(Class<?> type) {
         return t -> isTokenType(type).thenReturn(t);
     }
 
-    static Mono<AuthContext> isTokenType(Class<?> type) {
-        return AuthReactorHolder.deferAuthContext()
+    public Mono<AuthContext> isTokenType(Class<?> type) {
+        return authReactorHolder.deferAuthContext()
             .flatMap(tokenTypeHandler(type));
     }
 
-    static Function<AuthContext, Mono<AuthContext>> tokenTypeHandler(Class<?> type) {
+    public Function<AuthContext, Mono<AuthContext>> tokenTypeHandler(Class<?> type) {
         return ctx -> {
             if (!type.isInstance(ctx)) {
                 return Mono.error(BaseExceptionUtils.forbidden("不允许访问 todo"));
@@ -30,20 +34,20 @@ public interface AuthReactorUtils {
         };
     }
 
-    static <T> Function<T, Mono<T>> loginInterceptor() {
+    public <T> Function<T, Mono<T>> loginInterceptor() {
         return t -> hasLogin().thenReturn(t);
     }
 
-    static <T> Mono<T> hasLogin(T val) {
+    public <T> Mono<T> hasLogin(T val) {
         return hasLogin().then(Mono.just(val));
     }
 
-    static Mono<AuthContext> hasLogin() {
-        return AuthReactorHolder.deferAuthContext()
-            .flatMap(AuthReactorUtils.hasLoginHandler());
+    public Mono<AuthContext> hasLogin() {
+        return authReactorHolder.deferAuthContext()
+            .flatMap(hasLoginHandler());
     }
 
-    static Function<AuthContext, Mono<AuthContext>> hasLoginHandler() {
+    public Function<AuthContext, Mono<AuthContext>> hasLoginHandler() {
         return ctx -> {
             if (!ctx.isLogin()) {
                 return Mono.error(AuthExceptionUtils.unLogin());
@@ -52,17 +56,17 @@ public interface AuthReactorUtils {
         };
     }
 
-    static <T> Function<T, Mono<T>> roleInterceptor(String... roles) {
+    public <T> Function<T, Mono<T>> roleInterceptor(String... roles) {
         return t -> hasLogin(roles).thenReturn(t);
     }
 
-    static Mono<AuthContext> hasRole(String... roles) {
-        return AuthReactorHolder.deferAuthContext()
+    public Mono<AuthContext> hasRole(String... roles) {
+        return authReactorHolder.deferAuthContext()
             .cast(AuthContext.class)
             .flatMap(hasRoleHandler(roles));
     }
 
-    static Function<AuthContext, Mono<AuthContext>> hasRoleHandler(String... roles) {
+    public Function<AuthContext, Mono<AuthContext>> hasRoleHandler(String... roles) {
         return ctx -> {
             List<String> userRoles = ctx.authorization().roles();
             return Flux.just(roles)
@@ -76,16 +80,16 @@ public interface AuthReactorUtils {
         };
     }
 
-    static <T> Function<T, Mono<T>> permissionInterceptor(String... permissions) {
+    public <T> Function<T, Mono<T>> permissionInterceptor(String... permissions) {
         return t -> hasPermission(permissions).thenReturn(t);
     }
 
-    static Mono<AuthContext> hasPermission(String... permissions) {
-        return AuthReactorHolder.deferAuthContext()
+    public Mono<AuthContext> hasPermission(String... permissions) {
+        return authReactorHolder.deferAuthContext()
             .flatMap(hasPermissionHandler(permissions));
     }
 
-    static Function<AuthContext, Mono<AuthContext>> hasPermissionHandler(String... permissions) {
+    public Function<AuthContext, Mono<AuthContext>> hasPermissionHandler(String... permissions) {
         return ctx -> {
             List<String> userPermissions = ctx.authorization().permissions();
             return Flux.just(permissions)

@@ -25,7 +25,9 @@ public class TestAnnotationConverterFactory {
             TestAuthHandler handler = applicationContext.getBean(classAuthHandler.get().value());
             AuthContext context = handler.convert(testClass, applicationContext);
             TestAuthContextHolder.setAuthContext(context);
+            return;
         }
+        TestAuthContextHolder.setAuthContext(AuthContext.unLogin());
     }
 
 }
