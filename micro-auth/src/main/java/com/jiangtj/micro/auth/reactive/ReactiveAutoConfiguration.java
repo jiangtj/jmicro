@@ -12,6 +12,7 @@ import com.jiangtj.micro.web.aop.AnnotationPointcut;
 import org.springframework.aop.Advisor;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
 
@@ -20,6 +21,7 @@ import org.springframework.context.annotation.Bean;
 public class ReactiveAutoConfiguration {
 
     @Bean
+    @ConditionalOnMissingBean
     public AuthReactiveHolder authReactorHolder() {
         return new AuthReactiveHolder();
     }

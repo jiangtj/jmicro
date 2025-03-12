@@ -24,7 +24,7 @@ public class ServletAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public AuthService authService() {
-        return new ServletAuthService();
+        return new AuthServiceImpl();
     }
 
     @Bean

@@ -6,7 +6,7 @@ import com.jiangtj.micro.auth.core.AuthService;
 import com.jiangtj.micro.auth.core.AuthUtils;
 import jakarta.annotation.Resource;
 
-public class ServletAuthService implements AuthService {
+public class AuthServiceImpl implements AuthService {
     @Resource
     private AuthHolder authHolder;
 
