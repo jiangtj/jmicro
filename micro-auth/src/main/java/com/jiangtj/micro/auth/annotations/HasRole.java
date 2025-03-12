@@ -10,4 +10,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface HasRole {
     String[] value();
+    Logic logic() default Logic.AND;
 }

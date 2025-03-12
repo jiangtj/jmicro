@@ -3,6 +3,7 @@ package com.jiangtj.platform.basereactive;
 import com.jiangtj.micro.auth.annotations.HasLogin;
 import com.jiangtj.micro.auth.annotations.HasPermission;
 import com.jiangtj.micro.auth.annotations.HasRole;
+import com.jiangtj.micro.auth.annotations.Logic;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -26,6 +27,11 @@ public class RbacTestService {
 
     @HasRole("admin")
     public Mono<Void> hasAdmin(){
+        return Mono.empty();
+    }
+
+    @HasRole(value = {"admin", "user"}, logic = Logic.OR)
+    public Mono<Void> hasAdminOrUser(){
         return Mono.empty();
     }
 }

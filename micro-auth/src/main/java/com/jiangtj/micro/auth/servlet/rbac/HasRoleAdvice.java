@@ -3,6 +3,7 @@ package com.jiangtj.micro.auth.servlet.rbac;
 import com.jiangtj.micro.auth.annotations.HasRole;
 import com.jiangtj.micro.auth.core.AuthService;
 import com.jiangtj.micro.web.aop.AnnotationMethodBeforeAdvice;
+import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
@@ -22,9 +23,9 @@ public class HasRoleAdvice extends AnnotationMethodBeforeAdvice<HasRole> impleme
     }
 
     @Override
-    public void before(List<HasRole> annotations, Method method, Object[] args, Object target) {
+    public void before(List<HasRole> annotations, Method method, Object[] args, @Nullable Object target) {
         for (HasRole annotation : annotations) {
-            authService.hasRole(annotation.value());
+            authService.hasRole(annotation.logic(), annotation.value());
         }
     }
 

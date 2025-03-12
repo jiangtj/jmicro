@@ -1,5 +1,6 @@
 package com.jiangtj.micro.auth.reactive;
 
+import com.jiangtj.micro.auth.annotations.Logic;
 import com.jiangtj.micro.auth.context.AuthContext;
 import com.jiangtj.micro.auth.context.Authorization;
 import com.jiangtj.micro.auth.context.Subject;
@@ -54,16 +55,16 @@ public class AuthReactiveServiceImpl implements AuthReactiveService {
     }
 
     @Override
-    public Mono<Void> hasRole(String... roles) {
+    public Mono<Void> hasRole(Logic logic, String... roles) {
         return authReactiveHolder.deferAuthContext()
             .cast(AuthContext.class)
-            .flatMap(hasRoleHandler(roles))
+            .flatMap(hasRoleHandler(logic, roles))
             .then();
     }
 
-    public Function<AuthContext, Mono<AuthContext>> hasRoleHandler(String... roles) {
+    public Function<AuthContext, Mono<AuthContext>> hasRoleHandler(Logic logic, String... roles) {
         return ctx -> {
-            AuthUtils.hasRole(ctx, roles);
+            AuthUtils.hasRole(ctx, logic, roles);
             return Mono.just(ctx);
         };
     }
@@ -73,15 +74,15 @@ public class AuthReactiveServiceImpl implements AuthReactiveService {
     }
 
     @Override
-    public Mono<Void> hasPermission(String... permissions) {
+    public Mono<Void> hasPermission(Logic logic, String... permissions) {
         return authReactiveHolder.deferAuthContext()
-            .flatMap(hasPermissionHandler(permissions))
+            .flatMap(hasPermissionHandler(logic, permissions))
             .then();
     }
 
-    public Function<AuthContext, Mono<AuthContext>> hasPermissionHandler(String... permissions) {
+    public Function<AuthContext, Mono<AuthContext>> hasPermissionHandler(Logic logic, String... permissions) {
         return ctx -> {
-            AuthUtils.hasPermission(ctx, permissions);
+            AuthUtils.hasPermission(ctx, logic, permissions);
             return Mono.just(ctx);
         };
     }

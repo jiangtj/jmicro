@@ -27,7 +27,7 @@ public class HasRoleAdvice extends ReactiveAnnotationMethodBeforeAdvice<HasRole>
     @Override
     public Mono<Void> before(List<HasRole> annotations, Method method, Object[] args, @Nullable Object target) {
         return Flux.fromIterable(annotations)
-            .flatMap(annotation -> authReactiveService.hasRole(annotation.value()))
+            .flatMap(annotation -> authReactiveService.hasRole(annotation.logic(), annotation.value()))
             .then();
     }
 

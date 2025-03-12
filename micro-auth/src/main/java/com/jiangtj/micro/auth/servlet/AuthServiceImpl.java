@@ -1,5 +1,6 @@
 package com.jiangtj.micro.auth.servlet;
 
+import com.jiangtj.micro.auth.annotations.Logic;
 import com.jiangtj.micro.auth.context.Authorization;
 import com.jiangtj.micro.auth.context.Subject;
 import com.jiangtj.micro.auth.core.AuthService;
@@ -26,13 +27,13 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void hasRole(String... roles) {
-        AuthUtils.hasRole(authHolder.getAuthContext(), roles);
+    public void hasRole(Logic logic, String... roles) {
+        AuthUtils.hasRole(authHolder.getAuthContext(), logic, roles);
     }
 
     @Override
-    public void hasPermission(String... permissions) {
-        AuthUtils.hasPermission(authHolder.getAuthContext(), permissions);
+    public void hasPermission(Logic logic, String... permissions) {
+        AuthUtils.hasPermission(authHolder.getAuthContext(), logic, permissions);
 
     }
 }

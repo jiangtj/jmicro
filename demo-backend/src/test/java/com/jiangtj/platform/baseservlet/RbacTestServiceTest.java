@@ -61,6 +61,7 @@ class RbacTestServiceTest {
         assertDoesNotThrow(() -> rbacTestService.hasLogin());
         assertThrows(BaseException.class, () -> rbacTestService.hasRoleA());
         assertDoesNotThrow(() -> rbacTestService.hasPermissionB());
+        assertThrows(BaseException.class, () -> rbacTestService.hasAdminOrUser());
     }
 
     @Test
@@ -69,5 +70,12 @@ class RbacTestServiceTest {
         assertDoesNotThrow(() -> rbacTestService.hasLogin());
         assertDoesNotThrow(() -> rbacTestService.hasAdmin());
         assertThrows(BaseException.class, () -> rbacTestService.hasRoleA());
+        assertDoesNotThrow(() -> rbacTestService.hasAdminOrUser());
+    }
+
+    @Test
+    @WithMockRole("user")
+    void testUser() {
+        assertDoesNotThrow(() -> rbacTestService.hasAdminOrUser());
     }
 }

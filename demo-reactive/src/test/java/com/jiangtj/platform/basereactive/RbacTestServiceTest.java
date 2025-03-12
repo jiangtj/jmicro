@@ -87,6 +87,9 @@ class RbacTestServiceTest {
         AuthStepVerifier.create(rbacTestService.hasPermissionB())
             .expectComplete()
             .verify();
+        AuthStepVerifier.create(rbacTestService.hasAdminOrUser())
+            .expectError(BaseException.class)
+            .verify();
     }
 
     @Test
@@ -100,6 +103,17 @@ class RbacTestServiceTest {
             .verify();
         AuthStepVerifier.create(rbacTestService.hasRoleA())
             .expectError(BaseException.class)
+            .verify();
+        AuthStepVerifier.create(rbacTestService.hasAdminOrUser())
+            .expectComplete()
+            .verify();
+    }
+
+    @Test
+    @WithMockRole("user")
+    void testUser() {
+        AuthStepVerifier.create(rbacTestService.hasAdminOrUser())
+            .expectComplete()
             .verify();
     }
 }

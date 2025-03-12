@@ -3,6 +3,7 @@ package com.jiangtj.micro.auth.servlet.rbac;
 import com.jiangtj.micro.auth.annotations.HasPermission;
 import com.jiangtj.micro.auth.core.AuthService;
 import com.jiangtj.micro.web.aop.AnnotationMethodBeforeAdvice;
+import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
@@ -23,9 +24,9 @@ public class HasPermissionAdvice extends AnnotationMethodBeforeAdvice<HasPermiss
     }
 
     @Override
-    public void before(@NonNull List<HasPermission> annotations, @NonNull Method method, @NonNull Object[] args, Object target) {
+    public void before(@NonNull List<HasPermission> annotations, @NonNull Method method, @NonNull Object[] args, @Nullable Object target) {
         for (HasPermission annotation : annotations) {
-            authService.hasPermission(annotation.value());
+            authService.hasPermission(annotation.logic(), annotation.value());
         }
     }
 

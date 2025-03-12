@@ -27,7 +27,7 @@ public class HasPermissionAdvice extends ReactiveAnnotationMethodBeforeAdvice<Ha
     @Override
     public Mono<Void> before(List<HasPermission> annotations, Method method, Object[] args, @Nullable Object target) {
         return Flux.fromIterable(annotations)
-            .flatMap(annotation -> authReactiveService.hasPermission(annotation.value()))
+            .flatMap(annotation -> authReactiveService.hasPermission(annotation.logic(), annotation.value()))
             .then();
     }
 
