@@ -1,6 +1,9 @@
 package com.jiangtj.micro.auth.reactive;
 
 import com.jiangtj.micro.auth.context.AuthContext;
+import com.jiangtj.micro.auth.context.Authorization;
+import com.jiangtj.micro.auth.context.Subject;
+import com.jiangtj.micro.auth.core.AuthReactiveService;
 import com.jiangtj.micro.auth.exceptions.AuthExceptionUtils;
 import com.jiangtj.micro.web.BaseExceptionUtils;
 import jakarta.annotation.Resource;
@@ -10,17 +13,29 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.function.Function;
 
-public class AuthReactorService {
+public class AuthReactiveServiceImpl implements AuthReactiveService {
 
     @Resource
-    private AuthReactorHolder authReactorHolder;
+    private AuthReactiveHolder authReactiveHolder;
+
+    @Override
+    public Mono<Subject> getSubject() {
+        return authReactiveHolder.deferAuthContext()
+            .map(AuthContext::subject);
+    }
+
+    @Override
+    public Mono<Authorization> getAuthorization() {
+        return authReactiveHolder.deferAuthContext()
+            .map(AuthContext::authorization);
+    }
 
     public <T> Function<T, Mono<T>> tokenTypeInterceptor(Class<?> type) {
         return t -> isTokenType(type).thenReturn(t);
     }
 
     public Mono<AuthContext> isTokenType(Class<?> type) {
-        return authReactorHolder.deferAuthContext()
+        return authReactiveHolder.deferAuthContext()
             .flatMap(tokenTypeHandler(type));
     }
 
@@ -41,9 +56,11 @@ public class AuthReactorService {
         return hasLogin().then(Mono.just(val));
     }
 
-    public Mono<AuthContext> hasLogin() {
-        return authReactorHolder.deferAuthContext()
-            .flatMap(hasLoginHandler());
+    @Override
+    public Mono<Void> hasLogin() {
+        return authReactiveHolder.deferAuthContext()
+            .flatMap(hasLoginHandler())
+            .then();
     }
 
     public Function<AuthContext, Mono<AuthContext>> hasLoginHandler() {
@@ -59,10 +76,12 @@ public class AuthReactorService {
         return t -> hasLogin(roles).thenReturn(t);
     }
 
-    public Mono<AuthContext> hasRole(String... roles) {
-        return authReactorHolder.deferAuthContext()
+    @Override
+    public Mono<Void> hasRole(String... roles) {
+        return authReactiveHolder.deferAuthContext()
             .cast(AuthContext.class)
-            .flatMap(hasRoleHandler(roles));
+            .flatMap(hasRoleHandler(roles))
+            .then();
     }
 
     public Function<AuthContext, Mono<AuthContext>> hasRoleHandler(String... roles) {
@@ -82,9 +101,11 @@ public class AuthReactorService {
         return t -> hasPermission(permissions).thenReturn(t);
     }
 
-    public Mono<AuthContext> hasPermission(String... permissions) {
-        return authReactorHolder.deferAuthContext()
-            .flatMap(hasPermissionHandler(permissions));
+    @Override
+    public Mono<Void> hasPermission(String... permissions) {
+        return authReactiveHolder.deferAuthContext()
+            .flatMap(hasPermissionHandler(permissions))
+            .then();
     }
 
     public Function<AuthContext, Mono<AuthContext>> hasPermissionHandler(String... permissions) {

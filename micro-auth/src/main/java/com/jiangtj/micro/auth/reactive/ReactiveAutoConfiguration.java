@@ -4,6 +4,7 @@ package com.jiangtj.micro.auth.reactive;
 import com.jiangtj.micro.auth.annotations.HasLogin;
 import com.jiangtj.micro.auth.annotations.HasPermission;
 import com.jiangtj.micro.auth.annotations.HasRole;
+import com.jiangtj.micro.auth.core.AuthReactiveService;
 import com.jiangtj.micro.auth.reactive.rbac.HasLoginAdvice;
 import com.jiangtj.micro.auth.reactive.rbac.HasPermissionAdvice;
 import com.jiangtj.micro.auth.reactive.rbac.HasRoleAdvice;
@@ -19,13 +20,13 @@ import org.springframework.context.annotation.Bean;
 public class ReactiveAutoConfiguration {
 
     @Bean
-    public AuthReactorHolder authReactorHolder() {
-        return new AuthReactorHolder();
+    public AuthReactiveHolder authReactorHolder() {
+        return new AuthReactiveHolder();
     }
 
     @Bean
-    public AuthReactorService authReactorService() {
-        return new AuthReactorService();
+    public AuthReactiveService authReactorService() {
+        return new AuthReactiveServiceImpl();
     }
 
 

@@ -2,7 +2,7 @@ package com.jiangtj.platform.basereactive;
 
 import com.jiangtj.micro.auth.casdoor.CasdoorAuthService;
 import com.jiangtj.micro.auth.casdoor.CasdoorUserContextImpl;
-import com.jiangtj.micro.auth.reactive.AuthReactorHolder;
+import com.jiangtj.micro.auth.reactive.AuthReactiveHolder;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.casbin.casdoor.entity.User;
@@ -19,7 +19,7 @@ public class CasdoorController {
     @Resource
     private CasdoorAuthService casdoorAuthService;
     @Resource
-    private AuthReactorHolder authReactorHolder;
+    private AuthReactiveHolder authReactiveHolder;
 
     @GetMapping("toLogin")
     public Mono<String> toLogin(String redirectUrl) {
@@ -28,7 +28,7 @@ public class CasdoorController {
 
     @GetMapping("user")
     public Mono<User> user() {
-        return authReactorHolder.deferAuthContext()
+        return authReactiveHolder.deferAuthContext()
             .cast(CasdoorUserContextImpl.class)
             .map(CasdoorUserContextImpl::getCasdoorUser);
     }

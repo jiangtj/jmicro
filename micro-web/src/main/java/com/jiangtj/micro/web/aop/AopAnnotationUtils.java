@@ -1,7 +1,7 @@
 package com.jiangtj.micro.web.aop;
 
 import com.jiangtj.micro.web.AnnotationUtils;
-import org.aopalliance.intercept.MethodInvocation;
+import jakarta.annotation.Nullable;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
@@ -13,10 +13,8 @@ import java.util.Optional;
 
 public interface AopAnnotationUtils {
 
-    static <A extends Annotation> List<A> findAnnotation(MethodInvocation invocation, Class<A> aClass) {
+    static <A extends Annotation> List<A> findAnnotation(Class<A> aClass, Method method, @Nullable Object target) {
         List<A> list = new ArrayList<>();
-        Method method = invocation.getMethod();
-        Object target = invocation.getThis();
 
         Target targets = aClass.getAnnotation(Target.class);
         ElementType[] elementTypes = targets.value();

@@ -1,29 +1,25 @@
 package com.jiangtj.micro.auth.reactive.rbac;
 
-import com.jiangtj.micro.auth.context.AuthContext;
-import com.jiangtj.micro.auth.reactive.AuthReactorHolder;
-import com.jiangtj.micro.auth.reactive.AuthReactorService;
+import com.jiangtj.micro.auth.core.AuthReactiveService;
+import com.jiangtj.micro.auth.reactive.aop.ReactiveMethodBeforeAdvice;
+import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.aopalliance.intercept.MethodInterceptor;
-import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.core.Ordered;
+import org.springframework.lang.NonNull;
 import reactor.core.publisher.Mono;
 
+import java.lang.reflect.Method;
+
 @Slf4j
-public class HasLoginAdvice implements MethodInterceptor, Ordered {
+public class HasLoginAdvice extends ReactiveMethodBeforeAdvice implements Ordered {
 
     @Resource
-    private AuthReactorHolder authReactorHolder;
-    @Resource
-    private AuthReactorService authReactorService;
+    private AuthReactiveService authReactiveService;
 
     @Override
-    public Object invoke(MethodInvocation invocation) throws Throwable {
-        Mono<AuthContext> context = authReactorHolder.deferAuthContext()
-                .flatMap(ctx -> authReactorService.hasLoginHandler().apply(ctx));
-
-        return MethodInvocationUtils.handleAdvice(context, invocation);
+    public Mono<Void> before(@NonNull Method method, @NonNull Object[] args, @Nullable Object target) throws Throwable {
+        return authReactiveService.hasLogin();
     }
 
     @Override

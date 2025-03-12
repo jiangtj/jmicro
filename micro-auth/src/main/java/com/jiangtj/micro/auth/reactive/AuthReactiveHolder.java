@@ -8,7 +8,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Optional;
 
-public class AuthReactorHolder {
+public class AuthReactiveHolder {
 
     @Resource
     private AuthContextFactory factory;
