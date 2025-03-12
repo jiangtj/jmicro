@@ -1,5 +1,6 @@
 package com.jiangtj.micro.auth;
 
+@Deprecated
 public interface KeyUtils {
 
     static String toKey(String name) {

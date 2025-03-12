@@ -31,13 +31,13 @@ public class BaseController {
         return Mono.just("这个请求需要token");
     }
 
-    @HasRole("role-test-1")
+    @HasRole("role-test1")
     @GetMapping("/role-test-1")
     public Mono<String> needRole1(){
         return Mono.just("这个请求需要 role-test-1");
     }
 
-    @HasRole("role-test-2")
+    @HasRole("role-test2")
     @GetMapping("/role-test-2")
     public Mono<String> needRole2(){
         return Mono.just("这个请求需要 role-test-2");

@@ -1,6 +1,5 @@
 package com.jiangtj.micro.auth.reactive;
 
-import com.jiangtj.micro.auth.KeyUtils;
 import com.jiangtj.micro.auth.context.AuthContext;
 import com.jiangtj.micro.auth.exceptions.AuthExceptionUtils;
 import com.jiangtj.micro.web.BaseExceptionUtils;
@@ -70,7 +69,6 @@ public class AuthReactorService {
         return ctx -> {
             List<String> userRoles = ctx.authorization().roles();
             return Flux.just(roles)
-                .map(KeyUtils::toKey)
                 .doOnNext(role -> {
                     if (!userRoles.contains(role)) {
                         throw AuthExceptionUtils.noRole(role);
@@ -93,7 +91,6 @@ public class AuthReactorService {
         return ctx -> {
             List<String> userPermissions = ctx.authorization().permissions();
             return Flux.just(permissions)
-                .map(KeyUtils::toKey)
                 .doOnNext(perm -> {
                     if (!userPermissions.contains(perm)) {
                         throw AuthExceptionUtils.noPermission(perm);

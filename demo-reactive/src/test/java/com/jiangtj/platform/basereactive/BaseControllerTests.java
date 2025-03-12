@@ -67,7 +67,7 @@ class BaseControllerTests {
     void testNotHaveRoleAnnotations() {
         client.get().uri("/role-test-2")
             .exchange()
-            .expectAll(ProblemDetailConsumer.unRole("roletest2").expect());
+            .expectAll(ProblemDetailConsumer.unRole("role-test2").expect());
     }
 
 }
