@@ -1,7 +1,7 @@
 package com.jiangtj.micro.auth.reactive.rbac;
 
 import com.jiangtj.micro.auth.core.AuthReactiveService;
-import com.jiangtj.micro.auth.reactive.aop.ReactiveMethodBeforeAdvice;
+import com.jiangtj.micro.web.aop.ReactiveMethodBeforeAdvice;
 import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
