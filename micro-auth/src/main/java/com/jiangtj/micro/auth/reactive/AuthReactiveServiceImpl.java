@@ -4,13 +4,10 @@ import com.jiangtj.micro.auth.context.AuthContext;
 import com.jiangtj.micro.auth.context.Authorization;
 import com.jiangtj.micro.auth.context.Subject;
 import com.jiangtj.micro.auth.core.AuthReactiveService;
-import com.jiangtj.micro.auth.exceptions.AuthExceptionUtils;
-import com.jiangtj.micro.web.BaseExceptionUtils;
+import com.jiangtj.micro.auth.core.AuthUtils;
 import jakarta.annotation.Resource;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.function.Function;
 
 public class AuthReactiveServiceImpl implements AuthReactiveService {
@@ -30,24 +27,6 @@ public class AuthReactiveServiceImpl implements AuthReactiveService {
             .map(AuthContext::authorization);
     }
 
-    public <T> Function<T, Mono<T>> tokenTypeInterceptor(Class<?> type) {
-        return t -> isTokenType(type).thenReturn(t);
-    }
-
-    public Mono<AuthContext> isTokenType(Class<?> type) {
-        return authReactiveHolder.deferAuthContext()
-            .flatMap(tokenTypeHandler(type));
-    }
-
-    public Function<AuthContext, Mono<AuthContext>> tokenTypeHandler(Class<?> type) {
-        return ctx -> {
-            if (!type.isInstance(ctx)) {
-                return Mono.error(BaseExceptionUtils.forbidden("不允许访问 todo"));
-            }
-            return Mono.just(ctx);
-        };
-    }
-
     public <T> Function<T, Mono<T>> loginInterceptor() {
         return t -> hasLogin().thenReturn(t);
     }
@@ -65,9 +44,7 @@ public class AuthReactiveServiceImpl implements AuthReactiveService {
 
     public Function<AuthContext, Mono<AuthContext>> hasLoginHandler() {
         return ctx -> {
-            if (!ctx.isLogin()) {
-                return Mono.error(AuthExceptionUtils.unLogin());
-            }
+            AuthUtils.hasLogin(ctx);
             return Mono.just(ctx);
         };
     }
@@ -86,14 +63,8 @@ public class AuthReactiveServiceImpl implements AuthReactiveService {
 
     public Function<AuthContext, Mono<AuthContext>> hasRoleHandler(String... roles) {
         return ctx -> {
-            List<String> userRoles = ctx.authorization().roles();
-            return Flux.just(roles)
-                .doOnNext(role -> {
-                    if (!userRoles.contains(role)) {
-                        throw AuthExceptionUtils.noRole(role);
-                    }
-                })
-                .then(Mono.just(ctx));
+            AuthUtils.hasRole(ctx, roles);
+            return Mono.just(ctx);
         };
     }
 
@@ -110,14 +81,8 @@ public class AuthReactiveServiceImpl implements AuthReactiveService {
 
     public Function<AuthContext, Mono<AuthContext>> hasPermissionHandler(String... permissions) {
         return ctx -> {
-            List<String> userPermissions = ctx.authorization().permissions();
-            return Flux.just(permissions)
-                .doOnNext(perm -> {
-                    if (!userPermissions.contains(perm)) {
-                        throw AuthExceptionUtils.noPermission(perm);
-                    }
-                })
-                .then(Mono.just(ctx));
+            AuthUtils.hasPermission(ctx, permissions);
+            return Mono.just(ctx);
         };
     }
 

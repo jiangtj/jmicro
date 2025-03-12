@@ -3,6 +3,7 @@ package com.jiangtj.micro.auth.servlet;
 import com.jiangtj.micro.auth.context.Authorization;
 import com.jiangtj.micro.auth.context.Subject;
 import com.jiangtj.micro.auth.core.AuthService;
+import com.jiangtj.micro.auth.core.AuthUtils;
 import jakarta.annotation.Resource;
 
 public class ServletAuthService implements AuthService {

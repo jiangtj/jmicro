@@ -1,4 +1,4 @@
-package com.jiangtj.micro.auth.servlet;
+package com.jiangtj.micro.auth.core;
 
 import com.jiangtj.micro.auth.context.AuthContext;
 import com.jiangtj.micro.auth.exceptions.AuthExceptionUtils;
