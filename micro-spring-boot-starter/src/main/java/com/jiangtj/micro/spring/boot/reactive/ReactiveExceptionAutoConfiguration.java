@@ -18,9 +18,4 @@ public class ReactiveExceptionAutoConfiguration {
         return new NoViewResponseContext();
     }
 
-    @Bean
-    public FixServerWebExchangeContext fixServerWebExchangeContext() {
-        return new FixServerWebExchangeContext();
-    }
-
 }
