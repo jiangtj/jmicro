@@ -6,25 +6,21 @@ import com.jiangtj.micro.auth.context.Authorization;
 import com.jiangtj.micro.auth.context.Subject;
 import com.jiangtj.micro.auth.core.AuthReactiveService;
 import com.jiangtj.micro.auth.core.AuthUtils;
-import jakarta.annotation.Resource;
 import reactor.core.publisher.Mono;
 
 import java.util.function.Function;
 
 public class AuthReactiveServiceImpl implements AuthReactiveService {
 
-    @Resource
-    private AuthReactiveHolder authReactiveHolder;
-
     @Override
     public Mono<Subject> getSubject() {
-        return authReactiveHolder.deferAuthContext()
+        return AuthReactiveHolder.deferAuthContext()
             .map(AuthContext::subject);
     }
 
     @Override
     public Mono<Authorization> getAuthorization() {
-        return authReactiveHolder.deferAuthContext()
+        return AuthReactiveHolder.deferAuthContext()
             .map(AuthContext::authorization);
     }
 
@@ -38,7 +34,7 @@ public class AuthReactiveServiceImpl implements AuthReactiveService {
 
     @Override
     public Mono<Void> hasLogin() {
-        return authReactiveHolder.deferAuthContext()
+        return AuthReactiveHolder.deferAuthContext()
             .flatMap(hasLoginHandler())
             .then();
     }
@@ -56,7 +52,7 @@ public class AuthReactiveServiceImpl implements AuthReactiveService {
 
     @Override
     public Mono<Void> hasRole(Logic logic, String... roles) {
-        return authReactiveHolder.deferAuthContext()
+        return AuthReactiveHolder.deferAuthContext()
             .cast(AuthContext.class)
             .flatMap(hasRoleHandler(logic, roles))
             .then();
@@ -75,7 +71,7 @@ public class AuthReactiveServiceImpl implements AuthReactiveService {
 
     @Override
     public Mono<Void> hasPermission(Logic logic, String... permissions) {
-        return authReactiveHolder.deferAuthContext()
+        return AuthReactiveHolder.deferAuthContext()
             .flatMap(hasPermissionHandler(logic, permissions))
             .then();
     }

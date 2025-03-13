@@ -18,8 +18,6 @@ public class CasdoorController {
 
     @Resource
     private CasdoorAuthService casdoorAuthService;
-    @Resource
-    private AuthReactiveHolder authReactiveHolder;
 
     @GetMapping("toLogin")
     public Mono<String> toLogin(String redirectUrl) {
@@ -28,7 +26,7 @@ public class CasdoorController {
 
     @GetMapping("user")
     public Mono<User> user() {
-        return authReactiveHolder.deferAuthContext()
+        return AuthReactiveHolder.deferAuthContext()
             .cast(CasdoorUserContextImpl.class)
             .map(CasdoorUserContextImpl::getCasdoorUser);
     }
