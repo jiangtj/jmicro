@@ -36,6 +36,11 @@ public class ReactiveAutoConfiguration {
         return new ServerWebExchangeContextFixFilter();
     }
 
+    @Bean
+    public ReactiveAuthContextFilter reactiveAuthContextFilter() {
+        return new ReactiveAuthContextFilter();
+    }
+
 
     @Bean
     public HasLoginAdvice hasLoginAdvice() {

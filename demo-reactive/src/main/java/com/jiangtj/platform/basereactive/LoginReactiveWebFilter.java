@@ -4,6 +4,7 @@ import com.jiangtj.micro.auth.AntPathMatcherUtils;
 import com.jiangtj.micro.auth.core.AuthReactiveService;
 import jakarta.annotation.Resource;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
@@ -24,10 +25,14 @@ public class LoginReactiveWebFilter implements WebFilter {
     public Mono<Void> filter(ServerWebExchange exchange, @NotNull WebFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
 
+        if (request.getMethod() == HttpMethod.OPTIONS) {
+            return chain.filter(exchange);
+        }
+
         String path = request.getPath().value();
         if (!AntPathMatcherUtils.match(path,
             List.of("/**"),
-            List.of("/", "/insecure/**"))) {
+            List.of("/", "/insecure/**", "/toLogin", "/login"))) {
             return chain.filter(exchange);
         }
 

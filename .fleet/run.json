@@ -28,34 +28,22 @@
             "module": "micro-auth"
         },
         {
+            "name": "Build auth casdoor",
+            "type": "jps-build",
+            "workingDir": "$PROJECT_DIR$",
+            "module": "micro-auth-casdoor"
+        },
+        {
             "name": "Build jooq",
             "type": "jps-build",
             "workingDir": "$PROJECT_DIR$",
             "module": "micro-sql-jooq"
         },
         {
-            "name": "Build r2dbc",
-            "type": "jps-build",
-            "workingDir": "$PROJECT_DIR$",
-            "module": "micro-sql-r2dbc"
-        },
-        {
             "name": "Build boot starter",
             "type": "jps-build",
             "workingDir": "$PROJECT_DIR$",
             "module": "micro-spring-boot-starter"
-        },
-        {
-            "name": "Build cloud starter",
-            "type": "jps-build",
-            "workingDir": "$PROJECT_DIR$",
-            "module": "micro-spring-cloud-starter"
-        },
-        {
-            "name": "Build core-server",
-            "type": "jps-build",
-            "workingDir": "$PROJECT_DIR$",
-            "module": "core-server"
         },
         {
             "name": "Test all module",
