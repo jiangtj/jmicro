@@ -1,6 +1,5 @@
 package com.jiangtj.platform.basereactive;
 
-import com.jiangtj.micro.auth.annotations.HasLogin;
 import com.jiangtj.micro.auth.annotations.HasRole;
 import com.jiangtj.micro.web.BaseExceptionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,7 +24,6 @@ public class BaseController {
         throw new RuntimeException("系统错误");
     }
 
-    @HasLogin
     @GetMapping("/needtoken")
     public Mono<String> needToken(){
         return Mono.just("这个请求需要token");

@@ -1,13 +1,23 @@
 package com.jiangtj.platform.baseservlet;
 
-import com.jiangtj.micro.auth.servlet.ServletLoginFilter;
-import org.springframework.context.annotation.Bean;
+import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
+
+    @Resource
+    private LoginHandlerInterceptor loginHandlerInterceptor;
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(loginHandlerInterceptor)
+            .addPathPatterns("/**")
+            .excludePathPatterns("/", "/insecure/**", "/anno/**", "/food/**", "/toLogin", "/login");
+    }
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
@@ -15,12 +25,5 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOrigins("*")
                 .allowedHeaders("*")
                 .allowedMethods("*");
-    }
-
-    @Bean
-    public ServletLoginFilter servletLoginFilter() {
-        return new ServletLoginFilter.builder()
-            .without("/", "/insecure/**", "/anno/**", "/food/**", "/toLogin", "/login")
-            .build();
     }
 }
