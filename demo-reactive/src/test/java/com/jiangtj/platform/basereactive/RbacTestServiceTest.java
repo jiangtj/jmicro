@@ -1,8 +1,9 @@
 package com.jiangtj.platform.basereactive;
 
+import com.jiangtj.micro.auth.exceptions.NoPermissionException;
+import com.jiangtj.micro.auth.exceptions.NoRoleException;
 import com.jiangtj.micro.auth.exceptions.UnLoginException;
 import com.jiangtj.micro.test.*;
-import com.jiangtj.micro.web.BaseException;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -36,10 +37,10 @@ class RbacTestServiceTest {
             .expectComplete()
             .verify();
         AuthStepVerifier.create(rbacTestService.hasRoleA())
-            .expectError(BaseException.class)
+            .expectError(NoRoleException.class)
             .verify();
         AuthStepVerifier.create(rbacTestService.hasPermissionB())
-            .expectError(BaseException.class)
+            .expectError(NoPermissionException.class)
             .verify();
     }
 
@@ -54,7 +55,7 @@ class RbacTestServiceTest {
             .expectComplete()
             .verify();
         AuthStepVerifier.create(rbacTestService.hasPermissionB())
-            .expectError(BaseException.class)
+            .expectError(NoPermissionException.class)
             .verify();
     }
 
@@ -66,7 +67,7 @@ class RbacTestServiceTest {
             .expectComplete()
             .verify();
         AuthStepVerifier.create(rbacTestService.hasRoleA())
-            .expectError(BaseException.class)
+            .expectError(NoRoleException.class)
             .verify();
         AuthStepVerifier.create(rbacTestService.hasPermissionB())
             .expectComplete()
@@ -82,13 +83,13 @@ class RbacTestServiceTest {
             .expectComplete()
             .verify();
         AuthStepVerifier.create(rbacTestService.hasRoleA())
-            .expectError(BaseException.class)
+            .expectError(NoRoleException.class)
             .verify();
         AuthStepVerifier.create(rbacTestService.hasPermissionB())
             .expectComplete()
             .verify();
         AuthStepVerifier.create(rbacTestService.hasAdminOrUser())
-            .expectError(BaseException.class)
+            .expectError(NoRoleException.class)
             .verify();
     }
 
@@ -102,7 +103,7 @@ class RbacTestServiceTest {
             .expectComplete()
             .verify();
         AuthStepVerifier.create(rbacTestService.hasRoleA())
-            .expectError(BaseException.class)
+            .expectError(NoRoleException.class)
             .verify();
         AuthStepVerifier.create(rbacTestService.hasAdminOrUser())
             .expectComplete()

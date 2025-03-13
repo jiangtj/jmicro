@@ -10,7 +10,7 @@ public class AuthExceptionUtils {
     /**
      * 401 未登录
      */
-    public static BaseException unLogin() {
+    public static UnLoginException unLogin() {
         return new UnLoginException();
     }
 
@@ -33,21 +33,17 @@ public class AuthExceptionUtils {
     }
 
     /**
-     * 403 No Permission
+     * 403 No Role
      */
-    public static BaseException noRole(String role) {
-        BaseException exception = BaseExceptionUtils.forbidden(String.format("Don't have role<%s>.", role));
-        exception.setTitle("No Role");
-        return exception;
+    public static NoRoleException noRole(String role) {
+        return new NoRoleException(role);
     }
 
     /**
      * 403 No Permission
      */
-    public static BaseException noPermission(String permission) {
-        BaseException exception = BaseExceptionUtils.forbidden(String.format("Don't have permission<%s>.", permission));
-        exception.setTitle("No Permission");
-        return exception;
+    public static NoPermissionException noPermission(String permission) {
+        return new NoPermissionException(permission);
     }
 
 }

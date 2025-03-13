@@ -1,11 +1,12 @@
 package com.jiangtj.platform.baseservlet;
 
+import com.jiangtj.micro.auth.exceptions.NoPermissionException;
+import com.jiangtj.micro.auth.exceptions.NoRoleException;
 import com.jiangtj.micro.auth.exceptions.UnLoginException;
 import com.jiangtj.micro.test.JMicroTest;
 import com.jiangtj.micro.test.WithMockPermission;
 import com.jiangtj.micro.test.WithMockRole;
 import com.jiangtj.micro.test.WithMockUser;
-import com.jiangtj.micro.web.BaseException;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -31,8 +32,8 @@ class RbacTestServiceTest {
     @WithMockUser
     void testOnlyLogin() {
         assertDoesNotThrow(() -> rbacTestService.hasLogin());
-        assertThrows(BaseException.class, () -> rbacTestService.hasRoleA());
-        assertThrows(BaseException.class, () -> rbacTestService.hasPermissionB());
+        assertThrows(NoRoleException.class, () -> rbacTestService.hasRoleA());
+        assertThrows(NoPermissionException.class, () -> rbacTestService.hasPermissionB());
     }
 
     @Test
@@ -41,7 +42,7 @@ class RbacTestServiceTest {
     void testHasA() {
         assertDoesNotThrow(() -> rbacTestService.hasLogin());
         assertDoesNotThrow(() -> rbacTestService.hasRoleA());
-        assertThrows(BaseException.class, () -> rbacTestService.hasPermissionB());
+        assertThrows(NoPermissionException.class, () -> rbacTestService.hasPermissionB());
     }
 
     @Test
@@ -49,7 +50,7 @@ class RbacTestServiceTest {
     @WithMockPermission("permissionB")
     void testHasB() {
         assertDoesNotThrow(() -> rbacTestService.hasLogin());
-        assertThrows(BaseException.class, () -> rbacTestService.hasRoleA());
+        assertThrows(NoRoleException.class, () -> rbacTestService.hasRoleA());
         assertDoesNotThrow(() -> rbacTestService.hasPermissionB());
     }
 
@@ -59,9 +60,9 @@ class RbacTestServiceTest {
     @WithMockPermission("permissionB")
     void testOver() {
         assertDoesNotThrow(() -> rbacTestService.hasLogin());
-        assertThrows(BaseException.class, () -> rbacTestService.hasRoleA());
+        assertThrows(NoRoleException.class, () -> rbacTestService.hasRoleA());
         assertDoesNotThrow(() -> rbacTestService.hasPermissionB());
-        assertThrows(BaseException.class, () -> rbacTestService.hasAdminOrUser());
+        assertThrows(NoRoleException.class, () -> rbacTestService.hasAdminOrUser());
     }
 
     @Test
@@ -69,7 +70,7 @@ class RbacTestServiceTest {
     void testCustomAnno() {
         assertDoesNotThrow(() -> rbacTestService.hasLogin());
         assertDoesNotThrow(() -> rbacTestService.hasAdmin());
-        assertThrows(BaseException.class, () -> rbacTestService.hasRoleA());
+        assertThrows(NoRoleException.class, () -> rbacTestService.hasRoleA());
         assertDoesNotThrow(() -> rbacTestService.hasAdminOrUser());
     }
 
