@@ -1,5 +1,7 @@
 package com.jiangtj.platform.baseservlet;
 
+import com.jiangtj.micro.auth.core.AuthService;
+import com.jiangtj.micro.spring.boot.servlet.FunctionHandlerInterceptor;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -10,11 +12,17 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
 
     @Resource
-    private LoginHandlerInterceptor loginHandlerInterceptor;
+    private AuthService authService;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(loginHandlerInterceptor)
+        registry.addInterceptor(FunctionHandlerInterceptor.preHandle((request, response, handler) -> {
+                if ("options".equalsIgnoreCase(request.getMethod())) {
+                    return true;
+                }
+                authService.hasLogin();
+                return true;
+            }))
             .addPathPatterns("/**")
             .excludePathPatterns("/", "/insecure/**", "/anno/**", "/food/**", "/toLogin", "/login");
     }

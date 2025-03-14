@@ -109,6 +109,27 @@ public class MyConfiguration {
 
 > Tip: 这是对过滤器的扩展，所以不仅仅能用于鉴权，任何你希望过滤的场景，都可以使用这个过滤器
 
+在传统的 servlet 中，一般使用拦截器对请求进行拦截，Spring 已经对 Ant Path 匹配风格做了适配，而我们鉴权这块也很简单，仅仅调用一个方法即可，所以，对于 servlet 不进行过度封装，仅提供一个 Function 工具类
+
+```java
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+    
+    @Resource
+    private AuthService authService;
+    
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(FunctionHandlerInterceptor.preHandle((request, response, handler) -> {
+                authService.hasLogin();
+                return true;
+            }))
+            .addPathPatterns("/**")
+            .excludePathPatterns("/", "/login");
+    }
+}
+```
+
 #### Jooq 扩展
 
 ```xml
