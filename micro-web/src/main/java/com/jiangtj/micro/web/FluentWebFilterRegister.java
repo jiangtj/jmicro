@@ -38,28 +38,37 @@ public class FluentWebFilterRegister implements WebFilter {
             invokeFilter(filter, path, collect);
         });
 
+        if (collect.isEmpty()) {
+            return chain.filter(exchange);
+        }
+
+
         FluentWebFilterChain fluentChain = new FluentWebFilterChain(collect, chain.filter(exchange));
         return fluentChain.filter(exchange);
     }
 
     private void invokeFilter(FluentWebFilter filter, String path, List<FluentWebFilter> collect) {
+        // 存在 exclude，且任意匹配到都不执行过滤
         List<String> exclude = filter.getExclude();
         if (!CollectionUtils.isEmpty(exclude)) {
-            for (String ex: exclude) {
-                if (matcher.match(ex, path)) {
-                    return;
-                }
-            }
+            boolean anyMatch = exclude.stream()
+                .anyMatch(p -> matcher.match(p, path));
+            if (anyMatch) return;
         }
         collect.add(filter);
         List<FluentWebFilter.FluentWebFilterPath> paths = filter.getPaths();
         if (!CollectionUtils.isEmpty(paths)) {
             paths.forEach(filterPath -> {
-                for (String in: filterPath.getInclude()) {
-                    if (matcher.match(in, path)) {
-                        invokeFilter(filterPath.getNest(), path, collect);
-                        return;
-                    }
+                List<String> include = filterPath.getInclude();
+                // 需要 include，且任意匹配到都不执行过滤
+                if (CollectionUtils.isEmpty(include)) {
+                    return;
+                }
+                // 任意匹配到都需要执行过滤
+                boolean anyMatch = include.stream()
+                    .anyMatch(p -> matcher.match(p, path));
+                if (anyMatch) {
+                    invokeFilter(filterPath.getNest(), path, collect);
                 }
             });
         }
