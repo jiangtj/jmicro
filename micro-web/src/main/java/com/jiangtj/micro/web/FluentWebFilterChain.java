@@ -72,7 +72,7 @@ public class FluentWebFilterChain implements WebFilterChain {
 
     private Mono<Void> invokeFilter(FluentWebFilter current, FluentWebFilterChain chain, ServerWebExchange exchange) {
         String currentName = current.getClass().getName();
-        return current.getAction().filter(exchange, chain).checkpoint(currentName + " [DefaultWebFilterChain]");
+        return current.getAction().filter(exchange, chain).checkpoint(currentName + " [FluentWebFilterChain]");
     }
 
 }
