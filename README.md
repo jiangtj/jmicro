@@ -88,6 +88,27 @@ class Test {
 
 `micro-auth-casdoor` 是这个鉴权模块的扩展，用于支持casdoor的token认证，你可以参考他创建自己的鉴权模块
 
+#### Web 模块
+
+在响应式编程中，提供 `FluentWebFilter`，方便用户在过滤器中使用权限的场景，你可以向下面一样，十分轻松的实现过滤器的配置
+
+```java
+@Configuration
+public class MyConfiguration {
+    @Bean
+    public FluentWebFilter fluentWebFilter(AuthReactiveService authReactiveService) {
+        return FluentWebFilter.create()
+            .exclude("/", "/login")
+            .action((exchange, chain) ->
+                authReactiveService.hasLogin().then(chain.filter(exchange)))
+            .path("/roleA/**").action((exchange, chain) ->
+                authReactiveService.hasRole("roleA").then(chain.filter(exchange)));
+    }
+}
+```
+
+> Tip: 这是对过滤器的扩展，所以不仅仅能用于鉴权，任何你希望过滤的场景，都可以使用这个过滤器
+
 #### Jooq 扩展
 
 ```xml

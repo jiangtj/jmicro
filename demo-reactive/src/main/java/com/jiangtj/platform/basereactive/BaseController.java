@@ -29,7 +29,8 @@ public class BaseController {
         return Mono.just("这个请求需要token");
     }
 
-    @HasRole("role-test1")
+    // 测试在FluentWebFilter中配置
+    // @HasRole("role-test1")
     @GetMapping("/role-test-1")
     public Mono<String> needRole1(){
         return Mono.just("这个请求需要 role-test-1");
