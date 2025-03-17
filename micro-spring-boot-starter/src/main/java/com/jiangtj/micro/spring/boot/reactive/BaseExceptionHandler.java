@@ -7,6 +7,7 @@ import com.jiangtj.micro.web.Orders;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
+import org.springframework.lang.NonNull;
 import org.springframework.web.ErrorResponseException;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebExchange;
@@ -21,7 +22,8 @@ public class BaseExceptionHandler implements WebExceptionHandler {
     private NoViewResponseContext context;
 
     @Override
-    public Mono<Void> handle(ServerWebExchange exchange, Throwable throwable) {
+    @NonNull
+    public Mono<Void> handle(@NonNull ServerWebExchange exchange, @NonNull Throwable throwable) {
         if (throwable instanceof ErrorResponseException bex) {
             URIUtils.update(bex, exchange);
             log.error(JsonUtils.toJson(bex.getBody()));

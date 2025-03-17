@@ -1,7 +1,6 @@
 package com.jiangtj.micro.test;
 
 import com.jiangtj.micro.auth.context.AuthContext;
-import com.jiangtj.micro.auth.context.RoleProvider;
 
 public class TestAuthContextHolder {
 

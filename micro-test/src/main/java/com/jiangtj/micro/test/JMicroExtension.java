@@ -1,16 +1,13 @@
 package com.jiangtj.micro.test;
 
-import com.jiangtj.micro.web.AnnotationUtils;
 import org.junit.jupiter.api.extension.*;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.lang.reflect.Method;
-
 public class JMicroExtension implements BeforeEachCallback,
-    BeforeTestExecutionCallback,
-    AfterTestExecutionCallback,
-    AfterEachCallback {
+        BeforeTestExecutionCallback,
+        AfterTestExecutionCallback,
+        AfterEachCallback {
 
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {

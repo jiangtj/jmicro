@@ -1,8 +1,8 @@
 package com.jiangtj.micro.web.filter;
 
-import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.lang.NonNull;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ServerWebExchange;
@@ -23,9 +23,9 @@ public class FluentWebFilterRegister implements WebFilter {
         this.filters = filters;
     }
 
-    @NotNull
+    @NonNull
     @Override
-    public Mono<Void> filter(@NotNull ServerWebExchange exchange, @NotNull WebFilterChain chain) {
+    public Mono<Void> filter(@NonNull ServerWebExchange exchange, @NonNull WebFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
 
         if (request.getMethod() == HttpMethod.OPTIONS) {
@@ -42,7 +42,6 @@ public class FluentWebFilterRegister implements WebFilter {
             return chain.filter(exchange);
         }
 
-
         FluentWebFilterChain fluentChain = new FluentWebFilterChain(collect, chain.filter(exchange));
         return fluentChain.filter(exchange);
     }
@@ -52,8 +51,9 @@ public class FluentWebFilterRegister implements WebFilter {
         List<String> exclude = filter.getExclude();
         if (!CollectionUtils.isEmpty(exclude)) {
             boolean anyMatch = exclude.stream()
-                .anyMatch(p -> matcher.match(p, path));
-            if (anyMatch) return;
+                    .anyMatch(p -> matcher.match(p, path));
+            if (anyMatch)
+                return;
         }
         collect.add(filter);
         List<FluentWebFilter.FluentWebFilterPath> paths = filter.getPaths();
@@ -66,7 +66,7 @@ public class FluentWebFilterRegister implements WebFilter {
                 }
                 // 任意匹配到都需要执行过滤
                 boolean anyMatch = include.stream()
-                    .anyMatch(p -> matcher.match(p, path));
+                        .anyMatch(p -> matcher.match(p, path));
                 if (anyMatch) {
                     invokeFilter(filterPath.getNest(), path, collect);
                 }

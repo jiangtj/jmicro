@@ -14,7 +14,6 @@ public class MobilePhoneStringValidator implements ConstraintValidator<MobilePho
         if (value == null) {
             return true;
         }
-        String defaultConstraintMessageTemplate = context.getDefaultConstraintMessageTemplate();
         return p.matcher(value).matches();
     }
 }

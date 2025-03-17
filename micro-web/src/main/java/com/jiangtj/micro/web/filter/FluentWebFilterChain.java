@@ -15,19 +15,17 @@
  */
 package com.jiangtj.micro.web.filter;
 
-import org.jetbrains.annotations.NotNull;
+import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 
 public class FluentWebFilterChain implements WebFilterChain {
 
-    private final List<FluentWebFilter> allFilters;
     @Nullable
     private final FluentWebFilter currentFilter;
     @Nullable
@@ -35,7 +33,6 @@ public class FluentWebFilterChain implements WebFilterChain {
     private final Mono<Void> out;
 
     public FluentWebFilterChain(List<FluentWebFilter> filters, Mono<Void> out) {
-        this.allFilters = Collections.unmodifiableList(filters);
         FluentWebFilterChain chain = initChain(filters, out);
         this.currentFilter = chain.currentFilter;
         this.chain = chain.chain;
@@ -55,19 +52,19 @@ public class FluentWebFilterChain implements WebFilterChain {
      * Private constructor to represent one link in the chain.
      */
     private FluentWebFilterChain(List<FluentWebFilter> allFilters,
-                                  @Nullable FluentWebFilter currentFilter, @Nullable FluentWebFilterChain chain, Mono<Void> out) {
+            @Nullable FluentWebFilter currentFilter, @Nullable FluentWebFilterChain chain, Mono<Void> out) {
 
-        this.allFilters = allFilters;
         this.currentFilter = currentFilter;
         this.chain = chain;
         this.out = out;
     }
 
     @Override
-    public @NotNull Mono<Void> filter(@NotNull ServerWebExchange exchange) {
-        return Mono.defer(() ->
-            this.currentFilter != null && this.chain != null ?
-                invokeFilter(this.currentFilter, this.chain, exchange) : out);
+    @NonNull
+    public Mono<Void> filter(@NonNull ServerWebExchange exchange) {
+        return Mono.defer(() -> this.currentFilter != null && this.chain != null
+                ? invokeFilter(this.currentFilter, this.chain, exchange)
+                : out);
     }
 
     private Mono<Void> invokeFilter(FluentWebFilter current, FluentWebFilterChain chain, ServerWebExchange exchange) {

@@ -3,11 +3,11 @@ package com.jiangtj.micro.auth.casdoor;
 import com.jiangtj.micro.auth.AuthRequestAttributes;
 import com.jiangtj.micro.auth.context.AuthContext;
 import com.jiangtj.micro.auth.context.AuthContextConverter;
-import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import org.casbin.casdoor.entity.User;
 import org.casbin.casdoor.service.AuthService;
 import org.springframework.http.HttpRequest;
+import org.springframework.lang.Nullable;
 
 import java.util.List;
 
@@ -15,7 +15,6 @@ public class CasdoorAuthContextConverter implements AuthContextConverter {
 
     @Resource
     private AuthService casdoorAuthService;
-
 
     @Override
     @Nullable

@@ -5,6 +5,7 @@ import com.jiangtj.micro.web.aop.anno.AnnoT;
 import com.jiangtj.micro.web.aop.anno.AnnoTM;
 import org.junit.jupiter.api.Test;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -58,26 +59,32 @@ class AnnotationMethodBeforeAdviceTest {
     static class TestAnnotationMethodBeforeAdvice<A extends Annotation> extends AnnotationMethodBeforeAdvice<A> {
         private final Class<A> aClass;
         private List<A> annotations;
+
         public TestAnnotationMethodBeforeAdvice(Class<A> aClass) {
             this.aClass = aClass;
         }
-        public TestAnnotationMethodBeforeAdvice<A> check(@NonNull Method method, Object target) {
+
+        public TestAnnotationMethodBeforeAdvice<A> check(Method method, Object target) {
             try {
-                before(method, new Object[]{}, target);
+                before(method, new Object[] {}, target);
             } catch (Throwable e) {
                 throw new RuntimeException(e);
             }
             return this;
         }
+
         public void expect(Consumer<List<A>> consumer) {
             consumer.accept(annotations);
         }
+
         @Override
         public Class<A> getAnnotationType() {
             return aClass;
         }
+
         @Override
-        public void before(@NonNull List<A> annotations, @NonNull Method method, @NonNull Object[] args, Object target) {
+        public void before(@NonNull List<A> annotations, @NonNull Method method, @NonNull Object[] args,
+                @Nullable Object target) {
             this.annotations = annotations;
         }
     }
