@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.jiangtj.micro.spring.boot.servlet.interceptor;
+package com.jiangtj.micro.web.interceptor;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
