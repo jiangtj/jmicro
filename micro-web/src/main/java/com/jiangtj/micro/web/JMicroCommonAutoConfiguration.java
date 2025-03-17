@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 
 @AutoConfiguration
-public class JCloudCommonAutoConfiguration {
+public class JMicroCommonAutoConfiguration {
 
     @Resource
     private ObjectMapper mapper;

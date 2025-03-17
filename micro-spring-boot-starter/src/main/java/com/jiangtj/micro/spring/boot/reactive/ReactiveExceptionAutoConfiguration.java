@@ -1,7 +1,7 @@
 package com.jiangtj.micro.spring.boot.reactive;
 
-import com.jiangtj.micro.web.FluentWebFilter;
-import com.jiangtj.micro.web.FluentWebFilterRegister;
+import com.jiangtj.micro.web.filter.FluentWebFilter;
+import com.jiangtj.micro.web.filter.FluentWebFilterRegister;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;

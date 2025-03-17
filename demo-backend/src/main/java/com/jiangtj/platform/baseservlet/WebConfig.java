@@ -1,7 +1,7 @@
 package com.jiangtj.platform.baseservlet;
 
 import com.jiangtj.micro.auth.core.AuthService;
-import com.jiangtj.micro.web.FunctionHandlerInterceptor;
+import com.jiangtj.micro.web.interceptor.FunctionHandlerInterceptor;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
