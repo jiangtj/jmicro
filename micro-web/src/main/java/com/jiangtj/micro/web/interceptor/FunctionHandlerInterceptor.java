@@ -1,8 +1,5 @@
-package com.jiangtj.micro.spring.boot.servlet;
+package com.jiangtj.micro.web.interceptor;
 
-import com.jiangtj.micro.spring.boot.servlet.interceptor.AfterCompletionInterceptor;
-import com.jiangtj.micro.spring.boot.servlet.interceptor.PostHandleInterceptor;
-import com.jiangtj.micro.spring.boot.servlet.interceptor.PreHandleInterceptor;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.HandlerInterceptor;

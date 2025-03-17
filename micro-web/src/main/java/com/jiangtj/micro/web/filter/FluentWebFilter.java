@@ -1,4 +1,4 @@
-package com.jiangtj.micro.web;
+package com.jiangtj.micro.web.filter;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

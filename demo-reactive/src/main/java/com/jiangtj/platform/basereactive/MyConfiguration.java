@@ -1,7 +1,7 @@
 package com.jiangtj.platform.basereactive;
 
 import com.jiangtj.micro.auth.core.AuthReactiveService;
-import com.jiangtj.micro.web.FluentWebFilter;
+import com.jiangtj.micro.web.filter.FluentWebFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.config.CorsRegistry;
