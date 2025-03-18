@@ -41,10 +41,17 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>17</java.version>
         <jjwt.version>0.12.5</jjwt.version>
-        <jetbrains-annotations.version>26.0.2</jetbrains-annotations.version>
         <casdoor.version>1.15.0</casdoor.version>
         <!-- <maven.test.skip>true</maven.test.skip> -->
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 
     <profiles>
         <profile>
@@ -167,9 +174,9 @@
                 <version>0.0.13</version>
             </dependency>
             <dependency>
-                <groupId>org.jetbrains</groupId>
-                <artifactId>annotations</artifactId>
-                <version>${jetbrains-annotations.version}</version>
+                <groupId>com.google.code.findbugs</groupId>
+                <artifactId>jsr305</artifactId>
+                <version>3.0.2</version>
             </dependency>
             <dependency>
                 <groupId>org.casbin</groupId>
