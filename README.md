@@ -49,7 +49,37 @@ public class JsonAuthContextConverter implements AuthContextConverter {
 }
 ```
 
-只需要配置好转换器，你就可以在项目使用鉴权功能，可以使用过滤器(todo)或者通过注解方式(`@HasLogin` `@HasRole` `@HasPermission`)管理你的应用
+只需要配置好转换器，你就可以在项目使用鉴权功能，可以使用过滤器 由Spring管理的授权类(`AuthService`/`AuthReactiveService`)或者通过注解方式(`@HasLogin` `@HasRole` `@HasPermission`)管理你的应用
+
+```java
+@Service
+class Test {
+    @HasPermission("permission key")
+    public void hasAntPermissionAA(){
+        // @HasPermission === authService.hasPermission("permission key")
+        // do something
+    }
+}
+```
+
+默认授权的匹配规则是判断提供的 `key` 是否在授权上下文中存在，当然针对 `permission` 也提供了一个 `ant-style` 权限匹配规则，你可以覆写默认的授权类实现
+
+```java
+import com.jiangtj.micro.auth.servlet.SimpleAuthService;
+
+@Service
+public class AuthService extends SimpleAuthService {
+    @Override
+    public void hasPermission(@NonNull Logic logic, @NonNull String... permissions) {
+        /**
+         * a:* -> a:a
+         * b:** -> b:b:b
+         * c:*:c -> c:c:c
+         */
+        AuthUtils.hasAntPermission(getContext(), logic, permissions);
+    }
+}
+```
 
 我们同样提供了测试模块`micro-test`方便用户模拟登录用户进行集成测试，很简单使用`@WithMockUser`注解即可
 

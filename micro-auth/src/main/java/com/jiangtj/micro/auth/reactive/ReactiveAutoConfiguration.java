@@ -21,7 +21,7 @@ public class ReactiveAutoConfiguration {
 
     @Bean
     public AuthReactiveService authReactorService() {
-        return new AuthReactiveServiceImpl();
+        return new SimpleAuthReactiveService();
     }
 
     @Bean

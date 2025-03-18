@@ -1,26 +1,46 @@
 package com.jiangtj.micro.auth.core;
 
 import com.jiangtj.micro.auth.annotations.Logic;
+import com.jiangtj.micro.auth.context.AuthContext;
 import com.jiangtj.micro.auth.context.Authorization;
 import com.jiangtj.micro.auth.context.Subject;
 import reactor.core.publisher.Mono;
 
 public interface AuthReactiveService {
-    Mono<Subject> getSubject();
+    Mono<AuthContext> getContext();
 
-    Mono<Authorization> getAuthorization();
+    default Mono<Subject> getSubject() {
+        return getContext().map(AuthContext::subject);
+    }
 
-    Mono<Void> hasLogin();
+    default Mono<Authorization> getAuthorization() {
+        return getContext().map(AuthContext::authorization);
+    }
 
-    Mono<Void> hasRole(Logic logic, String... roles);
-
-    Mono<Void> hasPermission(Logic logic, String... permissions);
+    default Mono<Void> hasLogin() {
+        return getContext()
+            .doOnNext(AuthUtils::hasLogin)
+            .then();
+    }
 
     default Mono<Void> hasRole(String... roles) {
         return hasRole(Logic.AND, roles);
     }
 
+    default Mono<Void> hasRole(Logic logic, String... roles) {
+        return getContext()
+            .cast(AuthContext.class)
+            .doOnNext(ctx -> AuthUtils.hasRole(ctx, logic, roles))
+            .then();
+    }
+
     default Mono<Void> hasPermission(String... permissions) {
         return hasPermission(Logic.AND, permissions);
+    }
+
+    default Mono<Void> hasPermission(Logic logic, String... permissions) {
+        return getContext()
+            .doOnNext(ctx -> AuthUtils.hasPermission(ctx, logic, permissions))
+            .then();
     }
 }

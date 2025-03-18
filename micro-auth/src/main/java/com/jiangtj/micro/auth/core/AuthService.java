@@ -1,25 +1,38 @@
 package com.jiangtj.micro.auth.core;
 
 import com.jiangtj.micro.auth.annotations.Logic;
+import com.jiangtj.micro.auth.context.AuthContext;
 import com.jiangtj.micro.auth.context.Authorization;
 import com.jiangtj.micro.auth.context.Subject;
 
 public interface AuthService {
-    Subject getSubject();
+    AuthContext getContext();
 
-    Authorization getAuthorization();
+    default Subject getSubject(){
+        return getContext().subject();
+    }
 
-    void hasLogin();
+    default Authorization getAuthorization(){
+        return getContext().authorization();
+    }
 
-    void hasRole(Logic logic, String... roles);
-
-    void hasPermission(Logic logic, String... permissions);
+    default void hasLogin() {
+        AuthUtils.hasLogin(getContext());
+    }
 
     default void hasRole(String... roles) {
         hasRole(Logic.AND, roles);
     }
 
+    default void hasRole(Logic logic, String... roles) {
+        AuthUtils.hasRole(getContext(), logic, roles);
+    }
+
     default void hasPermission(String... permissions) {
         hasPermission(Logic.AND, permissions);
+    }
+
+    default void hasPermission(Logic logic, String... permissions) {
+        AuthUtils.hasPermission(getContext(), logic, permissions);
     }
 }

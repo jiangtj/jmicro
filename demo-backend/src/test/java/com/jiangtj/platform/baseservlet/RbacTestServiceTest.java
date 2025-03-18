@@ -79,4 +79,11 @@ class RbacTestServiceTest {
     void testUser() {
         assertDoesNotThrow(() -> rbacTestService.hasAdminOrUser());
     }
+
+    @Test
+    @WithMockPermission("a:*")
+    void testAntPermission() {
+        assertDoesNotThrow(() -> rbacTestService.hasAntPermissionAA());
+        assertThrows(NoPermissionException.class, () -> rbacTestService.hasAntPermissionAAA());
+    }
 }

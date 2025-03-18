@@ -31,4 +31,12 @@ public class RbacTestService {
     @HasRole(value = {"admin", "user"}, logic = Logic.OR)
     public void hasAdminOrUser(){
     }
+
+    @HasPermission("a:a")
+    public void hasAntPermissionAA(){
+    }
+
+    @HasPermission("a:a:a")
+    public void hasAntPermissionAAA(){
+    }
 }
