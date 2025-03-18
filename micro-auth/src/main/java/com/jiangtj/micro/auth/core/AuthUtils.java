@@ -3,6 +3,7 @@ package com.jiangtj.micro.auth.core;
 import com.jiangtj.micro.auth.annotations.Logic;
 import com.jiangtj.micro.auth.context.AuthContext;
 import com.jiangtj.micro.auth.exceptions.AuthExceptionUtils;
+import org.springframework.util.AntPathMatcher;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -42,6 +43,27 @@ public interface AuthUtils {
                 });
         } else {
             if (Stream.of(permissions).noneMatch(userPermissions::contains)) {
+                throw AuthExceptionUtils.noPermission(String.join(",", permissions));
+            }
+        }
+    }
+
+    AntPathMatcher dotMatcher = new AntPathMatcher(":");
+
+    static void hasAntPermission(AuthContext ctx, Logic logic, String... permissions) {
+        List<String> userPermissions = ctx.authorization().permissions();
+        if (logic == Logic.AND) {
+            Stream.of(permissions)
+                .forEach(perm -> {
+                    if (userPermissions.stream()
+                        .noneMatch(p -> dotMatcher.match(p, perm))) {
+                        throw AuthExceptionUtils.noPermission(perm);
+                    }
+                });
+        } else {
+            if (Stream.of(permissions)
+                .noneMatch(perm -> userPermissions.stream()
+                    .anyMatch(p -> dotMatcher.match(p, perm)))) {
                 throw AuthExceptionUtils.noPermission(String.join(",", permissions));
             }
         }
