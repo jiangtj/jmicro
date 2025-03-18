@@ -40,7 +40,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>17</java.version>
-        <jjwt.version>0.12.5</jjwt.version>
         <casdoor.version>1.15.0</casdoor.version>
         <!-- <maven.test.skip>true</maven.test.skip> -->
     </properties>
@@ -182,21 +181,6 @@
                 <groupId>org.casbin</groupId>
                 <artifactId>casdoor-spring-boot-starter</artifactId>
                 <version>${casdoor.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.jsonwebtoken</groupId>
-                <artifactId>jjwt-api</artifactId>
-                <version>${jjwt.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.jsonwebtoken</groupId>
-                <artifactId>jjwt-impl</artifactId>
-                <version>${jjwt.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.jsonwebtoken</groupId>
-                <artifactId>jjwt-jackson</artifactId>
-                <version>${jjwt.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
