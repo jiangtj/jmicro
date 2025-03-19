@@ -6,7 +6,7 @@ import com.jiangtj.micro.auth.exceptions.AuthExceptionUtils;
 import org.springframework.util.AntPathMatcher;
 
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.function.Predicate;
 
 public interface AuthUtils {
 
@@ -18,33 +18,17 @@ public interface AuthUtils {
 
     static void hasRole(AuthContext ctx, Logic logic, String... roles) {
         List<String> userRoles = ctx.authorization().roles();
-        if (logic == Logic.AND) {
-            Stream.of(roles)
-                .forEach(role -> {
-                    if (!userRoles.contains(role)) {
-                        throw AuthExceptionUtils.noRole(role);
-                    }
-                });
-        } else {
-            if (Stream.of(roles).noneMatch(userRoles::contains)) {
-                throw AuthExceptionUtils.noRole(String.join(",", roles));
-            }
+        List<String> unAuth = predicate(List.of(roles), logic, userRoles::contains);
+        if (!unAuth.isEmpty()) {
+            throw AuthExceptionUtils.noRole(String.join(",", unAuth));
         }
     }
 
     static void hasPermission(AuthContext ctx, Logic logic, String... permissions) {
         List<String> userPermissions = ctx.authorization().permissions();
-        if (logic == Logic.AND) {
-            Stream.of(permissions)
-                .forEach(perm -> {
-                    if (!userPermissions.contains(perm)) {
-                        throw AuthExceptionUtils.noPermission(perm);
-                    }
-                });
-        } else {
-            if (Stream.of(permissions).noneMatch(userPermissions::contains)) {
-                throw AuthExceptionUtils.noPermission(String.join(",", permissions));
-            }
+        List<String> unAuth = predicate(List.of(permissions), logic, userPermissions::contains);
+        if (!unAuth.isEmpty()) {
+            throw AuthExceptionUtils.noPermission(String.join(",", unAuth));
         }
     }
 
@@ -52,20 +36,19 @@ public interface AuthUtils {
 
     static void hasAntPermission(AuthContext ctx, Logic logic, String... permissions) {
         List<String> userPermissions = ctx.authorization().permissions();
+        List<String> unAuth = predicate(List.of(permissions), logic, perm ->
+            userPermissions.stream().anyMatch(p -> dotMatcher.match(p, perm)));
+        if (!unAuth.isEmpty()) {
+            throw AuthExceptionUtils.noPermission(String.join(",", unAuth));
+        }
+    }
+
+    static <T> List<T> predicate(List<T> list, Logic logic, Predicate<T> predicate) {
         if (logic == Logic.AND) {
-            Stream.of(permissions)
-                .forEach(perm -> {
-                    if (userPermissions.stream()
-                        .noneMatch(p -> dotMatcher.match(p, perm))) {
-                        throw AuthExceptionUtils.noPermission(perm);
-                    }
-                });
+            return list.stream().filter(p -> !predicate.test(p)).toList();
         } else {
-            if (Stream.of(permissions)
-                .noneMatch(perm -> userPermissions.stream()
-                    .anyMatch(p -> dotMatcher.match(p, perm)))) {
-                throw AuthExceptionUtils.noPermission(String.join(",", permissions));
-            }
+            boolean anyMatch = list.stream().anyMatch(predicate);
+            return anyMatch ? List.of() : list;
         }
     }
 
