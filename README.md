@@ -6,7 +6,7 @@
 ![status](https://img.shields.io/badge/status-developing-yellow.svg)
 ![Maven Central Version](https://img.shields.io/maven-central/v/com.jiangtj.micro/parent)
 
-J Micro 是一个基于 Spring Boot 的轻量工具集，封装了常用功能，方便开发者快速开发(提供基于 vue 的前后端分离的 Demo), 由 [JCPlatform](https://github.com/JiangTJ/jc-platform) 拆分出来专于基础应用的工具集，之后也将重构另一个项目，基于该项目专注微服务应用。
+J Micro 是一个基于 Spring Boot 的轻量框架，方便开发者更轻松的开发应用(提供基于 vue 的前后端分离的 Demo), 由 [JCPlatform](https://github.com/JiangTJ/jc-platform) 拆分出来专于基础应用的工具集，之后也将重构另一个项目，基于该项目专注微服务应用。
 
 ### 使用
 
@@ -14,7 +14,7 @@ J Micro 是一个基于 Spring Boot 的轻量工具集，封装了常用功能�
 
 该项目包含下面这些模块
 
-#### [认证与鉴权模块](/micro-auth)
+#### [认证与鉴权模块](micro-auth)
 
 ```xml
 <dependency>
