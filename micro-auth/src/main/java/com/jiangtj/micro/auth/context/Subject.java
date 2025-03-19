@@ -8,4 +8,6 @@ public class Subject {
     String name;
     String displayName;
     String avatar;
+    String issuer;
+    String type;
 }
