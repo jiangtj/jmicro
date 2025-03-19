@@ -3,7 +3,6 @@ package com.jiangtj.platform.baseservlet;
 import com.jiangtj.micro.auth.annotations.HasLogin;
 import com.jiangtj.micro.auth.annotations.HasPermission;
 import com.jiangtj.micro.auth.annotations.HasRole;
-import com.jiangtj.micro.auth.annotations.Logic;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -28,7 +27,7 @@ public class RbacTestService {
     public void hasAdmin(){
     }
 
-    @HasRole(value = {"admin", "user"}, logic = Logic.OR)
+    @HasAdminOrUser
     public void hasAdminOrUser(){
     }
 

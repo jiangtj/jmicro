@@ -14,7 +14,7 @@ J Micro 是一个基于 Spring Boot 的轻量工具集，封装了常用功能�
 
 该项目包含下面这些模块
 
-#### 认证与鉴权模块
+#### [认证与鉴权模块](/micro-auth)
 
 ```xml
 <dependency>
@@ -53,10 +53,10 @@ public class JsonAuthContextConverter implements AuthContextConverter {
 
 ```java
 @Service
-class Test {
+class ExampleService {
     @HasPermission("permission key")
-    public void hasAntPermissionAA(){
-        // @HasPermission === authService.hasPermission("permission key")
+    public void hasAnyPermission(){
+        // authService.hasPermission("permission key") 如果使用授权类的写法，是不是和注解很相似
         // do something
     }
 }
