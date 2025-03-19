@@ -10,7 +10,7 @@ public class CasdoorUserContextImpl extends DefaultAuthContext {
 
     private final User casdoorUser;
 
-    public CasdoorUserContextImpl(String issuer, User user) {
+    public CasdoorUserContextImpl(User user) {
         super(new Subject());
         this.casdoorUser = user;
         Subject subject = this.subject();
@@ -18,7 +18,5 @@ public class CasdoorUserContextImpl extends DefaultAuthContext {
         subject.setName(user.name);
         subject.setDisplayName(user.displayName);
         subject.setAvatar(user.avatar);
-        subject.setIssuer(issuer);
-        subject.setType("casdoor");
     }
 }

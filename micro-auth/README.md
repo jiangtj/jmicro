@@ -20,7 +20,6 @@
 public class JsonAuthContextConverter implements AuthContextConverter {
 
     @Override
-    @Nullable
     public AuthContext convert(HttpRequest request) {
         List<String> headers = request.getHeaders().get(AuthRequestAttributes.TOKEN_HEADER_NAME);
         if (headers == null || headers.size() != 1) {
@@ -77,10 +76,6 @@ public class AuthService extends SimpleAuthService {
 ```
 
 除此外，你只需覆盖我们的授权类(`AuthService`/`AuthReactiveService`)，你可以实现任意的鉴权方式
-
-### 多账号体系
-
-我们的 `AuthContextConverter` 返回值是可以为 `Null`，如果返回 `Null`，那么会继续使用下一个转换器转换授权上下文，所以很容易实现多体系，你只需多个转换器，处理各自的授权上下文即可，如果不支持的那么返回 `Null` 让其他的处理。我们建议通过 `Subject` 的 `issuer` 和 `type` 来区分，比如 `casdoor` 模块中，`issuer` 是授权服务器地址，`type` 是固定的 `casdoor`
 
 ### 自定义注解
 
