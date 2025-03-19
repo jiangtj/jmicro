@@ -14,7 +14,7 @@
 </dependency>
 ```
 
-第二步，配置转换器，转换你的请求到 AuthContext，下面是一个例子，使用 jwt 解析 bearer token
+第二步，配置转换器，转换你的请求到 AuthContext，下面是一个例子，使用 jjwt 解析 bearer token
 
 ```java
 public class JsonAuthContextConverter implements AuthContextConverter {
@@ -31,7 +31,7 @@ public class JsonAuthContextConverter implements AuthContextConverter {
             .verifyWith(key)
             .build();
         Claims body = parser.parseSignedClaims(token).getPayload();
-        Subject subject = this.subject();
+        Subject subject = new Subject();
         subject.setId(body.sub);
         // 如果你在 session 中存储登录信息，那么你只需从 session 中取出并转换为 AuthContext 即可
         // 获取角色和权限从你的服务中(tip: 缓存可以带来更好的性能)

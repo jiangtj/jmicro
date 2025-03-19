@@ -24,7 +24,7 @@ J Micro 是一个基于 Spring Boot 的轻量框架，方便开发者更轻松�
 </dependency>
 ```
 
-下面是一个例子，使用 jwt 解析 bearer token
+下面是一个例子，使用 jjwt 解析 bearer token
 
 ```java
 public class JsonAuthContextConverter implements AuthContextConverter {
@@ -41,7 +41,7 @@ public class JsonAuthContextConverter implements AuthContextConverter {
             .verifyWith(key)
             .build();
         Claims body = parser.parseSignedClaims(token).getPayload();
-        Subject subject = this.subject();
+        Subject subject = new Subject();
         subject.setId(body.sub);
         return AuthContext.create(subject);
     }
