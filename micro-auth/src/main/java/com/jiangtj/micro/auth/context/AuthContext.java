@@ -16,8 +16,20 @@ public interface AuthContext {
         return UnLoginContextImpl.self;
     }
 
+    static AuthContext create(String subjectId) {
+        Subject subject = new Subject();
+        subject.setId(subjectId);
+        return create(subject);
+    }
+
     static AuthContext create(Subject subject) {
         return new DefaultAuthContext(subject);
+    }
+
+    static AuthContext create(String subjectId, Authorization authorization) {
+        Subject subject = new Subject();
+        subject.setId(subjectId);
+        return create(subject, authorization);
     }
 
     static AuthContext create(Subject subject, Authorization authorization) {
