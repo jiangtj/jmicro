@@ -1,14 +1,12 @@
 package com.jiangtj.micro.spring.boot.reactive;
 
-import com.jiangtj.micro.web.filter.FluentWebFilter;
-import com.jiangtj.micro.web.filter.FluentWebFilterRegister;
+import com.jiangtj.micro.web.filter.EnableFluentWebFilter;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
 
-import java.util.List;
-
 @AutoConfiguration
+@EnableFluentWebFilter
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
 public class ReactiveExceptionAutoConfiguration {
 
@@ -20,11 +18,6 @@ public class ReactiveExceptionAutoConfiguration {
     @Bean
     public NoViewResponseContext noViewResponseContext() {
         return new NoViewResponseContext();
-    }
-
-    @Bean
-    public FluentWebFilterRegister fluentWebFilterRegister(List<FluentWebFilter> filters) {
-        return new FluentWebFilterRegister(filters);
     }
 
 }
