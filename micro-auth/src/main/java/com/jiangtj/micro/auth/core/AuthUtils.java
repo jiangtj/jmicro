@@ -35,9 +35,13 @@ public interface AuthUtils {
     AntPathMatcher dotMatcher = new AntPathMatcher(":");
 
     static void hasAntPermission(AuthContext ctx, Logic logic, String... permissions) {
+        hasAntPermission(ctx, dotMatcher, logic, permissions);
+    }
+
+    static void hasAntPermission(AuthContext ctx, AntPathMatcher matcher, Logic logic, String... permissions) {
         List<String> userPermissions = ctx.authorization().permissions();
         List<String> unAuth = predicate(List.of(permissions), logic, perm ->
-            userPermissions.stream().anyMatch(p -> dotMatcher.match(p, perm)));
+            userPermissions.stream().anyMatch(p -> matcher.match(p, perm)));
         if (!unAuth.isEmpty()) {
             throw AuthExceptionUtils.noPermission(String.join(",", unAuth));
         }

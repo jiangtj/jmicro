@@ -57,7 +57,7 @@ class ExampleService {
 
 ### 匹配方式
 
-默认授权的匹配规则是判断提供的 `key` 是否在授权上下文中存在，当然针对 `permission` 也提供了一个 `ant-style` 权限匹配规则，你可以覆盖默认的授权类实现
+默认授权的匹配规则是判断提供的 `key` 是否在授权上下文中存在，当然针对 `permission` 也提供了一个 `ant-style` 权限匹配规则，添加 `jmicro.auth.permission-match=ant` 配置选项即可，除此之外你可以覆盖默认的授权类，实现任意的鉴权方式(`AuthUtils` 可以帮助你更简单的判断权限)
 
 ```java
 import com.jiangtj.micro.auth.servlet.SimpleAuthService;
@@ -75,8 +75,6 @@ public class AuthService extends SimpleAuthService {
     }
 }
 ```
-
-除此外，你只需覆盖我们的授权类(`AuthService`/`AuthReactiveService`)，你可以实现任意的鉴权方式
 
 ### 多账号体系
 
