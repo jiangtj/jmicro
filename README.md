@@ -2,6 +2,7 @@
 # J Micro
 
 ![author](https://img.shields.io/badge/author-mrtt-blue.svg)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/ad8a5940990d43ecbbb01f35ee451d4e)](https://app.codacy.com/gh/jiangtj/jmicro?utm_source=github.com&utm_medium=referral&utm_content=jiangtj/jmicro&utm_campaign=Badge_Grade)
 [![email](https://img.shields.io/badge/email-jiang.taojie@foxmail.com-blue.svg)](mailto:jiang.taojie@foxmail.com)
 ![status](https://img.shields.io/badge/status-developing-yellow.svg)
 ![Maven Central Version](https://img.shields.io/maven-central/v/com.jiangtj.micro/parent)
