@@ -5,6 +5,7 @@
 [![email](https://img.shields.io/badge/email-jiang.taojie@foxmail.com-blue.svg)](mailto:jiang.taojie@foxmail.com)
 ![status](https://img.shields.io/badge/status-developing-yellow.svg)
 ![Maven Central Version](https://img.shields.io/maven-central/v/com.jiangtj.micro/parent)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/1d836355f32d423cb487081709b5890d)](https://app.codacy.com/gh/jiangtj/jmicro/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 
 J Micro 是一个基于 Spring Boot 的轻量框架，方便开发者更轻松的开发应用(提供基于 vue 的前后端分离的 Demo), 由 [JCPlatform](https://github.com/JiangTJ/jc-platform) 拆分出来专于基础应用的工具集，之后也将重构另一个项目，基于该项目专注微服务应用。
 
