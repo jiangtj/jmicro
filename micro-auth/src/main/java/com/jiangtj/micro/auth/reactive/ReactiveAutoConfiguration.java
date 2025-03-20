@@ -23,7 +23,7 @@ public class ReactiveAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public AuthReactiveService authReactorService() {
-        return new SimpleAuthReactiveService();
+        return new DefaultAuthReactiveService();
     }
 
     @Bean

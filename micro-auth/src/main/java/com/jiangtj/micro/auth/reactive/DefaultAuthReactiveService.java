@@ -9,7 +9,7 @@ import jakarta.annotation.Resource;
 import org.springframework.util.AntPathMatcher;
 import reactor.core.publisher.Mono;
 
-public class SimpleAuthReactiveService implements AuthReactiveService {
+public class DefaultAuthReactiveService implements AuthReactiveService {
     @Resource
     private AuthProperties properties;
 

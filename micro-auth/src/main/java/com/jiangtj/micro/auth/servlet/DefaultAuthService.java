@@ -8,7 +8,7 @@ import com.jiangtj.micro.auth.core.AuthUtils;
 import jakarta.annotation.Resource;
 import org.springframework.util.AntPathMatcher;
 
-public class SimpleAuthService implements AuthService {
+public class DefaultAuthService implements AuthService {
     @Resource
     private AuthHolder authHolder;
     @Resource
