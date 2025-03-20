@@ -1,40 +1,35 @@
 package com.jiangtj.micro.auth.context;
 
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.http.HttpRequest;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * AuthContextFactory 类用于创建 AuthContext 对象。
  */
 public class AuthContextFactory {
 
-    private final ObjectProvider<AuthContextConverter> op;
-    private List<AuthContextConverter> converters;
+    private final List<AuthContextConverter> converters;
+    private final List<AuthContextHandler> handlers;
 
-    public AuthContextFactory(ObjectProvider<AuthContextConverter> op) {
-        this.op = op;
-    }
-
-    public void init() {
-        this.converters = op.orderedStream()
-            .collect(Collectors.toList());
+    public AuthContextFactory(List<AuthContextConverter> converters, List<AuthContextHandler> handlers) {
+        this.converters = converters;
+        this.handlers = handlers;
     }
 
     public AuthContext getAuthContext(HttpRequest request) {
-        if (this.converters == null || this.converters.isEmpty()) {
-            this.init();
-        }
+        AuthContext ctx = convertRequest(request);
+        handlers.forEach(handler -> handler.handle(ctx));
+        return ctx;
+    }
 
-        for (AuthContextConverter converter : this.converters) {
+    private AuthContext convertRequest(HttpRequest request) {
+        for (AuthContextConverter converter : converters) {
             AuthContext context = converter.convert(request);
             if (context != null) {
                 return context;
             }
         }
-
         return AuthContext.unLogin();
     }
 
