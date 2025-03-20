@@ -8,6 +8,10 @@
 
 name: Maven Test
 
+permissions:
+  checks: write
+  pull-requests: write
+
 on:
   workflow_dispatch:
   workflow_call:
