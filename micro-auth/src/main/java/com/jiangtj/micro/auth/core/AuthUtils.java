@@ -20,7 +20,7 @@ public interface AuthUtils {
         List<String> userRoles = ctx.authorization().roles();
         List<String> unAuth = nonMatch(List.of(roles), logic, userRoles::contains);
         if (!unAuth.isEmpty()) {
-            throw AuthExceptionUtils.noRole(String.join(",", unAuth));
+            throw AuthExceptionUtils.noRole(unAuth);
         }
     }
 
@@ -28,7 +28,7 @@ public interface AuthUtils {
         List<String> userPermissions = ctx.authorization().permissions();
         List<String> unAuth = nonMatch(List.of(permissions), logic, userPermissions::contains);
         if (!unAuth.isEmpty()) {
-            throw AuthExceptionUtils.noPermission(String.join(",", unAuth));
+            throw AuthExceptionUtils.noPermission(unAuth);
         }
     }
 
@@ -43,7 +43,7 @@ public interface AuthUtils {
         List<String> unAuth = nonMatch(List.of(permissions), logic, perm ->
             userPermissions.stream().anyMatch(p -> matcher.match(p, perm)));
         if (!unAuth.isEmpty()) {
-            throw AuthExceptionUtils.noPermission(String.join(",", unAuth));
+            throw AuthExceptionUtils.noPermission(unAuth);
         }
     }
 

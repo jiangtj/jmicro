@@ -5,6 +5,8 @@ import com.jiangtj.micro.web.BaseExceptionUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
 
+import java.util.List;
+
 public class AuthExceptionUtils {
 
     /**
@@ -35,15 +37,15 @@ public class AuthExceptionUtils {
     /**
      * 403 No Role
      */
-    public static NoRoleException noRole(String role) {
-        return new NoRoleException(role);
+    public static NoRoleException noRole(List<String> roles) {
+        return new NoRoleException(roles);
     }
 
     /**
      * 403 No Permission
      */
-    public static NoPermissionException noPermission(String permission) {
-        return new NoPermissionException(permission);
+    public static NoPermissionException noPermission(List<String> permissions) {
+        return new NoPermissionException(permissions);
     }
 
 }
