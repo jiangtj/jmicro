@@ -18,7 +18,7 @@ public interface AuthUtils {
 
     static void hasRole(AuthContext ctx, Logic logic, String... roles) {
         List<String> userRoles = ctx.authorization().roles();
-        List<String> unAuth = predicate(List.of(roles), logic, userRoles::contains);
+        List<String> unAuth = nonMatch(List.of(roles), logic, userRoles::contains);
         if (!unAuth.isEmpty()) {
             throw AuthExceptionUtils.noRole(String.join(",", unAuth));
         }
@@ -26,7 +26,7 @@ public interface AuthUtils {
 
     static void hasPermission(AuthContext ctx, Logic logic, String... permissions) {
         List<String> userPermissions = ctx.authorization().permissions();
-        List<String> unAuth = predicate(List.of(permissions), logic, userPermissions::contains);
+        List<String> unAuth = nonMatch(List.of(permissions), logic, userPermissions::contains);
         if (!unAuth.isEmpty()) {
             throw AuthExceptionUtils.noPermission(String.join(",", unAuth));
         }
@@ -40,14 +40,14 @@ public interface AuthUtils {
 
     static void hasAntPermission(AuthContext ctx, AntPathMatcher matcher, Logic logic, String... permissions) {
         List<String> userPermissions = ctx.authorization().permissions();
-        List<String> unAuth = predicate(List.of(permissions), logic, perm ->
+        List<String> unAuth = nonMatch(List.of(permissions), logic, perm ->
             userPermissions.stream().anyMatch(p -> matcher.match(p, perm)));
         if (!unAuth.isEmpty()) {
             throw AuthExceptionUtils.noPermission(String.join(",", unAuth));
         }
     }
 
-    static <T> List<T> predicate(List<T> list, Logic logic, Predicate<T> predicate) {
+    static <T> List<T> nonMatch(List<T> list, Logic logic, Predicate<T> predicate) {
         if (logic == Logic.AND) {
             return list.stream().filter(p -> !predicate.test(p)).toList();
         } else {
