@@ -6,7 +6,7 @@
     <groupId>com.jiangtj.micro</groupId>
     <artifactId>parent</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.14</version>
+    <version>0.0.15</version>
     <url>https://github.com/jiangtj/jmicro</url>
 
     <parent>
@@ -140,37 +140,37 @@
             <dependency>
                 <groupId>com.jiangtj.micro</groupId>
                 <artifactId>micro-auth</artifactId>
-                <version>0.0.14</version>
+                <version>0.0.15</version>
             </dependency>
             <dependency>
                 <groupId>com.jiangtj.micro</groupId>
                 <artifactId>micro-auth-casdoor</artifactId>
-                <version>0.0.14</version>
+                <version>0.0.15</version>
             </dependency>
             <dependency>
                 <groupId>com.jiangtj.micro</groupId>
                 <artifactId>micro-common</artifactId>
-                <version>0.0.14</version>
+                <version>0.0.15</version>
             </dependency>
             <dependency>
                 <groupId>com.jiangtj.micro</groupId>
                 <artifactId>micro-web</artifactId>
-                <version>0.0.14</version>
+                <version>0.0.15</version>
             </dependency>
             <dependency>
                 <groupId>com.jiangtj.micro</groupId>
                 <artifactId>micro-spring-boot-starter</artifactId>
-                <version>0.0.14</version>
+                <version>0.0.15</version>
             </dependency>
             <dependency>
                 <groupId>com.jiangtj.micro</groupId>
                 <artifactId>micro-sql-jooq</artifactId>
-                <version>0.0.14</version>
+                <version>0.0.15</version>
             </dependency>
             <dependency>
                 <groupId>com.jiangtj.micro</groupId>
                 <artifactId>micro-test</artifactId>
-                <version>0.0.14</version>
+                <version>0.0.15</version>
             </dependency>
             <dependency>
                 <groupId>com.google.code.findbugs</groupId>
