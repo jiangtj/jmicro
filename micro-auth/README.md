@@ -17,6 +17,7 @@
 第二步，配置转换器，转换你的请求到 AuthContext，下面是一个例子，使用 jjwt 解析 bearer token
 
 ```java
+@Component
 public class JsonAuthContextConverter implements AuthContextConverter {
 
     @Override
@@ -51,6 +52,22 @@ class ExampleService {
     public void hasAnyPermission(){
         // authService.hasPermission("permission key") 如果使用授权类的写法，是不是和注解很相似
         // do something
+    }
+}
+```
+
+### 处理授权上下文
+
+一个很常见的情况，我们的认证与授权过程可能是分开的，比如 `casdoor` 模块中那样，我们需要在认证之后，完善授权信息，所以 `AuthContextHandler` 就来了
+
+```java
+@Order(Number)
+@Component
+public class ProvideRoleHandler implements AuthContextHandler{
+    @Override
+    public void handle(AuthContext ctx) {
+        // 获取你的角色
+        ctx.setAuthorization(Authorization.create(roles));
     }
 }
 ```
