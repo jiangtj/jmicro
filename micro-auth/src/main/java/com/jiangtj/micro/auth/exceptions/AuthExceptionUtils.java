@@ -26,6 +26,15 @@ public class AuthExceptionUtils {
     }
 
     /**
+     * 403 Forbidden
+     */
+    public static BaseException forbidden() {
+        BaseException exception = BaseExceptionUtils.forbidden("Don't support this operate with current token.");
+        exception.setTitle("Forbidden");
+        return exception;
+    }
+
+    /**
      * 403 Un Support
      */
     public static BaseException unSupport() {

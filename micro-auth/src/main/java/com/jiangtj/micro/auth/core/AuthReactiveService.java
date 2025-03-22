@@ -23,6 +23,12 @@ public interface AuthReactiveService {
             .then();
     }
 
+    default Mono<Void> hasSubject(Subject subject) {
+        return getContext()
+            .doOnNext(ctx -> AuthUtils.hasSubject(ctx, subject))
+            .then();
+    }
+
     default Mono<Void> hasRole(String... roles) {
         return hasRole(Logic.AND, roles);
     }

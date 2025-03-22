@@ -6,7 +6,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-@WithMockAuth(SimpleTestAuthHandler.class)
+@WithMockAuth(DefaultTestAuthHandler.class)
 public @interface WithMockRole {
     String[] value();
 }

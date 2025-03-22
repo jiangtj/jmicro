@@ -15,8 +15,8 @@ public class JMicroConfiguration {
     }
 
     @Bean
-    public SimpleTestAuthHandler simpleTestAuthContextConverter() {
-        return new SimpleTestAuthHandler();
+    public DefaultTestAuthHandler defaultTestAuthHandler() {
+        return new DefaultTestAuthHandler();
     }
 
 }

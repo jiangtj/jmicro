@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public class SimpleTestAuthHandler implements TestAuthHandler{
+public class DefaultTestAuthHandler implements TestAuthHandler{
 
     @Override
     public AuthContext convert(Method testMethod, ApplicationContext context) {
@@ -44,6 +44,8 @@ public class SimpleTestAuthHandler implements TestAuthHandler{
                 subject.setId(item.id());
                 subject.setName(item.name());
                 subject.setDisplayName(item.displayName());
+                subject.setType(item.type());
+                subject.setIssuer(item.issuer());
             });
 
         Optional<WithMockRole> mockRole = AnnotationUtils.findAnnotation(element, WithMockRole.class);

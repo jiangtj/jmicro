@@ -20,6 +20,10 @@ public interface AuthService {
         AuthUtils.hasLogin(getContext());
     }
 
+    default void hasSubject(Subject subject) {
+        AuthUtils.hasSubject(getContext(), subject);
+    }
+
     default void hasRole(String... roles) {
         hasRole(Logic.AND, roles);
     }

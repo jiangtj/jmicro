@@ -6,9 +6,11 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-@WithMockAuth(SimpleTestAuthHandler.class)
+@WithMockAuth(DefaultTestAuthHandler.class)
 public @interface WithMockSubject {
     String id();
     String name() default "";
     String displayName() default "";
+    String type() default "";
+    String issuer() default "";
 }

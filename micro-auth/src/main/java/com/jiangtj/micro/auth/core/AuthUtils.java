@@ -2,10 +2,13 @@ package com.jiangtj.micro.auth.core;
 
 import com.jiangtj.micro.auth.annotations.Logic;
 import com.jiangtj.micro.auth.context.AuthContext;
+import com.jiangtj.micro.auth.context.Subject;
 import com.jiangtj.micro.auth.exceptions.AuthExceptionUtils;
 import org.springframework.util.AntPathMatcher;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 public interface AuthUtils {
@@ -13,6 +16,24 @@ public interface AuthUtils {
     static void hasLogin(AuthContext ctx) {
         if (!ctx.isLogin()) {
             throw AuthExceptionUtils.unLogin();
+        }
+    }
+
+    static void hasSubject(AuthContext ctx, Subject subject) {
+        Subject user = ctx.subject();
+        checkSubjectAttribute(user, subject, Subject::getId);
+        checkSubjectAttribute(user, subject, Subject::getName);
+        checkSubjectAttribute(user, subject, Subject::getDisplayName);
+        checkSubjectAttribute(user, subject, Subject::getType);
+        checkSubjectAttribute(user, subject, Subject::getIssuer);
+    }
+
+    static void checkSubjectAttribute(Subject user, Subject subject, Function<Subject, String> getAttr) {
+        String subjectAttr = getAttr.apply(subject);
+        if (StringUtils.hasLength(subjectAttr)) {
+            if (!subjectAttr.equals(getAttr.apply(user))) {
+                throw AuthExceptionUtils.forbidden();
+            }
         }
     }
 

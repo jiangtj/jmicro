@@ -5,10 +5,12 @@ package com.jiangtj.micro.auth.servlet;
 import com.jiangtj.micro.auth.annotations.HasLogin;
 import com.jiangtj.micro.auth.annotations.HasPermission;
 import com.jiangtj.micro.auth.annotations.HasRole;
+import com.jiangtj.micro.auth.annotations.HasSubject;
 import com.jiangtj.micro.auth.core.AuthService;
 import com.jiangtj.micro.auth.servlet.rbac.HasLoginAdvice;
 import com.jiangtj.micro.auth.servlet.rbac.HasPermissionAdvice;
 import com.jiangtj.micro.auth.servlet.rbac.HasRoleAdvice;
+import com.jiangtj.micro.auth.servlet.rbac.HasSubjectAdvice;
 import com.jiangtj.micro.web.aop.AnnotationPointcut;
 import org.springframework.aop.Advisor;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
@@ -37,6 +39,11 @@ public class ServletAutoConfiguration {
         return new HasLoginAdvice();
     }
 
+    @Bean
+    public HasSubjectAdvice hasSubjectAdvice() {
+        return new HasSubjectAdvice();
+    }
+
 
     @Bean
     public HasRoleAdvice hasRoleAdvice() {
@@ -51,6 +58,11 @@ public class ServletAutoConfiguration {
     @Bean
     public Advisor hasLoginAdvisor(HasLoginAdvice advice) {
         return new DefaultPointcutAdvisor(new AnnotationPointcut<>(HasLogin.class), advice);
+    }
+
+    @Bean
+    public Advisor hasSubjectAdvisor(HasSubjectAdvice advice) {
+        return new DefaultPointcutAdvisor(new AnnotationPointcut<>(HasSubject.class), advice);
     }
 
     @Bean
