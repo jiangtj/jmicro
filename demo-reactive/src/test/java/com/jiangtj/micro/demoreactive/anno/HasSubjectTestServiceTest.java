@@ -1,9 +1,9 @@
 package com.jiangtj.micro.demoreactive.anno;
 
+import com.jiangtj.micro.auth.exceptions.UnAuthorizationException;
 import com.jiangtj.micro.test.AuthStepVerifier;
 import com.jiangtj.micro.test.JMicroTest;
 import com.jiangtj.micro.test.WithMockSubject;
-import com.jiangtj.micro.web.BaseException;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 
@@ -20,19 +20,19 @@ class HasSubjectTestServiceTest {
             .expectComplete()
             .verify();
         AuthStepVerifier.create(hasSubjectTestService.hasId2())
-            .expectError(BaseException.class)
+            .expectError(UnAuthorizationException.class)
             .verify();
         AuthStepVerifier.create(hasSubjectTestService.hasName())
-            .expectError(BaseException.class)
+            .expectError(UnAuthorizationException.class)
             .verify();
         AuthStepVerifier.create(hasSubjectTestService.hasDisplayName())
-            .expectError(BaseException.class)
+            .expectError(UnAuthorizationException.class)
             .verify();
         AuthStepVerifier.create(hasSubjectTestService.hasType())
-            .expectError(BaseException.class)
+            .expectError(UnAuthorizationException.class)
             .verify();
         AuthStepVerifier.create(hasSubjectTestService.hasIss())
-            .expectError(BaseException.class)
+            .expectError(UnAuthorizationException.class)
             .verify();
     }
 
@@ -46,7 +46,7 @@ class HasSubjectTestServiceTest {
     )
     void testId2() {
         AuthStepVerifier.create(hasSubjectTestService.hasId1())
-            .expectError(BaseException.class)
+            .expectError(UnAuthorizationException.class)
             .verify();
         AuthStepVerifier.create(hasSubjectTestService.hasId2())
             .expectComplete()

@@ -32,7 +32,7 @@ public interface AuthUtils {
         String subjectAttr = getAttr.apply(subject);
         if (StringUtils.hasLength(subjectAttr)) {
             if (!subjectAttr.equals(getAttr.apply(user))) {
-                throw AuthExceptionUtils.forbidden();
+                throw AuthExceptionUtils.unAuthorization("Current subject is not permitted.");
             }
         }
     }
