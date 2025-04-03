@@ -1,15 +1,14 @@
 package com.jiangtj.micro.sql.jooq;
 
-import com.jiangtj.micro.common.Tuple2;
-import org.jooq.Record;
 import org.jooq.*;
+import org.jooq.Record;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import java.util.List;
-import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import static org.jooq.impl.DSL.field;
 
@@ -75,8 +74,8 @@ public interface PageUtils {
         return select(create, table).from(table);
     }
 
-    static <T> BiFunction<List<T>, Integer, Page<T>> toPage(Pageable pageable) {
-        return (list, count) -> new PageImpl<>(list, pageable, count);
+    static <T> Page<T> toPage(List<T> result, Integer count, Pageable pageable) {
+        return new PageImpl<>(result, pageable, count);
     }
 
     record SelectStep<R extends Record>(SelectSelectStep<R> listStep, SelectSelectStep<Record1<Integer>> countStep) {
@@ -106,22 +105,29 @@ public interface PageUtils {
     record LimitStep<R extends Record>(SelectLimitPercentAfterOffsetStep<R> listStep,
                                        SelectConnectByStep<Record1<Integer>> countStep,
                                        Pageable pageable) {
-        public Tuple2<Result<R>, Integer> fetch() {
+        public ResultStep<Result<R>, Integer> fetch() {
             Result<R> result = listStep.fetch();
             Integer count = countStep.fetchSingle().value1();
-            return Tuple2.of(result, count);
+            return new ResultStep<>(result, count, pageable);
         }
-        public <T> Tuple2<List<T>, Integer> fetchInto(Class<T> clz) {
+        public <T> ResultStep<List<T>, Integer> fetchInto(Class<T> clz) {
             List<T> result = listStep.fetchInto(clz);
             Integer count = countStep.fetchSingle().value1();
-            return Tuple2.of(result, count);
+            return new ResultStep<>(result, count, pageable);
         }
         public <T> Page<T> fetchPage(Class<T> clz) {
-            return fetchInto(clz).map(toPage(pageable));
+            return fetchInto(clz).map(PageUtils::toPage);
         }
 
-        public <T> T biSubscribe(BiFunction<SelectLimitPercentAfterOffsetStep<R>, SelectConnectByStep<Record1<Integer>>, T> biFunction) {
-            return biFunction.apply(listStep, countStep);
+        public <L,C> ResultStep<L, C> subscribe(Function<SelectLimitPercentAfterOffsetStep<R>, L> l,
+                                                Function<SelectConnectByStep<Record1<Integer>>, C> c) {
+            return new ResultStep<>(l.apply(listStep), c.apply(countStep), pageable);
+        }
+    }
+
+    record ResultStep<R, C>(R result, C count, Pageable pageable) {
+        public <P> P map(ResultStepHandler<R, C, P> handler) {
+            return handler.handle(result, count, pageable);
         }
     }
 

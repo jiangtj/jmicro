@@ -126,10 +126,8 @@ public Mono<Page<AdminUser>> fetchPage() {
     return PageUtils.selectFrom(create, ADMIN_USER)
         .conditions(condition(new AdminUserRecord(user)))
         .pageable(pageable)
-        .biSubscribe((listS, countS) -> Mono.zip(
-            Flux.from(listS).map(l -> l.into(AdminUser.class)).collectList(),
-            Mono.from(countS).map(Record1::value1)))
-        .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
+        .subscribe(Flux::from, Mono::from)
+        .map(PageReactiveUtils.toPage(AdminUser.class));
 }
 ```
 

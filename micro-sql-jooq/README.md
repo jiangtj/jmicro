@@ -53,19 +53,16 @@ public DSLContext dslContext(ConnectionFactory connectionFactory) {
 }
 ```
 
-之后，使用 `biSubscribe()` 获取并转换值，下面是一个例子
+之后，使用 `subscribe()` 获取并转换值，下面是一个例子
 
 ```java
-PageUtils.selectFrom(create, SYSTEM_USER)
-    .conditions(SYSTEM_USER.IS_DELETED.eq((byte) 0)
-        .and(StringUtils.hasLength(user.getUsername()) ?
-            SYSTEM_USER.USERNAME.like(user.getUsername() + "%") :
-            noCondition()))
-    .pageable(pageable)
-    .biSubscribe((listS, countS) -> Mono.zip(
-        Flux.from(listS).map(l -> l.into(SystemUser.class)).collectList(),
-        Mono.from(countS).map(Record1::value1)))
-    .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()))
+public Mono<Page<AdminUser>> fetchPage() {
+    return PageUtils.selectFrom(create, ADMIN_USER)
+        .conditions(condition(new AdminUserRecord(user)))
+        .pageable(pageable)
+        .subscribe(Flux::from, Mono::from)
+        .map(PageReactiveUtils.toPage(AdminUser.class));
+}
 ```
 
 ## GenerateHelper

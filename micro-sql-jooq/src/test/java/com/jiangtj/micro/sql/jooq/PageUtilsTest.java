@@ -76,5 +76,20 @@ class PageUtilsTest {
         log.info(step.countStep().getSQL());
         List<Object> countValues = step.countStep().getBindValues();
         assertEquals(1, countValues.size());
+
+        /*PageUtils.select(create, SYSTEM_USER)
+            .from(SYSTEM_USER)
+            .where(SYSTEM_USER.ID.eq(1L))
+            .pageable(pageable)
+            .subscribe(Flux::from, Mono::from)
+            .map(PageReactiveUtils.into(SystemUser.class))
+            .map(PageReactiveUtils::toPage);
+
+        Mono<Page<SystemUser>> map = PageUtils.select(create, SYSTEM_USER)
+            .from(SYSTEM_USER)
+            .where(SYSTEM_USER.ID.eq(1L))
+            .pageable(pageable)
+            .subscribe(Flux::from, Mono::from)
+            .map(PageReactiveUtils.toPage(SystemUser.class));*/
     }
 }
