@@ -5,10 +5,10 @@
     <parent>
         <groupId>com.jiangtj.micro</groupId>
         <artifactId>parent</artifactId>
-        <version>0.0.18</version>
+        <version>0.0.19</version>
     </parent>
     <artifactId>micro-auth-casdoor</artifactId>
-    <version>0.0.18</version>
+    <version>0.0.19</version>
     <name>micro-auth</name>
     <description>micro-auth-casdoor</description>
 
