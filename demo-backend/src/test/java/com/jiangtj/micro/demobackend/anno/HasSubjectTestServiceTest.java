@@ -1,8 +1,8 @@
 package com.jiangtj.micro.demobackend.anno;
 
+import com.jiangtj.micro.auth.exceptions.UnAuthorizationException;
 import com.jiangtj.micro.test.JMicroTest;
 import com.jiangtj.micro.test.WithMockSubject;
-import com.jiangtj.micro.web.BaseException;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 
@@ -19,11 +19,11 @@ class HasSubjectTestServiceTest {
     @WithMockSubject(id = "1")
     void testId1() {
         assertDoesNotThrow(() -> hasSubjectTestService.hasId1());
-        assertThrows(BaseException.class, () -> hasSubjectTestService.hasId2());
-        assertThrows(BaseException.class, () -> hasSubjectTestService.hasName());
-        assertThrows(BaseException.class, () -> hasSubjectTestService.hasDisplayName());
-        assertThrows(BaseException.class, () -> hasSubjectTestService.hasType());
-        assertThrows(BaseException.class, () -> hasSubjectTestService.hasIss());
+        assertThrows(UnAuthorizationException.class, () -> hasSubjectTestService.hasId2());
+        assertThrows(UnAuthorizationException.class, () -> hasSubjectTestService.hasName());
+        assertThrows(UnAuthorizationException.class, () -> hasSubjectTestService.hasDisplayName());
+        assertThrows(UnAuthorizationException.class, () -> hasSubjectTestService.hasType());
+        assertThrows(UnAuthorizationException.class, () -> hasSubjectTestService.hasIss());
     }
 
     @Test
@@ -35,7 +35,7 @@ class HasSubjectTestServiceTest {
         issuer = "iss"
     )
     void testId2() {
-        assertThrows(BaseException.class, () -> hasSubjectTestService.hasId1());
+        assertThrows(UnAuthorizationException.class, () -> hasSubjectTestService.hasId1());
         assertDoesNotThrow(() -> hasSubjectTestService.hasId2());
         assertDoesNotThrow(() -> hasSubjectTestService.hasName());
         assertDoesNotThrow(() -> hasSubjectTestService.hasDisplayName());

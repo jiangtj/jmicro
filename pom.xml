@@ -6,13 +6,14 @@
     <groupId>com.jiangtj.micro</groupId>
     <artifactId>parent</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.15</version>
+    <version>0.0.18</version>
     <url>https://github.com/jiangtj/jmicro</url>
+    <description>An open-source framework based on Spring Boot, helps you create applications more easily</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.3</version>
+        <version>3.4.4</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -41,6 +42,8 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>17</java.version>
         <casdoor.version>1.15.0</casdoor.version>
+        <wxJava.version>4.7.0</wxJava.version>
+        <jjwt.version>0.12.6</jjwt.version>
         <!-- <maven.test.skip>true</maven.test.skip> -->
     </properties>
 
@@ -72,9 +75,11 @@
                 <module>micro-web</module>
                 <module>micro-auth</module>
                 <module>micro-auth-casdoor</module>
+                <module>micro-auth-wechat</module>
                 <module>micro-spring-boot-starter</module>
                 <module>micro-sql-jooq</module>
                 <module>micro-test</module>
+                <module>micro-dependencies</module>
             </modules>
             <activation>
                 <activeByDefault>true</activeByDefault>
@@ -139,38 +144,10 @@
         <dependencies>
             <dependency>
                 <groupId>com.jiangtj.micro</groupId>
-                <artifactId>micro-auth</artifactId>
-                <version>0.0.15</version>
-            </dependency>
-            <dependency>
-                <groupId>com.jiangtj.micro</groupId>
-                <artifactId>micro-auth-casdoor</artifactId>
-                <version>0.0.15</version>
-            </dependency>
-            <dependency>
-                <groupId>com.jiangtj.micro</groupId>
-                <artifactId>micro-common</artifactId>
-                <version>0.0.15</version>
-            </dependency>
-            <dependency>
-                <groupId>com.jiangtj.micro</groupId>
-                <artifactId>micro-web</artifactId>
-                <version>0.0.15</version>
-            </dependency>
-            <dependency>
-                <groupId>com.jiangtj.micro</groupId>
-                <artifactId>micro-spring-boot-starter</artifactId>
-                <version>0.0.15</version>
-            </dependency>
-            <dependency>
-                <groupId>com.jiangtj.micro</groupId>
-                <artifactId>micro-sql-jooq</artifactId>
-                <version>0.0.15</version>
-            </dependency>
-            <dependency>
-                <groupId>com.jiangtj.micro</groupId>
-                <artifactId>micro-test</artifactId>
-                <version>0.0.15</version>
+                <artifactId>micro-dependencies</artifactId>
+                <version>0.0.18</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>com.google.code.findbugs</groupId>
@@ -181,6 +158,51 @@
                 <groupId>org.casbin</groupId>
                 <artifactId>casdoor-spring-boot-starter</artifactId>
                 <version>${casdoor.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.binarywang</groupId>
+                <artifactId>weixin-java-miniapp</artifactId>
+                <version>${wxJava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.binarywang</groupId>
+                <artifactId>weixin-java-open</artifactId>
+                <version>${wxJava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.binarywang</groupId>
+                <artifactId>weixin-java-pay</artifactId>
+                <version>${wxJava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.binarywang</groupId>
+                <artifactId>weixin-java-mp</artifactId>
+                <version>${wxJava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.binarywang</groupId>
+                <artifactId>weixin-java-cp</artifactId>
+                <version>${wxJava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-api</artifactId>
+                <version>${jjwt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-impl</artifactId>
+                <version>${jjwt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-jackson</artifactId>
+                <version>${jjwt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-gson</artifactId>
+                <version>${jjwt.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
