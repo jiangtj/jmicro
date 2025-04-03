@@ -6,8 +6,9 @@
     <groupId>com.jiangtj.micro</groupId>
     <artifactId>parent</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.17</version>
+    <version>0.0.18</version>
     <url>https://github.com/jiangtj/jmicro</url>
+    <description>An open-source framework based on Spring Boot, helps you create applications more easily</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -144,7 +145,7 @@
             <dependency>
                 <groupId>com.jiangtj.micro</groupId>
                 <artifactId>micro-dependencies</artifactId>
-                <version>0.0.17</version>
+                <version>0.0.18</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
