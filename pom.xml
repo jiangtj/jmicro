@@ -78,6 +78,7 @@
                 <module>micro-spring-boot-starter</module>
                 <module>micro-sql-jooq</module>
                 <module>micro-test</module>
+                <module>micro-dependencies</module>
             </modules>
             <activation>
                 <activeByDefault>true</activeByDefault>

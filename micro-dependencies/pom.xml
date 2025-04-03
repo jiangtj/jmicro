@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.jiangtj.micro</groupId>
+    <artifactId>micro-dependencies</artifactId>
+    <packaging>pom</packaging>
+    <version>0.0.15</version>
+    <url>https://github.com/jiangtj/jmicro</url>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.jiangtj.micro</groupId>
+                <artifactId>micro-auth</artifactId>
+                <version>0.0.15</version>
+            </dependency>
+            <dependency>
+                <groupId>com.jiangtj.micro</groupId>
+                <artifactId>micro-auth-casdoor</artifactId>
+                <version>0.0.15</version>
+            </dependency>
+            <dependency>
+                <groupId>com.jiangtj.micro</groupId>
+                <artifactId>micro-common</artifactId>
+                <version>0.0.15</version>
+            </dependency>
+            <dependency>
+                <groupId>com.jiangtj.micro</groupId>
+                <artifactId>micro-web</artifactId>
+                <version>0.0.15</version>
+            </dependency>
+            <dependency>
+                <groupId>com.jiangtj.micro</groupId>
+                <artifactId>micro-spring-boot-starter</artifactId>
+                <version>0.0.15</version>
+            </dependency>
+            <dependency>
+                <groupId>com.jiangtj.micro</groupId>
+                <artifactId>micro-sql-jooq</artifactId>
+                <version>0.0.15</version>
+            </dependency>
+            <dependency>
+                <groupId>com.jiangtj.micro</groupId>
+                <artifactId>micro-test</artifactId>
+                <version>0.0.15</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+</project>
