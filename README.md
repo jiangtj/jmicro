@@ -11,7 +11,20 @@ J Micro 是一个基于 Spring Boot 的轻量框架，方便开发者更轻松�
 
 在开发阶段，建议使用本地安装。即 `clone` 后，`mvn install -P lib` 安装到本地，当然也可直接引用 Maven Central 上已发布的lib
 
-该项目包含下面这些模块
+```xml
+<!-- 添加依赖管理，可以在添加模块的时候省略版本号 -->
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>com.jiangtj.micro</groupId>
+            <artifactId>micro-dependencies</artifactId>
+            <version>${last-version}</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+    </dependencies>
+</dependencyManagement>
+```
 
 ### [认证与鉴权模块](micro-auth)
 
@@ -19,7 +32,6 @@ J Micro 是一个基于 Spring Boot 的轻量框架，方便开发者更轻松�
 <dependency>
     <groupId>com.jiangtj.micro</groupId>
     <artifactId>micro-auth</artifactId>
-    <version>${last-version}</version>
 </dependency>
 ```
 
@@ -69,7 +81,6 @@ class ExampleService {
 <dependency>
     <groupId>com.jiangtj.micro</groupId>
     <artifactId>micro-web</artifactId>
-    <version>${last-version}</version>
 </dependency>
 ```
 
@@ -99,7 +110,6 @@ public class MyConfiguration {
 <dependency>
     <groupId>com.jiangtj.micro</groupId>
     <artifactId>micro-sql-jooq</artifactId>
-    <version>${last-version}</version>
 </dependency>
 ```
 
@@ -139,7 +149,6 @@ public Mono<Page<AdminUser>> fetchPage() {
 <dependency>
     <groupId>com.jiangtj.micro</groupId>
     <artifactId>micro-spring-boot-starter</artifactId>
-    <version>${last-version}</version>
 </dependency>
 ```
 
