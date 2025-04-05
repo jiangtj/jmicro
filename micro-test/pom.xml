@@ -35,7 +35,6 @@
         <dependency>
             <groupId>io.projectreactor</groupId>
             <artifactId>reactor-test</artifactId>
-            <optional>true</optional>
         </dependency>
     </dependencies>
 
