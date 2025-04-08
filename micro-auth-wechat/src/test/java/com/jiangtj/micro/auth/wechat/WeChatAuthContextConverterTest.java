@@ -3,6 +3,7 @@ package com.jiangtj.micro.auth.wechat;
 import com.jiangtj.micro.auth.AuthRequestAttributes;
 import com.jiangtj.micro.auth.context.AuthContext;
 import com.jiangtj.micro.auth.context.Subject;
+import com.jiangtj.micro.auth.reactive.ReactiveAuthRequest;
 import io.jsonwebtoken.Jwts;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
@@ -16,7 +17,7 @@ class WeChatAuthContextConverterTest {
     @Test
     public void convert_NoAuthorizationHeader_ReturnsNull() {
         MockServerHttpRequest request = MockServerHttpRequest.get("/").build();
-        AuthContext result = converter.convert(request);
+        AuthContext result = converter.convert(new ReactiveAuthRequest(request));
         assertNull(result);
     }
 
@@ -26,7 +27,7 @@ class WeChatAuthContextConverterTest {
                 .header(AuthRequestAttributes.TOKEN_HEADER_NAME, "Bearer token1")
                 .header(AuthRequestAttributes.TOKEN_HEADER_NAME, "Bearer token2")
                 .build();
-        AuthContext result = converter.convert(request);
+        AuthContext result = converter.convert(new ReactiveAuthRequest(request));
         assertNull(result);
     }
 
@@ -39,7 +40,7 @@ class WeChatAuthContextConverterTest {
         MockServerHttpRequest request = MockServerHttpRequest.get("/")
                 .header(AuthRequestAttributes.TOKEN_HEADER_NAME, "Bearer " + jwt)
                 .build();
-        AuthContext result = converter.convert(request);
+        AuthContext result = converter.convert(new ReactiveAuthRequest(request));
         assertNotNull(result);
         Subject subject = result.subject();
         assertEquals("testUser", subject.getId());
@@ -51,6 +52,6 @@ class WeChatAuthContextConverterTest {
         MockServerHttpRequest request = MockServerHttpRequest.get("/")
                 .header(AuthRequestAttributes.TOKEN_HEADER_NAME, "Bearer invalidToken")
                 .build();
-        assertThrows(Exception.class, () -> converter.convert(request));
+        assertThrows(Exception.class, () -> converter.convert(new ReactiveAuthRequest(request)));
     }
 }

@@ -1,6 +1,5 @@
 package com.jiangtj.micro.auth.context;
 
-import org.springframework.http.HttpRequest;
 import org.springframework.lang.Nullable;
 
 /**
@@ -9,12 +8,12 @@ import org.springframework.lang.Nullable;
 public interface AuthContextConverter {
 
     /**
-     * 将HttpRequest转换为AuthContext对象。
+     * 将AuthRequest转换为AuthContext对象。
      *
-     * @param request 要转换的HttpRequest对象
+     * @param request 要转换的AuthRequest对象
      * @return 转换后的AuthContext对象，如果转换失败则返回null
      */
     @Nullable
-    AuthContext convert(HttpRequest request);
+    AuthContext convert(AuthRequest request);
 
 }

@@ -1,7 +1,5 @@
 package com.jiangtj.micro.auth.context;
 
-import org.springframework.http.HttpRequest;
-
 import java.util.List;
 
 /**
@@ -17,13 +15,13 @@ public class AuthContextFactory {
         this.handlers = handlers;
     }
 
-    public AuthContext getAuthContext(HttpRequest request) {
+    public AuthContext getAuthContext(AuthRequest request) {
         AuthContext ctx = convertRequest(request);
         handlers.forEach(handler -> handler.handle(ctx));
         return ctx;
     }
 
-    private AuthContext convertRequest(HttpRequest request) {
+    private AuthContext convertRequest(AuthRequest request) {
         for (AuthContextConverter converter : converters) {
             AuthContext context = converter.convert(request);
             if (context != null) {
