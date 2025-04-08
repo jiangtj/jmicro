@@ -75,7 +75,7 @@ public interface AuthRequest {
      */
     default Optional<String> getHeader(String name) {
         List<String> headers = getHeaders(name);
-        return headers.size() == 1 ? Optional.of(headers.get(0)) : Optional.empty();
+        return headers.stream().findFirst();
     }
 
     /**
@@ -86,6 +86,6 @@ public interface AuthRequest {
      */
     default Optional<String> getQueryParam(String name) {
         List<String> params = getQueryParams(name);
-        return params.size() == 1 ? Optional.of(params.get(0)) : Optional.empty();
+        return params.stream().findFirst();
     }
 }
