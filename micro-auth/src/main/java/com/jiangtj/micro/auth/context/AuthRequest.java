@@ -1,5 +1,6 @@
 package com.jiangtj.micro.auth.context;
 
+import org.springframework.http.HttpMethod;
 import org.springframework.util.AntPathMatcher;
 
 import java.net.URI;
@@ -42,6 +43,13 @@ public interface AuthRequest {
      * @return 完整的请求 URI，包含查询参数
      */
     URI getURI();
+
+    /**
+     * 获取 HTTP 请求方法
+     *
+     * @return HTTP 请求方法（Spring 的 HttpMethod 枚举类型）
+     */
+    HttpMethod getMethod();
 
     /**
      * 获取查询参数值

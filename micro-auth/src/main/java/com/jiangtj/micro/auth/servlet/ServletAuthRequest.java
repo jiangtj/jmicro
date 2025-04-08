@@ -2,6 +2,7 @@ package com.jiangtj.micro.auth.servlet;
 
 import com.jiangtj.micro.auth.context.AuthRequest;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.server.RequestPath;
 
 import java.net.URI;
@@ -47,6 +48,11 @@ public final class ServletAuthRequest implements AuthRequest {
             this.uri = initURI(request);
         }
         return this.uri;
+    }
+
+    @Override
+    public HttpMethod getMethod() {
+        return HttpMethod.valueOf(request.getMethod());
     }
 
     public HttpServletRequest request() {

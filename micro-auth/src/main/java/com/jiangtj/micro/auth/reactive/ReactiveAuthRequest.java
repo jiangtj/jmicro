@@ -1,6 +1,7 @@
 package com.jiangtj.micro.auth.reactive;
 
 import com.jiangtj.micro.auth.context.AuthRequest;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 
 import java.net.URI;
@@ -32,5 +33,10 @@ public record ReactiveAuthRequest(ServerHttpRequest request) implements AuthRequ
     @Override
     public URI getURI() {
         return request.getURI();
+    }
+
+    @Override
+    public HttpMethod getMethod() {
+        return request.getMethod();
     }
 }
