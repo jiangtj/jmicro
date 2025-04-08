@@ -59,4 +59,9 @@ public final class ServletAuthRequest implements AuthRequest {
         return request;
     }
 
+    @Override
+    public Object getSessionAttribute(String name) {
+        return request.getSession(false) != null ? request.getSession().getAttribute(name) : null;
+    }
+
 }

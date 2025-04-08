@@ -52,4 +52,9 @@ public class MockAuthRequest implements AuthRequest {
     public List<String> getHeaders(String name) {
         return headers.getOrDefault(name, Collections.emptyList());
     }
+
+    @Override
+    public Object getSessionAttribute(String name) {
+        return null;
+    }
 }

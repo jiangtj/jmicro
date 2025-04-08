@@ -68,6 +68,14 @@ public interface AuthRequest {
     List<String> getHeaders(String name);
 
     /**
+     * 获取session中的属性值
+     *
+     * @param name 属性名称
+     * @return session中的属性值，如果属性不存在则返回null
+     */
+    Object getSessionAttribute(String name);
+
+    /**
      * 获取单个请求头值
      *
      * @param name 请求头名称
@@ -75,7 +83,7 @@ public interface AuthRequest {
      */
     default Optional<String> getHeader(String name) {
         List<String> headers = getHeaders(name);
-        return headers.stream().findFirst();
+        return headers.size() == 1 ? Optional.of(headers.get(0)) : Optional.empty();
     }
 
     /**
@@ -86,6 +94,18 @@ public interface AuthRequest {
      */
     default Optional<String> getQueryParam(String name) {
         List<String> params = getQueryParams(name);
-        return params.stream().findFirst();
+        return params.size() == 1 ? Optional.of(params.get(0)) : Optional.empty();
+    }
+
+    /**
+     * 获取session中的属性值并转换为指定类型
+     *
+     * @param name 属性名称
+     * @param <T>  返回值类型
+     * @return session中的属性值，如果属性不存在则返回null
+     */
+    @SuppressWarnings("unchecked")
+    default <T> T getSessionValue(String name) {
+        return (T) getSessionAttribute(name);
     }
 }

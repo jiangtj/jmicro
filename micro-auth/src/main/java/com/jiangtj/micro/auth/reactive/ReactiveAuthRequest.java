@@ -3,6 +3,7 @@ package com.jiangtj.micro.auth.reactive;
 import com.jiangtj.micro.auth.context.AuthRequest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.web.server.ServerWebExchange;
 
 import java.net.URI;
 import java.util.Collections;
@@ -11,7 +12,7 @@ import java.util.List;
 /**
  * WebFlux 环境下的 AuthRequest 实现
  */
-public record ReactiveAuthRequest(ServerHttpRequest request) implements AuthRequest {
+public record ReactiveAuthRequest(ServerHttpRequest request, ServerWebExchange exchange) implements AuthRequest {
 
     @Override
     public String getPath() {
@@ -38,5 +39,12 @@ public record ReactiveAuthRequest(ServerHttpRequest request) implements AuthRequ
     @Override
     public HttpMethod getMethod() {
         return request.getMethod();
+    }
+
+    @Override
+    public Object getSessionAttribute(String name) {
+        return exchange.getSession()
+            .map(session -> session.getAttribute(name))
+            .block();
     }
 }

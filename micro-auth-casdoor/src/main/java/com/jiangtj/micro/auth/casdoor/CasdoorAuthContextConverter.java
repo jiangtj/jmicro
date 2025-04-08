@@ -29,6 +29,7 @@ public class CasdoorAuthContextConverter implements AuthContextConverter {
         String token = headers.get(0);
         String headerPrefix = AuthRequestAttributes.TOKEN_HEADER_PREFIX;
         User user = casdoorAuthService.parseJwtToken(token.substring(headerPrefix.length()));
+        Object test = request.getSessionAttribute("test");
         return new CasdoorUserContextImpl(issuer, user);
     }
 

@@ -15,12 +15,12 @@ public class MockAuthRequest implements AuthRequest {
     private final Map<String, List<String>> headers;
     private final Map<String, List<String>> queryParams;
 
-    public MockAuthRequest(HttpMethod method, URI uri) {
-        this.uri = uri;
+    private MockAuthRequest(Builder builder) {
+        this.uri = builder.uri;
         this.path = RequestPath.parse(this.uri, null);
-        this.method = method;
-        this.headers = new HashMap<>();
-        this.queryParams = new HashMap<>();
+        this.method = builder.method;
+        this.headers = builder.headers;
+        this.queryParams = builder.queryParams;
 
         String query = uri.getQuery();
         if (query != null && !query.isEmpty()) {
@@ -71,11 +71,54 @@ public class MockAuthRequest implements AuthRequest {
         return headers.getOrDefault(name, Collections.emptyList());
     }
 
-    public static MockAuthRequest create(HttpMethod method, String urlString) {
-        try {
-            return new MockAuthRequest(method, new URI(urlString));
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
+    @Override
+    public Object getSessionAttribute(String name) {
+        return null;
+    }
+
+    public static Builder get(String urlString) {
+        return new Builder(HttpMethod.GET, urlString);
+    }
+
+    public static Builder post(String urlString) {
+        return new Builder(HttpMethod.POST, urlString);
+    }
+
+    public static Builder put(String urlString) {
+        return new Builder(HttpMethod.PUT, urlString);
+    }
+
+    public static Builder delete(String urlString) {
+        return new Builder(HttpMethod.DELETE, urlString);
+    }
+
+    public static class Builder {
+        private final URI uri;
+        private final HttpMethod method;
+        private final Map<String, List<String>> headers = new HashMap<>();
+        private final Map<String, List<String>> queryParams = new HashMap<>();
+
+        private Builder(HttpMethod method, String urlString) {
+            try {
+                this.uri = new URI(urlString);
+                this.method = method;
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        public Builder header(String name, String value) {
+            headers.computeIfAbsent(name, k -> new ArrayList<>()).add(value);
+            return this;
+        }
+
+        public Builder queryParam(String name, String value) {
+            queryParams.computeIfAbsent(name, k -> new ArrayList<>()).add(value);
+            return this;
+        }
+
+        public MockAuthRequest build() {
+            return new MockAuthRequest(this);
         }
     }
 }
