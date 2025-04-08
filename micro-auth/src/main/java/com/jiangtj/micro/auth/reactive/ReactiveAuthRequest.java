@@ -3,6 +3,7 @@ package com.jiangtj.micro.auth.reactive;
 import com.jiangtj.micro.auth.context.AuthRequest;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 
+import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 
@@ -13,7 +14,7 @@ public record ReactiveAuthRequest(ServerHttpRequest request) implements AuthRequ
 
     @Override
     public String getPath() {
-        return request.getPath().value();
+        return request.getPath().pathWithinApplication().value();
     }
 
     @Override
@@ -26,5 +27,10 @@ public record ReactiveAuthRequest(ServerHttpRequest request) implements AuthRequ
     public List<String> getHeaders(String name) {
         List<String> headers = request.getHeaders().get(name);
         return headers != null ? headers : Collections.emptyList();
+    }
+
+    @Override
+    public URI getURI() {
+        return request.getURI();
     }
 }

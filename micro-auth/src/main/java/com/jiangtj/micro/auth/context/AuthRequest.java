@@ -2,6 +2,7 @@ package com.jiangtj.micro.auth.context;
 
 import org.springframework.util.AntPathMatcher;
 
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -14,7 +15,7 @@ public interface AuthRequest {
     AntPathMatcher matcher = new AntPathMatcher();
 
     /**
-     * 获取请求路径
+     * 获取请求路径(应用内的)
      *
      * @return 请求路径
      */
@@ -34,6 +35,13 @@ public interface AuthRequest {
         return Arrays.stream(patterns)
             .anyMatch(pattern -> matcher.match(pattern, path));
     }
+
+    /**
+     * 获取完整的请求 URI
+     *
+     * @return 完整的请求 URI，包含查询参数
+     */
+    URI getURI();
 
     /**
      * 获取查询参数值

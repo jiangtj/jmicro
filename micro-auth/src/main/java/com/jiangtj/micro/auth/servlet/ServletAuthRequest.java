@@ -2,18 +2,32 @@ package com.jiangtj.micro.auth.servlet;
 
 import com.jiangtj.micro.auth.context.AuthRequest;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.server.RequestPath;
 
+import java.net.URI;
 import java.util.Collections;
 import java.util.List;
+
+import static org.springframework.http.server.ServletServerHttpRequest.initURI;
 
 /**
  * Servlet 环境下的 AuthRequest 实现
  */
-public record ServletAuthRequest(HttpServletRequest request) implements AuthRequest {
+public final class ServletAuthRequest implements AuthRequest {
+    private final HttpServletRequest request;
+    private URI uri;
+    private RequestPath path;
+
+    public ServletAuthRequest(HttpServletRequest request) {
+        this.request = request;
+    }
 
     @Override
     public String getPath() {
-        return request.getRequestURI();
+        if (this.path == null) {
+            this.path = RequestPath.parse(getURI(), request.getContextPath());
+        }
+        return this.path.pathWithinApplication().value();
     }
 
     @Override
@@ -26,4 +40,17 @@ public record ServletAuthRequest(HttpServletRequest request) implements AuthRequ
     public List<String> getHeaders(String name) {
         return Collections.list(request.getHeaders(name));
     }
+
+    @Override
+    public URI getURI() {
+        if (this.uri == null) {
+            this.uri = initURI(request);
+        }
+        return this.uri;
+    }
+
+    public HttpServletRequest request() {
+        return request;
+    }
+
 }
