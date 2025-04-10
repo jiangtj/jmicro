@@ -42,7 +42,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>17</java.version>
         <casdoor.version>1.15.0</casdoor.version>
-        <wxJava.version>4.7.0</wxJava.version>
+        <wxJava.version>4.7.3.B</wxJava.version>
         <jjwt.version>0.12.6</jjwt.version>
         <!-- <maven.test.skip>true</maven.test.skip> -->
     </properties>
