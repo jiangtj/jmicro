@@ -12,6 +12,9 @@ import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
+import java.util.Map;
+
 @Order(Orders.BASE_EXCEPTION_FILTER + 10)
 public class ReactiveAuthContextFilter implements WebFilter {
 
@@ -26,9 +29,11 @@ public class ReactiveAuthContextFilter implements WebFilter {
             return chain.filter(exchange);
         }
 
-        AuthContext context = factory.getAuthContext(new ReactiveAuthRequest(request, exchange));
-
-        return chain.filter(exchange)
-            .contextWrite(ctx -> ctx.put(AuthContext.class, context));
+        return exchange.getSession().map(session -> session.getAttributes()).defaultIfEmpty(Collections.emptyMap())
+                .map(sessionAttributes -> {
+                    AuthContext context = factory
+                            .getAuthContext(new ReactiveAuthRequest(request, exchange, sessionAttributes));
+                    return context;
+                }).flatMap(context -> chain.filter(exchange).contextWrite(ctx -> ctx.put(AuthContext.class, context)));
     }
 }
