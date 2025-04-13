@@ -1,6 +1,7 @@
 package com.jiangtj.micro.auth.context;
 
 import org.springframework.http.HttpMethod;
+import org.springframework.lang.Nullable;
 import org.springframework.util.AntPathMatcher;
 
 import java.net.URI;
@@ -73,6 +74,7 @@ public interface AuthRequest {
      * @param name 属性名称
      * @return session中的属性值，如果属性不存在则返回null
      */
+    @Nullable
     Object getSessionAttribute(String name);
 
     /**
@@ -104,6 +106,7 @@ public interface AuthRequest {
      * @param <T>  返回值类型
      * @return session中的属性值，如果属性不存在则返回null
      */
+    @Nullable
     @SuppressWarnings("unchecked")
     default <T> T getSessionValue(String name) {
         return (T) getSessionAttribute(name);

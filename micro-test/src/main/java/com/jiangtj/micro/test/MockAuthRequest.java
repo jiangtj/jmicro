@@ -3,6 +3,7 @@ package com.jiangtj.micro.test;
 import com.jiangtj.micro.auth.context.AuthRequest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.server.RequestPath;
+import org.springframework.lang.NonNull;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -46,33 +47,38 @@ public class MockAuthRequest implements AuthRequest {
         queryParams.computeIfAbsent(name, k -> new ArrayList<>()).add(value);
     }
 
+    @NonNull
     @Override
     public String getPath() {
         return path.pathWithinApplication().value();
     }
 
+    @NonNull
     @Override
     public URI getURI() {
         return uri;
     }
 
+    @NonNull
     @Override
     public HttpMethod getMethod() {
         return method;
     }
 
+    @NonNull
     @Override
-    public List<String> getQueryParams(String name) {
+    public List<String> getQueryParams(@NonNull String name) {
         return queryParams.getOrDefault(name, Collections.emptyList());
     }
 
+    @NonNull
     @Override
-    public List<String> getHeaders(String name) {
+    public List<String> getHeaders(@NonNull String name) {
         return headers.getOrDefault(name, Collections.emptyList());
     }
 
     @Override
-    public Object getSessionAttribute(String name) {
+    public Object getSessionAttribute(@NonNull String name) {
         return null;
     }
 

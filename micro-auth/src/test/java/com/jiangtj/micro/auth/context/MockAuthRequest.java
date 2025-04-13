@@ -1,6 +1,7 @@
 package com.jiangtj.micro.auth.context;
 
 import org.springframework.http.HttpMethod;
+import org.springframework.lang.NonNull;
 
 import java.net.URI;
 import java.util.*;
@@ -44,17 +45,17 @@ public class MockAuthRequest implements AuthRequest {
     }
 
     @Override
-    public List<String> getQueryParams(String name) {
+    public List<String> getQueryParams(@NonNull String name) {
         return queryParams.getOrDefault(name, Collections.emptyList());
     }
 
     @Override
-    public List<String> getHeaders(String name) {
+    public List<String> getHeaders(@NonNull String name) {
         return headers.getOrDefault(name, Collections.emptyList());
     }
 
     @Override
-    public Object getSessionAttribute(String name) {
+    public Object getSessionAttribute(@NonNull String name) {
         return null;
     }
 }
