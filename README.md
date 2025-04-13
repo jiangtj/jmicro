@@ -176,5 +176,6 @@ casdoor 是需要的，demo 由 casdoor 提供认证和鉴权功能
     - 填写应用名application_he3oml
     - 填写client-id a1f9883530433d009fb1
     - 填写client-secret a7b03bfdb051d1e6115dad3ec304995f975900eb
+    - 证书选择新添加的证书
 
 接下来运行前端和后端项目，即可体验
