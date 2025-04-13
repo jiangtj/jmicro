@@ -15,10 +15,8 @@ class AuthRequestTest {
 
     @BeforeEach
     void setUp() {
-        request = new MockAuthRequest(
-            "/api/users",
-            URI.create("http://localhost:8080/api/users?id=1&name=test"),
-            HttpMethod.GET);
+        request = new MockAuthRequest("/api/users", URI.create("http://localhost:8080/api/users?id=1&name=test"),
+                HttpMethod.GET);
         request.addHeader("Authorization", "Bearer token");
         request.addHeader("Accept", "application/json");
         request.addQueryParam("id", "1");
@@ -40,9 +38,7 @@ class AuthRequestTest {
 
     @Test
     void testGetURI() {
-        assertEquals(
-            "http://localhost:8080/api/users?id=1&name=test",
-            request.getURI().toString());
+        assertEquals("http://localhost:8080/api/users?id=1&name=test", request.getURI().toString());
     }
 
     @Test
@@ -90,5 +86,19 @@ class AuthRequestTest {
         assertTrue(request.getQueryParam("id").isPresent());
         assertEquals("1", request.getQueryParam("id").get());
         assertTrue(request.getQueryParam("nonexistent").isEmpty());
+    }
+
+    @Test
+    void testGetSessionAttribute() {
+        // Add a session attribute
+        request.addAttributes("user", "admin");
+        request.addAttributes("role", "ADMIN");
+
+        // Test getting existing attributes
+        assertTrue(request.getSessionAttribute("user").equals("admin"));
+        assertEquals("ADMIN", request.getSessionAttribute("role"));
+
+        // Test getting non-existent attribute
+        assertNull(request.getSessionAttribute("nonexistent"));
     }
 }
