@@ -44,7 +44,7 @@ public record ReactiveAuthRequest(ServerHttpRequest request, WebSession session)
 
     @Nullable
     @Override
-    public Object getSessionAttribute(String name) {
+    public <T> T getSessionAttribute(String name) {
         return session.getAttribute(name);
     }
 }

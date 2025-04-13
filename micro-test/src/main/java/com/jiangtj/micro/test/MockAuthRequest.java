@@ -15,6 +15,7 @@ public class MockAuthRequest implements AuthRequest {
     private final HttpMethod method;
     private final Map<String, List<String>> headers;
     private final Map<String, List<String>> queryParams;
+    private final Map<String, Object> attributes;
 
     private MockAuthRequest(Builder builder) {
         this.uri = builder.uri;
@@ -22,6 +23,7 @@ public class MockAuthRequest implements AuthRequest {
         this.method = builder.method;
         this.headers = builder.headers;
         this.queryParams = builder.queryParams;
+        this.attributes = builder.attributes;
 
         String query = uri.getQuery();
         if (query != null && !query.isEmpty()) {
@@ -78,9 +80,11 @@ public class MockAuthRequest implements AuthRequest {
     }
 
     @Override
-    public Object getSessionAttribute(@NonNull String name) {
-        return null;
+    @SuppressWarnings("unchecked")
+    public <T> T getSessionAttribute(@NonNull String name) {
+        return (T)attributes.get(name);
     }
+
 
     public static Builder get(String urlString) {
         return new Builder(HttpMethod.GET, urlString);
@@ -103,6 +107,7 @@ public class MockAuthRequest implements AuthRequest {
         private final HttpMethod method;
         private final Map<String, List<String>> headers = new HashMap<>();
         private final Map<String, List<String>> queryParams = new HashMap<>();
+        private final Map<String, Object> attributes = new HashMap<>();
 
         private Builder(HttpMethod method, String urlString) {
             try {
@@ -120,6 +125,11 @@ public class MockAuthRequest implements AuthRequest {
 
         public Builder queryParam(String name, String value) {
             queryParams.computeIfAbsent(name, k -> new ArrayList<>()).add(value);
+            return this;
+        }
+
+        public Builder attribute(String name, Object value) {
+            attributes.put(name, value);
             return this;
         }
 

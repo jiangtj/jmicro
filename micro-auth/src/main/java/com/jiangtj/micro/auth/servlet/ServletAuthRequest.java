@@ -60,8 +60,9 @@ public final class ServletAuthRequest implements AuthRequest {
     }
 
     @Override
-    public Object getSessionAttribute(String name) {
-        return request.getSession(false) != null ? request.getSession().getAttribute(name) : null;
+    @SuppressWarnings("unchecked")
+    public <T> T getSessionAttribute(String name) {
+        return (T) request.getSession().getAttribute(name);
     }
 
 }

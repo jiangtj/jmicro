@@ -2,6 +2,7 @@ package com.jiangtj.micro.auth.context;
 
 import org.springframework.http.HttpMethod;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 import java.net.URI;
 import java.util.*;
@@ -12,6 +13,7 @@ public class MockAuthRequest implements AuthRequest {
     private final HttpMethod method;
     private final Map<String, List<String>> headers;
     private final Map<String, List<String>> queryParams;
+    private final Map<String, Object> attributes;
 
     public MockAuthRequest(String path, URI uri, HttpMethod method) {
         this.path = path;
@@ -19,6 +21,7 @@ public class MockAuthRequest implements AuthRequest {
         this.method = method;
         this.headers = new HashMap<>();
         this.queryParams = new HashMap<>();
+        this.attributes = new HashMap<>();
     }
 
     public void addHeader(String name, String value) {
@@ -27,6 +30,10 @@ public class MockAuthRequest implements AuthRequest {
 
     public void addQueryParam(String name, String value) {
         queryParams.computeIfAbsent(name, k -> new ArrayList<>()).add(value);
+    }
+
+    public void addAttributes(String name, Object value) {
+        attributes.put(name, value);
     }
 
     @Override
@@ -54,8 +61,10 @@ public class MockAuthRequest implements AuthRequest {
         return headers.getOrDefault(name, Collections.emptyList());
     }
 
+    @Nullable
     @Override
-    public Object getSessionAttribute(@NonNull String name) {
-        return null;
+    @SuppressWarnings("unchecked")
+    public <T> T getSessionAttribute(@NonNull String name) {
+        return (T)attributes.get(name);
     }
 }
