@@ -19,15 +19,13 @@
 ```java
 @Component
 public class JsonAuthContextConverter implements AuthContextConverter {
-
-    @Override
     @Nullable
-    public AuthContext convert(HttpRequest request) {
-        List<String> headers = request.getHeaders().get(AuthRequestAttributes.TOKEN_HEADER_NAME);
-        if (headers == null || headers.size() != 1) {
-            return AuthContext.unLogin();
+    @Override
+    public AuthContext convert(AuthRequest request) {
+        List<String> headers = request.getHeaders(AuthRequestAttributes.TOKEN_HEADER_NAME);
+        if (headers.size() != 1) {
+            return null;
         }
-
         String token = headers.get(0);
         JwtParser parser = Jwts.parser()
             .verifyWith(key)
@@ -39,7 +37,6 @@ public class JsonAuthContextConverter implements AuthContextConverter {
         // 获取角色和权限从你的服务中(tip: 缓存可以带来更好的性能)
         return AuthContext.create(subject, Authorization.create(roles, permissions));
     }
-
 }
 ```
 

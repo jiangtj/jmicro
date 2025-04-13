@@ -37,25 +37,26 @@ J Micro 是一个基于 Spring Boot 的轻量框架，方便开发者更轻松�
 下面是一个例子，使用 jjwt 解析 bearer token
 
 ```java
+@Component
 public class JsonAuthContextConverter implements AuthContextConverter {
-
-    @Override
-    public AuthContext convert(HttpRequest request) {
-        List<String> headers = request.getHeaders().get(AuthRequestAttributes.TOKEN_HEADER_NAME);
-        if (headers == null || headers.size() != 1) {
-            return AuthContext.unLogin();
-        }
-
-        String token = headers.get(0);
-        JwtParser parser = Jwts.parser()
-            .verifyWith(key)
-            .build();
-        Claims body = parser.parseSignedClaims(token).getPayload();
-        Subject subject = new Subject();
-        subject.setId(body.sub);
-        return AuthContext.create(subject);
-    }
-
+   @Nullable
+   @Override
+   public AuthContext convert(AuthRequest request) {
+      List<String> headers = request.getHeaders(AuthRequestAttributes.TOKEN_HEADER_NAME);
+      if (headers.size() != 1) {
+         return null;
+      }
+      String token = headers.get(0);
+      JwtParser parser = Jwts.parser()
+              .verifyWith(key)
+              .build();
+      Claims body = parser.parseSignedClaims(token).getPayload();
+      Subject subject = new Subject();
+      subject.setId(body.sub);
+      // 如果你在 session 中存储登录信息，那么你只需从 session 中取出并转换为 AuthContext 即可
+      // 获取角色和权限从你的服务中(tip: 缓存可以带来更好的性能)
+      return AuthContext.create(subject, Authorization.create(roles, permissions));
+   }
 }
 ```
 
