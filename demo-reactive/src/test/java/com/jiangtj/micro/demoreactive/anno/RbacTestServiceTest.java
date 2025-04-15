@@ -9,6 +9,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import reactor.core.publisher.Mono;
 
 @Slf4j
 @JMicroTest
@@ -92,6 +93,9 @@ class RbacTestServiceTest {
         AuthStepVerifier.create(rbacTestService.hasAdminOrUser())
             .expectError(NoRoleException.class)
             .verify();
+        AuthStepVerifier.create(rbacTestService.hasAdminOrUserP(Mono.just("start")))
+            .expectError(NoRoleException.class)
+            .verify();
     }
 
     @Test
@@ -109,12 +113,20 @@ class RbacTestServiceTest {
         AuthStepVerifier.create(rbacTestService.hasAdminOrUser())
             .expectComplete()
             .verify();
+        AuthStepVerifier.create(rbacTestService.hasAdminOrUserP(Mono.just("start")))
+            .expectNext("startresult")
+            .expectComplete()
+            .verify();
     }
 
     @Test
     @WithMockRole("user")
     void testUser() {
         AuthStepVerifier.create(rbacTestService.hasAdminOrUser())
+            .expectComplete()
+            .verify();
+        AuthStepVerifier.create(rbacTestService.hasAdminOrUserP(Mono.just("start")))
+            .expectNext("startresult")
             .expectComplete()
             .verify();
     }
