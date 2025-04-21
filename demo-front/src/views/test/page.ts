@@ -35,5 +35,14 @@ export default {
         component: () => import('./TableView.vue')
       }
     })
+    defineMenuRoute({
+      name: '图片上传',
+      parent: ['test'],
+      route: {
+        name: 'test-pic-upload',
+        path: '/test/pic-upload',
+        component: () => import('./PicUploadView.vue')
+      }
+    })
   }
 }
