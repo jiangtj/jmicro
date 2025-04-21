@@ -6,12 +6,16 @@ import com.aliyun.oss.common.auth.CredentialsProviderFactory;
 import com.aliyun.oss.common.comm.SignVersion;
 import com.aliyun.oss.model.PutObjectRequest;
 import com.aliyun.oss.model.PutObjectResult;
+import com.jiangtj.micro.pic.upload.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 @Slf4j
-public class AliOSSService {
+@PicUploadType("ali")
+public class AliOSSService implements PicUploadProvider {
 
     private final AliOSSProperties properties;
     ClientBuilderConfiguration clientBuilderConfiguration;
@@ -66,5 +70,19 @@ public class AliOSSService {
             ossClient.shutdown();
         }
         throw new RuntimeException("上传失败");
+    }
+
+    @Override
+    public PicUploadResult upload(PicUploadProperties.Dir dir, MultipartFile file) {
+        String name = PicUploadUtils.generateNewFileName(file);
+        try {
+            String url = upload(dir.resolve(name), file.getInputStream());
+            return PicUploadResult.builder()
+                .fileName(name)
+                .fileUrl(url)
+                .build();
+        } catch (IOException e) {
+            throw new PicUploadException("上传失败!");
+        }
     }
 }

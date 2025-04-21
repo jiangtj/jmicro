@@ -122,7 +122,7 @@ const uploadAction: UploadProps['httpRequest'] = (data) => {
   const file = data.file
   const forms = new FormData() // 实例化一个formData，用来做文件上传
   forms.append('file', file)
-  forms.append('type', '1')
+  forms.append('type', 'test')
   // api.upload(forms).then((data) => {
   //   emit('update:modelValue', data);
   // });

@@ -1,11 +1,17 @@
 package com.jiangtj.micro.pic.upload;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 图片上传结果
  */
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class PicUploadResult {
 
     /**
@@ -19,22 +25,12 @@ public class PicUploadResult {
     private String fileName;
 
     /**
-     * 文件路径
+     * 文件Url
      */
-    private String filePath;
+    private String fileUrl;
 
     /**
-     * 文件大小（字节）
+     * 缩略图Url（如果生成）
      */
-    private long fileSize;
-
-    /**
-     * 文件类型
-     */
-    private String fileType;
-
-    /**
-     * 缩略图路径（如果生成）
-     */
-    private String thumbnailPath;
+    private String thumbnailUrl;
 }
