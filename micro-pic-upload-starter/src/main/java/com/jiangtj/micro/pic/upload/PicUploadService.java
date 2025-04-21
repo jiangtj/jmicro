@@ -6,13 +6,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.Objects;
 
 /**
  * 图片上传服务
@@ -61,7 +59,7 @@ public class PicUploadService {
         Path targetPath = uploadDir.resolve(newFileName);
 
         // 保存文件
-        file.transferTo(targetPath.toFile());
+        file.transferTo(targetPath);
 
         // 构建结果
         PicUploadResult result = new PicUploadResult();
