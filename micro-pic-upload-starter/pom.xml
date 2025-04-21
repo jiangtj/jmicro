@@ -10,7 +10,7 @@
     <artifactId>micro-pic-upload-starter</artifactId>
     <version>0.0.20</version>
     <name>micro-pic-upload-starter</name>
-    <description>Spring Boot Starter for picture upload functionality</description>
+    <description>Make it easy to upload picture into oss</description>
 
     <dependencies>
         <dependency>

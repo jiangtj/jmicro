@@ -23,7 +23,7 @@ public class PicUploadProperties {
     /**
      * 最大文件大小（字节）
      */
-    private long maxFileSize = 5 * 1024 * 1024; // 默认5MB
+    private long maxFileSize = 10 * 1024 * 1024; // 默认5MB
 
     /**
      * 是否生成缩略图

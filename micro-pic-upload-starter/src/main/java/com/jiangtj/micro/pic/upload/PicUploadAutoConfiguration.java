@@ -1,14 +1,14 @@
 package com.jiangtj.micro.pic.upload;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * 图片上传自动配置类
  */
-@Configuration
+@AutoConfiguration
 @EnableConfigurationProperties(PicUploadProperties.class)
 public class PicUploadAutoConfiguration {
 
