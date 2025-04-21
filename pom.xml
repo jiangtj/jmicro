@@ -80,6 +80,7 @@
                 <module>micro-sql-jooq</module>
                 <module>micro-test</module>
                 <module>micro-dependencies</module>
+                <module>micro-pic-upload-starter</module>
             </modules>
             <activation>
                 <activeByDefault>true</activeByDefault>
