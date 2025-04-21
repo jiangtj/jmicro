@@ -14,7 +14,7 @@ public class RandomStringUtils {
     private static final String src_upper = src_lower.toUpperCase();
     private static final String src_hex_lower = "0123456789abcdef";
     private static final String src_hex_upper = src_hex_lower.toUpperCase();
-    private static final String esc_char = "?";
+    private static final char esc_char = '?';
 
     private static final Object locker = new Object();
 
@@ -28,26 +28,19 @@ public class RandomStringUtils {
     }
 
     public static String get(String format) {
-        StringBuilder r = new StringBuilder(format.length());
-        String src = src_number + src_upper;
-        for (int i = 0; i < format.length(); i++) {
-            String curr = String.valueOf(format.charAt(i));
-            if (curr.equalsIgnoreCase(esc_char)) {
-                r.append(getRandomChar(src));
-            } else {
-                r.append(curr);
-            }
-        }
-        return r.toString();
+        return get(format, esc_char);
     }
 
     public static String get(String format, char esc) {
+        return get(src_number + src_upper, format, esc);
+    }
+
+    public static String get(String source, String format, char esc) {
         StringBuilder r = new StringBuilder(format.length());
-        String src = src_number + src_upper;
         for (int i = 0; i < format.length(); i++) {
             String curr = String.valueOf(format.charAt(i));
             if (curr.equalsIgnoreCase(String.valueOf(esc))) {
-                r.append(getRandomChar(src));
+                r.append(getRandomChar(source));
             } else {
                 r.append(curr);
             }
@@ -64,29 +57,11 @@ public class RandomStringUtils {
     }
 
     public static String getNum(String format) {
-        StringBuilder r = new StringBuilder(format.length());
-        for (int i = 0; i < format.length(); i++) {
-            String curr = String.valueOf(format.charAt(i));
-            if (curr.equalsIgnoreCase(esc_char)) {
-                r.append(getRandomChar(src_number));
-            } else {
-                r.append(curr);
-            }
-        }
-        return r.toString();
+        return getNum(format, esc_char);
     }
 
     public static String getNum(String format, char esc) {
-        StringBuilder r = new StringBuilder(format.length());
-        for (int i = 0; i < format.length(); i++) {
-            String curr = String.valueOf(format.charAt(i));
-            if (curr.equalsIgnoreCase(String.valueOf(esc))) {
-                r.append(getRandomChar(src_number));
-            } else {
-                r.append(curr);
-            }
-        }
-        return r.toString();
+        return get(src_number, format, esc);
     }
 
     public static String getHex(int size) {
@@ -98,29 +73,11 @@ public class RandomStringUtils {
     }
 
     public static String getHex(String format) {
-        StringBuilder r = new StringBuilder(format.length());
-        for (int i = 0; i < format.length(); i++) {
-            String curr = String.valueOf(format.charAt(i));
-            if (curr.equalsIgnoreCase(esc_char)) {
-                r.append(getRandomChar(src_hex_upper));
-            } else {
-                r.append(curr);
-            }
-        }
-        return r.toString();
+        return getHex(format, esc_char);
     }
 
     public static String getHex(String format, char esc) {
-        StringBuilder r = new StringBuilder(format.length());
-        for (int i = 0; i < format.length(); i++) {
-            String curr = String.valueOf(format.charAt(i));
-            if (curr.equalsIgnoreCase(String.valueOf(esc))) {
-                r.append(getRandomChar(src_hex_upper));
-            } else {
-                r.append(curr);
-            }
-        }
-        return r.toString();
+        return get(src_hex_upper, format, esc);
     }
 
     private static String getRandomChar(String src) {
