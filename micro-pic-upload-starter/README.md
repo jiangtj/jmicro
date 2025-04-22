@@ -46,16 +46,18 @@ micro:
 
 ```xml
 
-<dependency>
-    <groupId>com.aliyun.oss</groupId>
-    <artifactId>aliyun-sdk-oss</artifactId>
-    <version>3.18.1</version>
-</dependency>
-<dependency>
-<groupId>com.huaweicloud</groupId>
-<artifactId>esdk-obs-java-bundle</artifactId>
-<version>3.23.9.1</version>
-</dependency>
+<dependencies>
+    <dependency>
+        <groupId>com.aliyun.oss</groupId>
+        <artifactId>aliyun-sdk-oss</artifactId>
+        <version>3.18.1</version>
+    </dependency>
+    <dependency>
+        <groupId>com.huaweicloud</groupId>
+        <artifactId>esdk-obs-java-bundle</artifactId>
+        <version>3.23.9.1</version>
+    </dependency>
+</dependencies>
 ```
 
 ```properties
