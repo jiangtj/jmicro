@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -48,9 +47,8 @@ public class PicUploadService {
      *
      * @param file 上传的文件
      * @return 上传结果，包含文件路径等信息
-     * @throws IOException 如果文件操作失败
      */
-    public PicUploadResult upload(String target, MultipartFile file) throws IOException {
+    public PicUploadResult upload(String target, MultipartFile file) {
         if (!StringUtils.hasText(target)) {
             throw new PicUploadException("请提供上传目标");
         }
@@ -97,5 +95,9 @@ public class PicUploadService {
             return false;
         }
         return Arrays.asList(dir.getAllowedExtensions()).contains(extension.toLowerCase());
+    }
+
+    public PicUploadProperties.Dir getDir(String target) {
+        return properties.getDirs().get(target);
     }
 }
