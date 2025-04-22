@@ -5,10 +5,8 @@
 ## 功能特性
 
 - 支持多种图片格式（jpg、jpeg、png、gif、webp）
-- 文件大小限制
 - 自动生成随机文件名
 - 可配置上传路径
-- 可选的缩略图生成功能
 
 ## 使用方法
 
@@ -18,7 +16,6 @@
 <dependency>
     <groupId>com.jiangtj.micro</groupId>
     <artifactId>micro-pic-upload-starter</artifactId>
-    <version>0.0.20</version>
 </dependency>
 ```
 
@@ -30,12 +27,49 @@
 micro:
   pic:
     upload:
-      upload-path: /path/to/upload/directory # 上传目录，默认为系统临时目录
-      allowed-extensions: jpg,jpeg,png,gif,webp # 允许的文件类型
-      max-file-size: 5242880 # 最大文件大小，默认5MB
-      generate-thumbnail: false # 是否生成缩略图
-      thumbnail-width: 200 # 缩略图宽度
-      thumbnail-height: 200 # 缩略图高度
+      provider: local # 上传提供者，可选值：local, ali, hw
+      allowed-extensions: jpg,jpeg,png,gif,webp # 默认允许的文件类型
+      max-file-size: 5242880 # 最大文件大小
+      target-name:
+        path: /path/to/upload/directory # 上传路径，必须
+        provider: local # 覆盖上传提供者
+        allowed-extensions: jpg,jpeg,png,gif,webp # 覆盖允许的文件类型
+        max-file-size: 5242880 # 覆盖最大文件大小
+
+      # local provider
+      local:
+        upload-path: /path/to/upload/directory # 上传目录，默认为系统临时目录
+        url: http://localhost:8080/upload/ # 上传后的访问路径，默认为当前请求路径
+```
+
+如果使用 ali 和 hw 提供者需要引入他们的 sdk，并配置响应的属性
+
+```xml
+
+<dependency>
+    <groupId>com.aliyun.oss</groupId>
+    <artifactId>aliyun-sdk-oss</artifactId>
+    <version>3.18.1</version>
+</dependency>
+<dependency>
+<groupId>com.huaweicloud</groupId>
+<artifactId>esdk-obs-java-bundle</artifactId>
+<version>3.23.9.1</version>
+</dependency>
+```
+
+```properties
+ali.oss.endpoint=https://oss-cn-hangzhou.aliyuncs.com
+ali.oss.region=cn-hangzhou
+ali.oss.bucket-name=bucket-name
+ali.oss.url=https://bucket-name.oss-cn-hangzhou.aliyuncs.com
+# 你需要配置密钥，也可以从系统环境中读取
+#ali.oss.access-key-id=access-key-id
+#ali.oss.secret-access-key=secret-access-key
+hw.obs.end-point=https://obs.cn-north-1.myhuaweicloud.com
+hw.obs.bucket-name=bucket-name
+hw.obs.key=key
+hw.obs.secret=secret
 ```
 
 ### 在代码中使用
@@ -52,8 +86,8 @@ public class UploadController {
     }
 
     @PostMapping("/image")
-    public PicUploadResult uploadImage(@RequestParam("file") MultipartFile file) throws IOException {
-        return picUploadService.upload(file);
+    public PicUploadResult uploadImage(@RequestParam("target") String target, @RequestParam("file") MultipartFile file) throws IOException {
+        return picUploadService.upload(target, file);
     }
 }
 ```
@@ -64,7 +98,5 @@ public class UploadController {
 
 - originalFileName: 原始文件名
 - fileName: 新文件名
-- filePath: 文件保存路径
-- fileSize: 文件大小（字节）
-- fileType: 文件类型
-- thumbnailPath: 缩略图路径（如果生成）
+- fileUrl: 文件访问路径
+- thumbnailUrl: 缩略图路径（如果存在）
