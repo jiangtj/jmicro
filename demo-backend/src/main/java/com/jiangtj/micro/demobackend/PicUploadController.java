@@ -18,9 +18,8 @@ public class PicUploadController {
     private PicUploadService picUploadService;
 
     @PostMapping("upload")
-    public PicUploadResult upload(String type, MultipartFile file) throws IOException {
-        PicUploadResult result = picUploadService.upload(type, file);
-        return result;
+    public PicUploadResult upload(String target, MultipartFile file) throws IOException {
+        return picUploadService.upload(target, file);
     }
 
 }

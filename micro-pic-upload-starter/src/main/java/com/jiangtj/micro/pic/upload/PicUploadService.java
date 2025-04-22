@@ -30,6 +30,17 @@ public class PicUploadService {
                         .map(PicUploadType::value)
                         .orElse(provider.getClass().getName()),
                 Function.identity()));
+        this.properties.getDirs().forEach((target, dir) -> {
+            if (!StringUtils.hasText(dir.getProvider())) {
+                dir.setProvider(properties.getProvider());
+            }
+            if (dir.getMaxFileSize() == null) {
+                dir.setMaxFileSize(properties.getMaxFileSize());
+            }
+            if (dir.getAllowedExtensions() == null) {
+                dir.setAllowedExtensions(properties.getAllowedExtensions());
+            }
+        });
     }
 
     /**
@@ -39,10 +50,13 @@ public class PicUploadService {
      * @return 上传结果，包含文件路径等信息
      * @throws IOException 如果文件操作失败
      */
-    public PicUploadResult upload(String type, MultipartFile file) throws IOException {
-        PicUploadProperties.Dir dir = properties.getDirs().get(type);
+    public PicUploadResult upload(String target, MultipartFile file) throws IOException {
+        if (!StringUtils.hasText(target)) {
+            throw new PicUploadException("请提供上传目标");
+        }
+        PicUploadProperties.Dir dir = properties.getDirs().get(target);
         if (dir == null) {
-            throw new PicUploadException("不存在上传类型定义，请在配置文件中添加: micro.pic.upload." + type);
+            throw new PicUploadException("不存在上传的目标定义，请在配置文件中添加: micro.pic.upload." + target);
         }
 
         // 检查文件是否为空
@@ -64,7 +78,7 @@ public class PicUploadService {
             throw new PicUploadException("不支持的文件类型");
         }
 
-        PicUploadProvider provider = providers.get(properties.getProvider());
+        PicUploadProvider provider = providers.get(dir.getProvider());
         if (provider == null) {
             throw new PicUploadException("不存在的图片上传服务");
         }

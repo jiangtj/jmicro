@@ -12,15 +12,29 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "micro.pic.upload")
 public class PicUploadProperties {
 
+    /**
+     * 默认的文件上传提供者
+     */
     private String provider = "local";
+
+    /**
+     * 默认允许的文件类型
+     */
+    private String[] allowedExtensions = {"jpg", "jpeg", "png", "gif", "webp"};
+
+    /**
+     * 默认最大文件大小（字节）
+     */
+    private long maxFileSize = 10 * 1024 * 1024; // 默认10MB
 
     private Map<String, Dir> dirs;
 
     @Data
     public static class Dir {
         private String path;
-        private long maxFileSize = 10 * 1024 * 1024; // 默认10MB
-        private String[] allowedExtensions = {"jpg", "jpeg", "png", "gif", "webp"};
+        private String provider;
+        private Long maxFileSize;
+        private String[] allowedExtensions;
 
         public String resolve(String fileName) {
             if (path.endsWith("/")) {
