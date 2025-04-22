@@ -45,7 +45,6 @@ micro:
 如果使用 ali 和 hw 提供者需要引入他们的 sdk，并配置响应的属性
 
 ```xml
-
 <dependencies>
     <dependency>
         <groupId>com.aliyun.oss</groupId>
