@@ -104,6 +104,24 @@ public class MyConfiguration {
 
 > Tip: 这是对过滤器的扩展，所以不仅仅能用于鉴权，任何你希望过滤的场景，都可以使用这个过滤器，另外在传统的 servlet 中，可以使用拦截器，它由 Spring 提供的且支持 ant-style 的路径匹配
 
+### [图片上传模块](micro-pic-upload-starter)
+
+```xml
+
+<dependency>
+   <groupId>com.jiangtj.micro</groupId>
+   <artifactId>micro-pic-upload-starter</artifactId>
+</dependency>
+```
+
+图片上传在项目中属于比较常用的功能，这个模块旨在简化上传，配置好参数，即可将你的图片转换为url，支持以下服务商上传图片
+
+- [x] 本地上传
+- [x] 阿里云 OSS
+- [x] 华为云 OBS
+- [ ] minio
+- [ ] easyimage2.0
+
 ### [JOOQ 扩展](micro-sql-jooq)
 
 ```xml

@@ -3,6 +3,7 @@ package com.jiangtj.micro.pic.upload;
 import com.jiangtj.micro.common.utils.FileNameUtils;
 import com.jiangtj.micro.web.AnnotationUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.lang.NonNull;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -48,14 +49,8 @@ public class PicUploadService {
      * @param file 上传的文件
      * @return 上传结果，包含文件路径等信息
      */
-    public PicUploadResult upload(String target, MultipartFile file) {
-        if (!StringUtils.hasText(target)) {
-            throw new PicUploadException("请提供上传目标");
-        }
-        PicUploadProperties.Dir dir = properties.getDirs().get(target);
-        if (dir == null) {
-            throw new PicUploadException("不存在上传的目标定义，请在配置文件中添加: micro.pic.upload." + target);
-        }
+    public PicUploadResult upload(@NonNull String target, MultipartFile file) {
+        PicUploadProperties.Dir dir = getDir(target);
 
         // 检查文件是否为空
         if (file.isEmpty()) {
@@ -97,7 +92,15 @@ public class PicUploadService {
         return Arrays.asList(dir.getAllowedExtensions()).contains(extension.toLowerCase());
     }
 
+    @NonNull
     public PicUploadProperties.Dir getDir(String target) {
-        return properties.getDirs().get(target);
+        if (!StringUtils.hasText(target)) {
+            throw new PicUploadException("请提供上传目标");
+        }
+        PicUploadProperties.Dir dir = properties.getDirs().get(target);
+        if (dir == null) {
+            throw new PicUploadException("不存在上传的目标定义，请在配置文件中添加: micro.pic.upload." + target);
+        }
+        return dir;
     }
 }
