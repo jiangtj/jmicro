@@ -84,7 +84,7 @@ class LocalPicUploadServiceTest {
     @Test
     void testUploadExceedMaxSize() {
         // 设置最大文件大小为500字节
-        dir.setMaxFileSize(500);
+        dir.setMaxFileSize(500L);
 
         // 创建超过大小限制的文件
         byte[] content = new byte[1000];
