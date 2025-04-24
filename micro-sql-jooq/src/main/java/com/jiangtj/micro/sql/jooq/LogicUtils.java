@@ -9,13 +9,6 @@ import static org.jooq.impl.DSL.field;
 
 /**
  * 逻辑删除工具类。
- * <p>
- * 该类提供了一系列静态方法，用于处理数据库表中的逻辑删除功能。 主要包括：
- * <ul>
- * <li>生成未删除条件</li>
- * <li>执行逻辑删除操作</li>
- * </ul>
- * </p>
  */
 public abstract class LogicUtils {
     /**

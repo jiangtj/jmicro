@@ -10,9 +10,6 @@ import org.springframework.data.domain.Pageable;
 
 /**
  * 支持分页查询的 DAO 实现基类。
- * <p>
- * 该类扩展了 JOOQ 的标准 DAO 实现，添加了分页查询功能。
- * </p>
  *
  * @param <R> 数据库记录类型
  * @param <P> POJO 类型

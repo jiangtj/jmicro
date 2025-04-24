@@ -9,13 +9,6 @@ import reactor.core.publisher.Mono;
 
 /**
  * 响应式分页查询工具类。
- * <p>
- * 该类提供了一系列静态方法，用于支持响应式环境下的分页查询操作。 主要功能包括：
- * <ul>
- * <li>响应式数据转换</li>
- * <li>分页结果构建</li>
- * </ul>
- * </p>
  */
 public interface PageReactiveUtils {
 

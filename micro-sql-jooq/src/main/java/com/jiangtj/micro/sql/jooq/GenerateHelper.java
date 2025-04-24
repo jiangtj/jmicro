@@ -10,14 +10,6 @@ import org.springframework.boot.jdbc.DatabaseDriver;
 
 /**
  * JOOQ 代码生成器的辅助工具类。
- * <p>
- * 该类提供了一系列静态方法和配置项，用于简化 JOOQ 代码生成器的配置过程。 主要功能包括：
- * <ul>
- * <li>数据源配置的管理</li>
- * <li>代码生成器的配置项管理</li>
- * <li>生成器扩展功能的开关控制</li>
- * </ul>
- * </p>
  */
 public class GenerateHelper {
 

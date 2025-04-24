@@ -11,13 +11,6 @@ import org.springframework.data.domain.Pageable;
 
 /**
  * JOOQ 代码生成器的扩展类，用于增强生成的代码功能。
- * <p>
- * 该类主要提供以下扩展功能：
- * <ul>
- * <li>为表类添加 PojoType 引用方法</li>
- * <li>为 DAO 类添加分页查询方法</li>
- * </ul>
- * </p>
  */
 @Slf4j
 public class ExtendGenerator extends JavaGenerator {
@@ -40,7 +33,7 @@ public class ExtendGenerator extends JavaGenerator {
      * 为表类生成获取 POJO 类型的方法。
      * <p>
      * 该方法会在表类中生成一个 getPojoType() 方法，用于获取对应的 POJO 类的 Class 对象。 这个功能需要通过
-     * {@link GenerateHelper#isGeneratePojoTypeRef()} 来启用。
+     * GenerateHelper.isGeneratePojoTypeRef() 来启用。
      * </p>
      *
      * @param table 表定义对象
@@ -59,7 +52,7 @@ public class ExtendGenerator extends JavaGenerator {
      * 为 DAO 类生成分页查询方法。
      * <p>
      * 该方法会在 DAO 类中生成一个 fetchPage 方法，用于支持分页查询功能。 这个功能需要通过
-     * {@link GenerateHelper#isGeneratePageFetch()} 来启用。
+     * GenerateHelper.isGeneratePageFetch() 来启用。
      * </p>
      * 
      * 生成的方法示例如下：
