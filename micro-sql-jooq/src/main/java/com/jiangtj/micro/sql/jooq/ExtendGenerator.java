@@ -9,6 +9,16 @@ import org.jooq.meta.TableDefinition;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+/**
+ * JOOQ 代码生成器的扩展类，用于增强生成的代码功能。
+ * <p>
+ * 该类主要提供以下扩展功能：
+ * <ul>
+ * <li>为表类添加 PojoType 引用方法</li>
+ * <li>为 DAO 类添加分页查询方法</li>
+ * </ul>
+ * </p>
+ */
 @Slf4j
 public class ExtendGenerator extends JavaGenerator {
 
@@ -27,7 +37,14 @@ public class ExtendGenerator extends JavaGenerator {
     }
 
     /**
-     * 创建一个 PojoType 方法，在表定义中
+     * 为表类生成获取 POJO 类型的方法。
+     * <p>
+     * 该方法会在表类中生成一个 getPojoType() 方法，用于获取对应的 POJO 类的 Class 对象。 这个功能需要通过
+     * {@link GenerateHelper#isGeneratePojoTypeRef()} 来启用。
+     * </p>
+     *
+     * @param table 表定义对象
+     * @param out   Java 代码输出器
      */
     public void generatePojoTypeForTableClass(TableDefinition table, JavaWriter out) {
         String className = out.ref(getStrategy().getFullJavaClassName(table, GeneratorStrategy.Mode.POJO));
@@ -39,15 +56,23 @@ public class ExtendGenerator extends JavaGenerator {
     }
 
     /**
-     * 创建一个分页查询方法，示例如下（由于无法修改默认实现，所以需要生成时添加）
-     * <code>
-     *    public Page fetchPage(Pageable pageable, Condition... conditions) {
-     *         return PageUtils.selectFrom(ctx(), getTable())
-     *             .conditions(conditions)
-     *             .pageable(pageable)
+     * 为 DAO 类生成分页查询方法。
+     * <p>
+     * 该方法会在 DAO 类中生成一个 fetchPage 方法，用于支持分页查询功能。 这个功能需要通过
+     * {@link GenerateHelper#isGeneratePageFetch()} 来启用。
+     * </p>
+     * 
+     * 生成的方法示例如下：
+     * 
+     * <pre>
+     * public Page fetchPage(Pageable pageable, Condition... conditions) {
+     *     return PageUtils.selectFrom(ctx(), getTable()).conditions(conditions).pageable(pageable)
      *             .fetchPage(getType());
-     *     }
-     * </code>
+     * }
+     * </pre>
+     *
+     * @param table 表定义对象
+     * @param out   Java 代码输出器
      */
     public void generatePageQueryForDaoClass(TableDefinition table, JavaWriter out) {
         String pojo = out.ref(getStrategy().getFullJavaClassName(table, GeneratorStrategy.Mode.POJO));
