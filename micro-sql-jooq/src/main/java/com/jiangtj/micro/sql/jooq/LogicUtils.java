@@ -28,17 +28,7 @@ public abstract class LogicUtils {
      * @return 未删除的条件表达式
      */
     public static <R extends Record> Condition notDeleted(Table<R> table) {
-        return Objects.requireNonNull(table.field("is_deleted", Number.class)).eq(0);
-    }
-
-    /**
-     * 使用指定的字段获取未删除条件。
-     *
-     * @param field 逻辑删除标记字段
-     * @return 未删除的条件表达式
-     */
-    public static Condition notDeleted(Field<Number> field) {
-        return field.eq(0);
+        return Objects.requireNonNull(table.field("is_deleted", Integer.class)).eq(0);
     }
 
     /**
@@ -50,7 +40,7 @@ public abstract class LogicUtils {
      * @return 更新语句构建器
      */
     public static <R extends Record> UpdateSetMoreStep<R> delete(DSLContext create, Table<R> table) {
-        return create.update(table).set(table.field("is_deleted", Number.class), 1);
+        return create.update(table).set(table.field("is_deleted", Integer.class), 1);
     }
 
     /**
