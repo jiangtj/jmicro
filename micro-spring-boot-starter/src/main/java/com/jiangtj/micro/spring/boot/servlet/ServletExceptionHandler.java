@@ -37,7 +37,7 @@ public class ServletExceptionHandler {
             ServerResponse.status(body.getStatus())
                 .body(body)
                 .writeTo(request, response, context);
-            log.warn(buildLogMessage(ex, request));
+            log.warn(buildLogMessage(ex, request), ex);
             return;
         }
 
@@ -49,7 +49,7 @@ public class ServletExceptionHandler {
             BaseException wrapper = BaseExceptionUtils.internalServerError(ex.getMessage(), ex);
             URIUtils.update(wrapper, request);
             ServerResponse.from(wrapper).writeTo(request, response, context);
-            log.error(buildLogMessage(ex, request));
+            log.error(buildLogMessage(ex, request), ex);
         }
     }
 
