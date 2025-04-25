@@ -3,10 +3,13 @@ package com.jiangtj.micro.sql.jooq;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.*;
 import org.jooq.Record;
+import org.springframework.util.StringUtils;
 
 import java.util.Objects;
+import java.util.function.Function;
 
 import static org.jooq.impl.DSL.condition;
+import static org.jooq.impl.DSL.noCondition;
 
 /**
  * 查询工具类。
@@ -35,7 +38,7 @@ public abstract class QueryUtils {
      * @param <R>     记录类型
      * @return 条件表达式
      */
-    public static <R extends Record> Condition noEmptyCondition(DSLContext create, Table<R> table, Object example) {
+    public static <R extends Record> Condition notEmptyCondition(DSLContext create, Table<R> table, Object example) {
         R record = create.newRecord(table, example);
         replaceEmptyWithNull(record);
         return condition(record);
@@ -58,4 +61,36 @@ public abstract class QueryUtils {
             }
         }
     }
+
+    /**
+     * 根据布尔条件返回对应的Condition对象
+     *
+     * @param predicate 条件判断标志
+     * @param condition true 时候选条件对象
+     * @return Condition 根据predicate值返回对应的条件对象
+     */
+    public static Condition predicate(boolean predicate, Condition condition) {
+        return predicate ? condition : noCondition();
+    }
+
+    public static Condition notEmpty(Function<String, Condition> condition, String fieldValue) {
+        return predicate(StringUtils.hasLength(fieldValue), condition.apply(fieldValue));
+    }
+
+    public static <T> Condition notNull(Function<T, Condition> condition, T fieldValue) {
+        return predicate(fieldValue != null, condition.apply(fieldValue));
+    }
+
+    public static Condition ne(Function<String, Condition> condition, String fieldValue) {
+        return notEmpty(condition, fieldValue);
+    }
+
+    public static <R extends Record> Condition nec(DSLContext create, Table<R> table, Object example) {
+        return notEmptyCondition(create, table, example);
+    }
+
+    public static <T> Condition nn(Function<T, Condition> condition, T fieldValue) {
+        return notNull(condition, fieldValue);
+    }
+
 }
