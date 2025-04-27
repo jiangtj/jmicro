@@ -131,7 +131,9 @@ public class MyConfiguration {
 </dependency>
 ```
 
-为什么不使用 Mybatis? 在中国 Mybatis 无疑是使用人数最多的，但多并不代表的好，我不喜欢在 xml 中写 sql, 因为它不能很好的对类型进行校验, 而 Jooq 可以像写 java 一样写 sql, 这对我来说很有吸引力, 这个扩展是提供一些方便的工具，比如分页查询
+为什么不使用 Mybatis? 在中国 Mybatis 无疑是使用人数最多的，但多并不代表的好，我不喜欢在 xml 中写 sql, 因为它不能很好的对类型进行校验,
+而 Jooq 可以像写 java 一样写 sql, 这对我来说很有吸引力, 这个扩展是提供一些方便的工具，比如 通用的Dao 分页查询
+支持Lombok的POJO生成 等等，例如分页查询可以如下写
 
 ```java
 public Page<AdminUser> fetchPage() {
