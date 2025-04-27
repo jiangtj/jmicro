@@ -1,5 +1,6 @@
-package com.jiangtj.micro.sql.jooq;
+package com.jiangtj.micro.sql.jooq.gen;
 
+import com.jiangtj.micro.sql.jooq.PageUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.Condition;
 import org.jooq.codegen.GeneratorStrategy;
