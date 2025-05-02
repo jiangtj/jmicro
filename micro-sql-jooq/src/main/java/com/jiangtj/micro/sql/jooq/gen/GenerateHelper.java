@@ -1,4 +1,4 @@
-package com.jiangtj.micro.sql.jooq;
+package com.jiangtj.micro.sql.jooq.gen;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -32,6 +32,12 @@ public class GenerateHelper {
     @Setter
     @Getter
     static boolean isGeneratePageFetch = true;
+    @Setter
+    @Getter
+    static boolean isGeneratePojoWithLombok = true;
+    @Setter
+    @Getter
+    static boolean isGeneratePojoWithLombokBuilder = false;
 
     /**
      * 使用 Spring 的数据源配置初始化生成器配置。

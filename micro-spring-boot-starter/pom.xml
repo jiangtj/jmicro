@@ -5,10 +5,10 @@
     <parent>
         <groupId>com.jiangtj.micro</groupId>
         <artifactId>parent</artifactId>
-        <version>0.0.22</version>
+        <version>0.0.23</version>
     </parent>
     <artifactId>micro-spring-boot-starter</artifactId>
-    <version>0.0.22</version>
+    <version>0.0.23</version>
     <name>micro-spring-boot-starter</name>
     <description>micro-spring-boot-starter</description>
 
