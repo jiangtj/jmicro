@@ -119,8 +119,8 @@ public class MyConfiguration {
 - [x] 本地上传
 - [x] 阿里云 OSS
 - [x] 华为云 OBS
-- [ ] minio
-- [ ] easyimage2.0
+- [ ] MinIO
+- [x] EasyImages 2.0
 
 ### [JOOQ 扩展](micro-sql-jooq)
 
