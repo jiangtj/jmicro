@@ -5,10 +5,10 @@
     <parent>
         <groupId>com.jiangtj.micro</groupId>
         <artifactId>parent</artifactId>
-        <version>0.0.23</version>
+        <version>0.0.24</version>
     </parent>
     <artifactId>micro-pic-upload-starter</artifactId>
-    <version>0.0.23</version>
+    <version>0.0.24</version>
     <name>micro-pic-upload-starter</name>
     <description>Make it easy to upload picture into oss</description>
 
