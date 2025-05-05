@@ -1,5 +1,5 @@
 # .ide/Dockerfile
-FROM openjdk:21
+FROM timbru31/java-node:21-jdk-22
 
 WORKDIR /root
 
