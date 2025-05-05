@@ -1,5 +1,5 @@
 # .ide/Dockerfile
-FROM timbru31/java-node:21-jdk-22
+FROM timbru31/java-node:21-jdk-20
 
 WORKDIR /root
 
@@ -14,9 +14,6 @@ RUN mkdir -p /ide_cnb
 # 安装 IntelliJ IDEA
 RUN wget https://download.jetbrains.com/idea/ideaIU-2025.1.tar.gz
 RUN tar -zxvf ideaIU-2025.1.tar.gz -C /ide_cnb
-
-# 安装 code-server(VSCode WebIDE 支持)
-RUN curl -LSs "https://download.jetbrains.com/product?code=FLL&release.type=preview&release.type=eap&platform=linux_x64" --output fleet && chmod +x fleet
 
 ENV LANG C.UTF-8
 ENV JAVA_TOOL_OPTIONS -Duser.timezone=GMT+8 -Dfile.encoding=UTF-8
