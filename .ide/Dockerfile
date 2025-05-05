@@ -12,8 +12,8 @@ RUN mkdir -p /ide_cnb
 # 选择安装下方其中一个或多个 IDE
 
 # 安装 IntelliJ IDEA
-RUN wget https://download.jetbrains.com/idea/ideaIU-2024.3.5.tar.gz
-RUN tar -zxvf ideaIU-2024.3.5.tar.gz -C /ide_cnb
+RUN wget https://download.jetbrains.com/idea/ideaIU-2025.1.tar.gz
+RUN tar -zxvf ideaIU-2025.1.tar.gz -C /ide_cnb
 
 # 安装 code-server(VSCode WebIDE 支持)
 RUN curl -fsSL https://code-server.dev/install.sh | sh \
