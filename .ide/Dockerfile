@@ -16,13 +16,7 @@ RUN wget https://download.jetbrains.com/idea/ideaIU-2025.1.tar.gz
 RUN tar -zxvf ideaIU-2025.1.tar.gz -C /ide_cnb
 
 # 安装 code-server(VSCode WebIDE 支持)
-RUN curl -fsSL https://code-server.dev/install.sh | sh \
-  && code-server --install-extension redhat.vscode-yaml \
-  && code-server --install-extension orta.vscode-jest \
-  && code-server --install-extension dbaeumer.vscode-eslint \
-  && code-server --install-extension waderyan.gitblame \
-  && code-server --install-extension mhutchie.git-graph \
-  && code-server --install-extension donjayamanne.githistory
+RUN curl -LSs "https://download.jetbrains.com/product?code=FLL&release.type=preview&release.type=eap&platform=linux_x64" --output fleet && chmod +x fleet
 
 ENV LANG C.UTF-8
 ENV JAVA_TOOL_OPTIONS -Duser.timezone=GMT+8 -Dfile.encoding=UTF-8
