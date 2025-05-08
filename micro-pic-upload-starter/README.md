@@ -8,6 +8,14 @@
 - 自动生成随机文件名
 - 可配置上传路径
 
+目前支持以下服务商上传图片
+
+- [x] 本地上传
+- [x] 阿里云 OSS
+- [x] 华为云 OBS
+- [ ] MinIO
+- [x] EasyImages 2.0
+
 ## 使用方法
 
 ### 添加依赖
@@ -27,7 +35,7 @@
 micro:
   pic:
     upload:
-      provider: local # 上传提供者，可选值：local, ali, hw
+      provider: local # 上传提供者，可选值：local, ali, hw, easyimages
       allowed-extensions: jpg,jpeg,png,gif,webp # 默认允许的文件类型
       max-file-size: 5242880 # 最大文件大小
       target-name:

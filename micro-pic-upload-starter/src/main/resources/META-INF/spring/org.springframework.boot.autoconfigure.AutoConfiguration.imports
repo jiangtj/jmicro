@@ -1,3 +1,4 @@
 com.jiangtj.micro.pic.upload.PicUploadAutoConfiguration
 com.jiangtj.micro.pic.upload.ali.AliOSSAutoConfiguration
 com.jiangtj.micro.pic.upload.hw.ObsAutoConfiguration
+com.jiangtj.micro.pic.upload.easyimages.EasyImagesAutoConfiguration
