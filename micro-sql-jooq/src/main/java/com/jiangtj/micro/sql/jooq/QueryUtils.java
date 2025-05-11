@@ -63,6 +63,20 @@ public abstract class QueryUtils {
         }
     }
 
+    public static void replaceEmptyWithNullForUpdate(Record record) {
+        for (int i = 0; i < record.size(); i++) {
+            Field<?> field = Objects.requireNonNull(record.field(i));
+            DataType<?> dataType = field.getDataType();
+            boolean nullable = dataType.nullable();
+            Object value = record.getValue(field);
+            if (dataType.isString() && !nullable && value instanceof String str && str.isEmpty()) {
+                log.debug("{} is empty, type is nonnull", field.getName());
+                record.set(field, null);
+                record.changed(field, false);
+            }
+        }
+    }
+
     /**
      * 根据布尔条件返回对应的Condition对象
      *
