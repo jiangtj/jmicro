@@ -1,27 +1,29 @@
 package com.jiangtj.micro.sql.jooq.dao;
 
 import lombok.Getter;
-import org.jooq.*;
-import org.jooq.Record;
+import org.jooq.DSLContext;
+import org.jooq.Result;
+import org.jooq.TableField;
+import org.jooq.TableRecord;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class RNLinkDao<R1 extends TableRecord<R1>, T1, R2 extends TableRecord<R2>, T2, RT extends Record>
-    extends AbstractRNDao<R1, T1, R2> {
+public class RNLinkDao<R1 extends TableRecord<R1>, T1, R2 extends TableRecord<R2>, T2, R3 extends TableRecord<R3>>
+    extends AbstractRNDao<R1, T1, R3> {
 
     @Getter
-    private final AbstractRNDao<R1, T1, RT> originalDao;
+    private final AbstractRNDao<R1, T1, R2> originalDao;
 
     @Getter
-    private final TableField<R1, T2> tableField1;
+    private final TableField<R2, T2> tableField1;
 
     @Getter
-    private final TableField<R2, T2> tableField2;
+    private final TableField<R3, T2> tableField2;
 
-    public RNLinkDao(AbstractRNDao<R1, T1, RT> rnDao, TableField<R1, T2> tableField1, TableField<R2, T2> tableField2) {
+    public RNLinkDao(AbstractRNDao<R1, T1, R2> rnDao, TableField<R2, T2> tableField1, TableField<R3, T2> tableField2) {
         super(rnDao.queryField(), tableField2.getTable(), rnDao.isLogic());
         this.originalDao = rnDao;
         this.tableField1 = tableField1;
@@ -29,8 +31,8 @@ public class RNLinkDao<R1 extends TableRecord<R1>, T1, R2 extends TableRecord<R2
     }
 
     @Override
-    public Result<R2> fetch(DSLContext create, T1 value) {
-        Result<RT> fetch = this.originalDao.fetch(create, value);
+    public Result<R3> fetch(DSLContext create, T1 value) {
+        Result<R2> fetch = this.originalDao.fetch(create, value);
         List<T2> list = fetch.stream()
             .map(record -> record.get(tableField1))
             .toList();
@@ -39,12 +41,12 @@ public class RNLinkDao<R1 extends TableRecord<R1>, T1, R2 extends TableRecord<R2
             .fetch();
     }
 
-    public Stream<R2> fetchOrdered(DSLContext create, T1 value) {
-        Result<RT> fetch = this.originalDao.fetch(create, value);
+    public Stream<R3> fetchOrdered(DSLContext create, T1 value) {
+        Result<R2> fetch = this.originalDao.fetch(create, value);
         List<T2> list = fetch.stream()
             .map(record -> record.get(tableField1))
             .toList();
-        Map<T2, R2> map = create.selectFrom(tableField2.getTable())
+        Map<T2, R3> map = create.selectFrom(tableField2.getTable())
             .where(tableField2.in(list))
             .fetch()
             .collect(Collectors.toMap(tableField2::getValue, record -> record));

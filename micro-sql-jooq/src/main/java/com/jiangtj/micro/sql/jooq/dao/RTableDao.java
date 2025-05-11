@@ -59,4 +59,7 @@ public class RTableDao<R extends TableRecord<R>, T1, T2> extends RNDao<R, T1> {
         return insert(create, list);
     }
 
+    public <R3 extends TableRecord<R3>> RTableLinkDao<R, T1, T2, R3> createLink(TableField<R3, T2> linkField) {
+        return new RTableLinkDao<>(this, linkField);
+    }
 }

@@ -4,8 +4,6 @@ import com.jiangtj.micro.sql.jooq.LogicUtils;
 import com.jiangtj.micro.sql.jooq.PageUtils;
 import lombok.Getter;
 import org.jooq.*;
-import org.jooq.impl.DSL;
-import org.jooq.impl.SQLDataType;
 
 import java.util.List;
 import java.util.function.Function;
@@ -14,16 +12,23 @@ import java.util.stream.Stream;
 import static com.jiangtj.micro.sql.jooq.LogicUtils.notDeleted;
 import static com.jiangtj.micro.sql.jooq.QueryUtils.*;
 
-public class Dao<R extends UpdatableRecord<R>> {
+public class Dao<R extends UpdatableRecord<R>, T> {
 
-    private static final Field<Integer> ID = DSL.field("id", SQLDataType.INTEGER);
+    private final Field<T> ID;
 
     private final Table<R> table;
     @Getter
     private final boolean isLogic;
 
-    public Dao(Table<R> table, boolean isLogic) {
+    public Dao(TableField<R, T> idField, boolean isLogic) {
+        this.table = idField.getTable();
+        this.ID = idField;
+        this.isLogic = isLogic;
+    }
+
+    public Dao(Table<R> table, Field<T> idField, boolean isLogic) {
         this.table = table;
+        this.ID = idField;
         this.isLogic = isLogic;
     }
 
@@ -40,11 +45,11 @@ public class Dao<R extends UpdatableRecord<R>> {
         return fetch(create).fetchStream();
     }
 
-    public <T> List<T> fetchAll(DSLContext create, Class<T> clz) {
+    public <V> List<V> fetchAll(DSLContext create, Class<V> clz) {
         return fetch(create).fetchInto(clz);
     }
 
-    public R fetchById(DSLContext create, Integer id) {
+    public R fetchById(DSLContext create, T id) {
         return create.selectFrom(table)
             .where(ID.eq(id))
             .fetchOne();
@@ -72,7 +77,7 @@ public class Dao<R extends UpdatableRecord<R>> {
     public R update(DSLContext create, Object example) {
         R record = create.newRecord(table, example);
         replaceEmptyWithNullForUpdate(record);
-        Integer id = record.getValue(ID);
+        T id = record.getValue(ID);
         Condition condition = ID.eq(id);
         if (isLogic) {
             condition = condition.and(notDeleted());
@@ -81,7 +86,7 @@ public class Dao<R extends UpdatableRecord<R>> {
         return record;
     }
 
-    public int deleteById(DSLContext create, Integer id) {
+    public int deleteById(DSLContext create, T id) {
         if (isLogic) {
             return LogicUtils.delete(create, table)
                 .where(ID.eq(id))
@@ -90,13 +95,5 @@ public class Dao<R extends UpdatableRecord<R>> {
         return create.deleteFrom(table)
             .where(ID.eq(id))
             .execute();
-    }
-
-    public static <R extends UpdatableRecord<R>> Dao<R> createDao(Table<R> table) {
-        return new Dao<>(table, false);
-    }
-
-    public static <R extends UpdatableRecord<R>> Dao<R> createDao(Table<R> table, boolean isLogic) {
-        return new Dao<>(table, isLogic);
     }
 }

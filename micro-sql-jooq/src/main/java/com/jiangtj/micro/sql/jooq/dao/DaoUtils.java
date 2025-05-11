@@ -1,5 +1,7 @@
 package com.jiangtj.micro.sql.jooq.dao;
 
+import com.jiangtj.micro.sql.jooq.dao.i.IDao;
+import com.jiangtj.micro.sql.jooq.dao.i.RTableIDao;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableRecord;
@@ -7,12 +9,12 @@ import org.jooq.UpdatableRecord;
 
 public interface DaoUtils {
 
-    static <R extends UpdatableRecord<R>> Dao<R> createDao(Table<R> table) {
-        return new Dao<>(table, false);
+    static <R extends UpdatableRecord<R>> IDao<R> createDao(Table<R> table) {
+        return new IDao<>(table, false);
     }
 
-    static <R extends UpdatableRecord<R>> Dao<R> createDao(Table<R> table, boolean isLogic) {
-        return new Dao<>(table, isLogic);
+    static <R extends UpdatableRecord<R>> IDao<R> createDao(Table<R> table, boolean isLogic) {
+        return new IDao<>(table, isLogic);
     }
 
     static <R extends TableRecord<R>, T> RNDao<R, T> createRNDao(TableField<R, T> tableField) {
