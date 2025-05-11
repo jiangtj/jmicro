@@ -7,6 +7,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static org.jooq.impl.DSL.condition;
 import static org.jooq.impl.DSL.noCondition;
@@ -73,12 +74,16 @@ public abstract class QueryUtils {
         return predicate ? condition : noCondition();
     }
 
+    public static Condition predicate(boolean predicate, Supplier<Condition> condition) {
+        return predicate ? condition.get() : noCondition();
+    }
+
     public static Condition notEmpty(Function<String, Condition> condition, String fieldValue) {
-        return predicate(StringUtils.hasLength(fieldValue), condition.apply(fieldValue));
+        return predicate(StringUtils.hasLength(fieldValue), () -> condition.apply(fieldValue));
     }
 
     public static <T> Condition notNull(Function<T, Condition> condition, T fieldValue) {
-        return predicate(fieldValue != null, condition.apply(fieldValue));
+        return predicate(fieldValue != null, () -> condition.apply(fieldValue));
     }
 
     public static Condition ne(Function<String, Condition> condition, String fieldValue) {
