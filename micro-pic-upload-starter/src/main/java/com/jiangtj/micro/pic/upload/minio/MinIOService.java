@@ -15,6 +15,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
 @Slf4j
+@PicUploadType("minio")
 public class MinIOService implements PicUploadProvider {
     private final MinioClient minioClient;
     private final MinIOProperties properties;
