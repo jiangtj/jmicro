@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
@@ -38,16 +39,26 @@ public class MinIOService implements PicUploadProvider {
 
             // 上传对象
             String name = PicUploadUtils.generateNewFileName(file);
+            String path = dir.resolve(name);
             minioClient.putObject(
                 PutObjectArgs.builder()
                     .bucket(bucket)
-                    .object(dir.resolve(name))
+                    .object(path)
                     .stream(inputStream, file.getSize(), -1)
                     .contentType(file.getContentType())
                     .build()
             );
 
-            return PicUploadResult.builder().build();
+            // 生成 url
+            String fileUrl = URI.create(properties.getEndpoint())
+                .resolve(bucket)
+                .resolve(path)
+                .toString();
+
+            return PicUploadResult.builder()
+                .fileName(name)
+                .fileUrl(fileUrl)
+                .build();
 
         } catch (MinioException e) {
             log.error("Error occurred: {}", String.valueOf(e));
