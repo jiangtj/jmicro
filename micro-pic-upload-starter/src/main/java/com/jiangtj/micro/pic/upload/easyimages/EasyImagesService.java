@@ -47,9 +47,11 @@ public class EasyImagesService implements PicUploadProvider {
     @Override
     public PicUploadResult upload(PicUploadProperties.Dir dir, MultipartFile file) {
         EasyImagesResponse response = uploadImage(file);
+        String url = response.getUrl();
+        String[] split = url.split("/");
         return PicUploadResult.builder()
-            .fileName(response.getSrcName())
-            .fileUrl(response.getUrl())
+            .fileName(split[split.length - 1])
+            .fileUrl(url)
             .thumbnailUrl(response.getThumb())
             .build();
     }
