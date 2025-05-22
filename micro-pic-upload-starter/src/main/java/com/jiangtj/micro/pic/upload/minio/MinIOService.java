@@ -1,16 +1,21 @@
 package com.jiangtj.micro.pic.upload.minio;
 
+import com.jiangtj.micro.pic.upload.*;
 import io.minio.BucketExistsArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
-import io.minio.UploadObjectArgs;
+import io.minio.PutObjectArgs;
 import io.minio.errors.MinioException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
-public class MinIOService {
+@Slf4j
+public class MinIOService implements PicUploadProvider {
     private final MinioClient minioClient;
     private final MinIOProperties properties;
 
@@ -19,28 +24,37 @@ public class MinIOService {
         this.properties = properties;
     }
 
-    public void uploadObject() throws IOException, NoSuchAlgorithmException, InvalidKeyException {
+    @Override
+    public PicUploadResult upload(PicUploadProperties.Dir dir, MultipartFile file) {
         String bucket = properties.getBucket();
-        try {
+        try (InputStream inputStream = file.getInputStream()) {
             boolean found = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucket).build());
             if (!found) {
                 minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());
             } else {
-                System.out.println("Bucket '" + bucket + "' already exists.");
+                log.error("Bucket '{}' already exists.", bucket);
             }
 
-            minioClient.uploadObject(
-                UploadObjectArgs.builder()
+            // 上传对象
+            String name = PicUploadUtils.generateNewFileName(file);
+            minioClient.putObject(
+                PutObjectArgs.builder()
                     .bucket(bucket)
-                    .object("asiaphotos-2015.zip")
-                    .filename("/home/user/Photos/asiaphotos.zip")
-                    .build());
-            System.out.println(
-                "'/home/user/Photos/asiaphotos.zip' is successfully uploaded as "
-                    + "object 'asiaphotos-2015.zip' to bucket 'asiatrip'.");
+                    .object(dir.resolve(name))
+                    .stream(inputStream, file.getSize(), -1)
+                    .contentType(file.getContentType())
+                    .build()
+            );
+
+            return PicUploadResult.builder().build();
+
         } catch (MinioException e) {
-            System.out.println("Error occurred: " + e);
-            System.out.println("HTTP trace: " + e.httpTrace());
+            log.error("Error occurred: {}", String.valueOf(e));
+            log.error("HTTP trace: {}", e.httpTrace());
+            throw new PicUploadException("文件上传错误!");
+        } catch (IOException | NoSuchAlgorithmException | InvalidKeyException e) {
+            log.error("上传文件失败", e);
+            throw new PicUploadException("文件上传错误!");
         }
     }
 }
