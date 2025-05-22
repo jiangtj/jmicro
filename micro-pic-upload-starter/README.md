@@ -7,13 +7,14 @@
 - 支持多种图片格式（jpg、jpeg、png、gif、webp）
 - 自动生成随机文件名
 - 可配置上传路径
+- 使用官方的 SDK, 安全可靠
 
 目前支持以下服务商上传图片
 
 - [x] 本地上传
 - [x] 阿里云 OSS
 - [x] 华为云 OBS
-- [ ] MinIO
+- [x] MinIO (aka S3)
 - [x] EasyImages 2.0
 
 ## 使用方法
