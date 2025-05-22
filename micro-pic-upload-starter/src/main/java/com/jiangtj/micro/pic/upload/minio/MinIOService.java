@@ -40,6 +40,9 @@ public class MinIOService implements PicUploadProvider {
             // 上传对象
             String name = PicUploadUtils.generateNewFileName(file);
             String path = dir.resolve(name);
+            if (path.startsWith("/")) {
+                path = path.substring(1);
+            }
             minioClient.putObject(
                 PutObjectArgs.builder()
                     .bucket(bucket)
@@ -51,8 +54,7 @@ public class MinIOService implements PicUploadProvider {
 
             // 生成 url
             String fileUrl = URI.create(properties.getEndpoint())
-                .resolve(bucket)
-                .resolve(path)
+                .resolve(bucket + "/" + path)
                 .toString();
 
             return PicUploadResult.builder()
