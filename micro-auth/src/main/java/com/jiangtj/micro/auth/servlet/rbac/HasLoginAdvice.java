@@ -1,28 +1,26 @@
 package com.jiangtj.micro.auth.servlet.rbac;
 
 import com.jiangtj.micro.auth.core.AuthService;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.MethodBeforeAdvice;
-import org.springframework.core.Ordered;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
 import java.lang.reflect.Method;
+import java.util.Objects;
 
 @Slf4j
-public class HasLoginAdvice implements MethodBeforeAdvice, Ordered {
+public class HasLoginAdvice implements MethodBeforeAdvice {
 
-    @Resource
-    private AuthService authService;
+    private final ObjectProvider<AuthService> authService;
 
-    @Override
-    public void before(@NonNull Method method, @NonNull Object[] args, @Nullable Object target) throws Throwable {
-        authService.hasLogin();
+    public HasLoginAdvice(ObjectProvider<AuthService> authService) {
+        this.authService = authService;
     }
 
     @Override
-    public int getOrder() {
-        return Ordered.HIGHEST_PRECEDENCE;
+    public void before(@NonNull Method method, @NonNull Object[] args, @Nullable Object target) throws Throwable {
+        Objects.requireNonNull(authService.getIfAvailable()).hasLogin();
     }
 }

@@ -5,18 +5,21 @@ import com.jiangtj.micro.auth.context.Subject;
 import com.jiangtj.micro.auth.core.AuthService;
 import com.jiangtj.micro.web.aop.AnnotationMethodBeforeAdvice;
 import jakarta.annotation.Nullable;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.Ordered;
+import org.springframework.beans.factory.ObjectProvider;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
-public class HasSubjectAdvice extends AnnotationMethodBeforeAdvice<HasSubject> implements Ordered {
+public class HasSubjectAdvice extends AnnotationMethodBeforeAdvice<HasSubject> {
 
-    @Resource
-    private AuthService authService;
+    private final ObjectProvider<AuthService> authService;
+
+    public HasSubjectAdvice(ObjectProvider<AuthService> authService) {
+        this.authService = authService;
+    }
 
     @Override
     public Class<HasSubject> getAnnotationType() {
@@ -26,7 +29,7 @@ public class HasSubjectAdvice extends AnnotationMethodBeforeAdvice<HasSubject> i
     @Override
     public void before(List<HasSubject> annotations, Method method, Object[] args, @Nullable Object target) {
         for (HasSubject annotation : annotations) {
-            authService.hasSubject(Subject.builder()
+            Objects.requireNonNull(authService.getIfAvailable()).hasSubject(Subject.builder()
                 .id(annotation.id())
                 .name(annotation.name())
                 .displayName(annotation.displayName())
@@ -34,10 +37,5 @@ public class HasSubjectAdvice extends AnnotationMethodBeforeAdvice<HasSubject> i
                 .issuer(annotation.issuer())
                 .build());
         }
-    }
-
-    @Override
-    public int getOrder() {
-        return Ordered.HIGHEST_PRECEDENCE + 100;
     }
 }

@@ -1,16 +1,16 @@
 package com.jiangtj.micro.auth.context;
 
-import java.util.List;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * AuthContextFactory 类用于创建 AuthContext 对象。
  */
 public class AuthContextFactory {
 
-    private final List<AuthContextConverter> converters;
-    private final List<AuthContextHandler> handlers;
+    private final ObjectProvider<AuthContextConverter> converters;
+    private final ObjectProvider<AuthContextHandler> handlers;
 
-    public AuthContextFactory(List<AuthContextConverter> converters, List<AuthContextHandler> handlers) {
+    public AuthContextFactory(ObjectProvider<AuthContextConverter> converters, ObjectProvider<AuthContextHandler> handlers) {
         this.converters = converters;
         this.handlers = handlers;
     }

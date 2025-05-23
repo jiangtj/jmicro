@@ -4,18 +4,21 @@ import com.jiangtj.micro.auth.annotations.HasRole;
 import com.jiangtj.micro.auth.core.AuthService;
 import com.jiangtj.micro.web.aop.AnnotationMethodBeforeAdvice;
 import jakarta.annotation.Nullable;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.Ordered;
+import org.springframework.beans.factory.ObjectProvider;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
-public class HasRoleAdvice extends AnnotationMethodBeforeAdvice<HasRole> implements Ordered {
+public class HasRoleAdvice extends AnnotationMethodBeforeAdvice<HasRole> {
 
-    @Resource
-    private AuthService authService;
+    private final ObjectProvider<AuthService> authService;
+
+    public HasRoleAdvice(ObjectProvider<AuthService> authService) {
+        this.authService = authService;
+    }
 
     @Override
     public Class<HasRole> getAnnotationType() {
@@ -25,12 +28,7 @@ public class HasRoleAdvice extends AnnotationMethodBeforeAdvice<HasRole> impleme
     @Override
     public void before(List<HasRole> annotations, Method method, Object[] args, @Nullable Object target) {
         for (HasRole annotation : annotations) {
-            authService.hasRole(annotation.logic(), annotation.value());
+            Objects.requireNonNull(authService.getIfAvailable()).hasRole(annotation.logic(), annotation.value());
         }
-    }
-
-    @Override
-    public int getOrder() {
-        return Ordered.HIGHEST_PRECEDENCE + 100;
     }
 }
