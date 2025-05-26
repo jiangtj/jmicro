@@ -9,11 +9,19 @@ import org.jooq.UpdatableRecord;
 
 public interface DaoUtils {
 
-    static <R extends UpdatableRecord<R>> IDao<R> createDao(Table<R> table) {
+    static <R extends UpdatableRecord<R>, T> Dao<R, T> createDao(TableField<R, T> idField) {
+        return new Dao<>(idField, false);
+    }
+
+    static <R extends UpdatableRecord<R>, T> Dao<R, T> createDao(TableField<R, T> idField, boolean isLogic) {
+        return new Dao<>(idField, isLogic);
+    }
+
+    static <R extends UpdatableRecord<R>> IDao<R> createIDao(Table<R> table) {
         return new IDao<>(table, false);
     }
 
-    static <R extends UpdatableRecord<R>> IDao<R> createDao(Table<R> table, boolean isLogic) {
+    static <R extends UpdatableRecord<R>> IDao<R> createIDao(Table<R> table, boolean isLogic) {
         return new IDao<>(table, isLogic);
     }
 

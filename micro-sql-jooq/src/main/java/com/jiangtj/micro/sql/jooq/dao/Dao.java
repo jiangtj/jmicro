@@ -55,6 +55,12 @@ public class Dao<R extends UpdatableRecord<R>, T> {
             .fetchOne();
     }
 
+    public Result<R> fetchByIds(DSLContext create, List<T> id) {
+        return create.selectFrom(table)
+            .where(ID.in(id))
+            .fetch();
+    }
+
     public PageUtils.FromStep<Record1<R>> fetchPage(DSLContext create) {
         return PageUtils.selectFrom(create, table);
     }
