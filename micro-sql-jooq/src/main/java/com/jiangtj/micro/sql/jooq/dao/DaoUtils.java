@@ -2,6 +2,8 @@ package com.jiangtj.micro.sql.jooq.dao;
 
 import com.jiangtj.micro.sql.jooq.dao.i.IDao;
 import com.jiangtj.micro.sql.jooq.dao.i.RTableIDao;
+import com.jiangtj.micro.sql.jooq.dao.l.LDao;
+import com.jiangtj.micro.sql.jooq.dao.l.RTableLDao;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableRecord;
@@ -35,5 +37,17 @@ public interface DaoUtils {
 
     static <R extends TableRecord<R>> RTableIDao<R> createRTableIDao(TableField<R, Integer> tableField1, TableField<R, Integer> tableField2) {
         return new RTableIDao<>(tableField1, tableField2, false);
+    }
+
+    static <R extends UpdatableRecord<R>> LDao<R> createLDao(Table<R> table) {
+        return new LDao<>(table, false);
+    }
+
+    static <R extends UpdatableRecord<R>> LDao<R> createLDao(Table<R> table, boolean isLogic) {
+        return new LDao<>(table, isLogic);
+    }
+
+    static <R extends TableRecord<R>> RTableLDao<R> createRTableLDao(TableField<R, Long> tableField1, TableField<R, Long> tableField2) {
+        return new RTableLDao<>(tableField1, tableField2, false);
     }
 }
