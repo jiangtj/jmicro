@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.util.unit.DataSize;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -46,10 +47,10 @@ class LocalPicUploadServiceTest {
         // 创建模拟的图片文件
         byte[] content = new byte[1024];
         MockMultipartFile file = new MockMultipartFile(
-                "test-image",
-                "test-image.jpg",
-                "image/jpeg",
-                content
+            "test-image",
+            "test-image.jpg",
+            "image/jpeg",
+            content
         );
 
         // 上传图片
@@ -67,10 +68,10 @@ class LocalPicUploadServiceTest {
         // 创建不支持的文件类型
         byte[] content = new byte[1024];
         MockMultipartFile file = new MockMultipartFile(
-                "test-file",
-                "test-file.exe",
-                "application/octet-stream",
-                content
+            "test-file",
+            "test-file.exe",
+            "application/octet-stream",
+            content
         );
 
         // 验证上传不支持的文件类型会抛出异常
@@ -84,15 +85,15 @@ class LocalPicUploadServiceTest {
     @Test
     void testUploadExceedMaxSize() {
         // 设置最大文件大小为500字节
-        dir.setMaxFileSize(500L);
+        dir.setMaxFileSize(DataSize.ofKilobytes(1));
 
         // 创建超过大小限制的文件
-        byte[] content = new byte[1000];
+        byte[] content = new byte[2000];
         MockMultipartFile file = new MockMultipartFile(
-                "test-image",
-                "test-image.jpg",
-                "image/jpeg",
-                content
+            "test-image",
+            "test-image.jpg",
+            "image/jpeg",
+            content
         );
 
         // 验证上传超过大小限制的文件会抛出异常
@@ -101,5 +102,11 @@ class LocalPicUploadServiceTest {
         });
 
         assertTrue(exception.getMessage().contains("文件大小超过限制"));
+    }
+
+    @Test
+    void testDataSize() {
+        assertEquals(1024 * 1024, DataSize.ofMegabytes(1).toBytes());
+        assertEquals(1024, DataSize.ofKilobytes(1).toBytes());
     }
 }
