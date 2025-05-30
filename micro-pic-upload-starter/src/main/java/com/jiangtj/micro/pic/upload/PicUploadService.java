@@ -58,7 +58,7 @@ public class PicUploadService {
         }
 
         // 检查文件大小
-        if (file.getSize() > dir.getMaxFileSize()) {
+        if (file.getSize() > dir.getMaxFileSize().toBytes()) {
             throw new PicUploadException("文件大小超过限制");
         }
 

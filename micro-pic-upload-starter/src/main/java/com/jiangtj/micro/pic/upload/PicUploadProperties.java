@@ -2,6 +2,7 @@ package com.jiangtj.micro.pic.upload;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.util.unit.DataSize;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,9 +25,9 @@ public class PicUploadProperties {
     private String[] allowedExtensions = {"jpg", "jpeg", "png", "gif", "webp", "bmp", "svg", "avif"};
 
     /**
-     * 默认最大文件大小（字节）
+     * 默认最大文件大小 10mb
      */
-    private long maxFileSize = 10 * 1024 * 1024; // 默认10MB
+    private DataSize maxFileSize = DataSize.ofMegabytes(10);
 
     private Map<String, Dir> dirs = new HashMap<>();
 
@@ -34,7 +35,7 @@ public class PicUploadProperties {
     public static class Dir {
         private String path;
         private String provider;
-        private Long maxFileSize;
+        private DataSize maxFileSize;
         private String[] allowedExtensions;
 
         public String resolve(String fileName) {

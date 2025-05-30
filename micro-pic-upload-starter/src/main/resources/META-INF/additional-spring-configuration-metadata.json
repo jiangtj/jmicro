@@ -1,0 +1,29 @@
+{
+  "hints": [
+    {
+      "name": "micro.pic.upload.provider",
+      "values": [
+        {
+          "value": "local"
+        },
+        {
+          "value": "minio"
+        },
+        {
+          "value": "ali"
+        },
+        {
+          "value": "hw"
+        },
+        {
+          "value": "easyimages"
+        }
+      ],
+      "providers": [
+        {
+          "name": "any"
+        }
+      ]
+    }
+  ]
+}
