@@ -8,6 +8,7 @@
     <packaging>pom</packaging>
     <version>0.0.29</version>
     <url>https://github.com/jiangtj/jmicro</url>
+    <name>micro-dependencies</name>
     <description>JMicro dependencies pom</description>
 
     <licenses>

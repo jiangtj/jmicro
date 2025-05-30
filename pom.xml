@@ -8,6 +8,7 @@
     <packaging>pom</packaging>
     <version>0.0.29</version>
     <url>https://github.com/jiangtj/jmicro</url>
+    <name>micro-parent</name>
     <description>An open-source framework based on Spring Boot, helps you create applications more easily</description>
 
     <parent>
