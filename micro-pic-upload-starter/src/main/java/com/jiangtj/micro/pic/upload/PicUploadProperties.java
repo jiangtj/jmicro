@@ -21,7 +21,7 @@ public class PicUploadProperties {
     /**
      * 默认允许的文件类型
      */
-    private String[] allowedExtensions = {"jpg", "jpeg", "png", "gif", "webp"};
+    private String[] allowedExtensions = {"jpg", "jpeg", "png", "gif", "webp", "bmp", "svg", "avif"};
 
     /**
      * 默认最大文件大小（字节）
