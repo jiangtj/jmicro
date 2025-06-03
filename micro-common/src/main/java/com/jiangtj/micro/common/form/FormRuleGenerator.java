@@ -24,7 +24,7 @@ public class FormRuleGenerator {
         if (map != null) {
             return map;
         }
-        map = new HashMap<>();
+        map = new LinkedHashMap<>();
         Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {
             List<FormRule> rules = new ArrayList<>();
