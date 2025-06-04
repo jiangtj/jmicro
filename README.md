@@ -103,6 +103,20 @@ public class MyConfiguration {
 ```
 
 > Tip: 这是对过滤器的扩展，所以不仅仅能用于鉴权，任何你希望过滤的场景，都可以使用这个过滤器，另外在传统的 servlet 中，可以使用拦截器，它由 Spring 提供的且支持 ant-style 的路径匹配
+>
+> 另外如果你使用 Spring Boot 3.5+, 你可以使用官方的 `@FilterRegistration` 例如
+`@FilterRegistration(name = "my-filter", urlPatterns = "/test/*", order = 0)`
+
+### [通用模块](micro-common)
+
+#### FormRule 规则生成
+
+通过 Java Bean Validation 生成对应的<a href="https://github.com/yiminghe/async-validator">Async Validator
+表单校验规则</a>
+
+```java
+Map<String, List<FormRule>> generate = FormRuleGenerator.generate(Example.class);
+```
 
 ### [图片上传模块](micro-pic-upload-starter)
 
