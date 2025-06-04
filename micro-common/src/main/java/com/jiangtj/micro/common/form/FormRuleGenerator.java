@@ -24,7 +24,6 @@ public class FormRuleGenerator {
         addHandler(new MobilePhoneHandler());
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
     public static Map<String, List<FormRule>> generate(Class<?> clazz) {
         Map<String, List<FormRule>> map = cache.get(clazz.getName());
         if (map != null) {
@@ -90,12 +89,7 @@ public class FormRuleGenerator {
                 rules.add(rule);
             }
 
-            for (FormRuleHandler handler : handlers) {
-                Class<? extends Annotation> annotation = handler.getAnnotation();
-                findAnnotation(field, annotation)
-                    .map(value -> handler.handle(field, value))
-                    .ifPresent(rules::add);
-            }
+            handle(field, rules);
 
             if (!rules.isEmpty()) {
                 map.put(field.getName(), rules);
@@ -104,6 +98,16 @@ public class FormRuleGenerator {
 
         cache.put(clazz.getName(), map);
         return map;
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private static void handle(Field field, List<FormRule> rules) {
+        for (FormRuleHandler handler : handlers) {
+            Class<? extends Annotation> annotation = handler.getAnnotation();
+            findAnnotation(field, annotation)
+                .map(value -> handler.handle(field, value))
+                .ifPresent(rules::add);
+        }
     }
 
     static <A extends Annotation> Optional<A> findAnnotation(AnnotatedElement element, Class<A> annotationType) {
