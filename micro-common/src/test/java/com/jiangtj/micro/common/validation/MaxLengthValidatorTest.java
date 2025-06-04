@@ -44,7 +44,7 @@ class MaxLengthValidatorTest {
 
     @Data
     static class ExampleTrim {
-        @MaxLength(value = 5, trim = false)
+        @MaxLength(value = 5, trim = true)
         private String name;
     }
 
@@ -59,11 +59,11 @@ class MaxLengthValidatorTest {
             Example obj = new Example();
             obj.setName(" 12345");
             Set<ConstraintViolation<Example>> validate1 = validator.validate(obj);
-            assertTrue(validate1.isEmpty());
+            assertFalse(validate1.isEmpty());
             ExampleTrim trim = new ExampleTrim();
             trim.setName(" 12345");
             Set<ConstraintViolation<ExampleTrim>> validate2 = validator.validate(trim);
-            assertFalse(validate2.isEmpty());
+            assertTrue(validate2.isEmpty());
         }
     }
 

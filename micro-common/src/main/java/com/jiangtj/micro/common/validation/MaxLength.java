@@ -17,7 +17,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface MaxLength {
     int value();
 
-    boolean trim() default true;
+    boolean trim() default false;
 
     String message() default "最小字符串长度不能大于 {value}";
 

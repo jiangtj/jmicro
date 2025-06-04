@@ -17,7 +17,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface MinLength {
     int value();
 
-    boolean trim() default true;
+    boolean trim() default false;
 
     String message() default "最小字符串长度不能小于 {value}";
 

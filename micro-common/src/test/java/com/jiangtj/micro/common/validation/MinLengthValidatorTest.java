@@ -44,7 +44,7 @@ class MinLengthValidatorTest {
 
     @Data
     static class MinLOTrim {
-        @MinLength(value = 5, trim = false)
+        @MinLength(value = 5, trim = true)
         private String name;
     }
 
@@ -59,11 +59,11 @@ class MinLengthValidatorTest {
             MinLO obj = new MinLO();
             obj.setName(" 1234");
             Set<ConstraintViolation<MinLO>> validate1 = validator.validate(obj);
-            assertFalse(validate1.isEmpty());
+            assertTrue(validate1.isEmpty());
             MinLOTrim trim = new MinLOTrim();
             trim.setName(" 1234");
             Set<ConstraintViolation<MinLOTrim>> validate2 = validator.validate(trim);
-            assertTrue(validate2.isEmpty());
+            assertFalse(validate2.isEmpty());
         }
     }
 
