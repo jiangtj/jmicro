@@ -6,8 +6,6 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
-import org.springframework.core.annotation.MergedAnnotation;
-import org.springframework.core.annotation.MergedAnnotations;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
@@ -18,7 +16,15 @@ public class FormRuleGenerator {
 
     @Getter
     private static final Map<String, Map<String, List<FormRule>>> cache = new HashMap<>();
+    @Getter
+    private static final List<FormRuleHandler<? extends Annotation>> handlers = new ArrayList<>();
 
+    static {
+        addHandler(new PatternHandler());
+        addHandler(new MobilePhoneHandler());
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public static Map<String, List<FormRule>> generate(Class<?> clazz) {
         Map<String, List<FormRule>> map = cache.get(clazz.getName());
         if (map != null) {
@@ -32,10 +38,6 @@ public class FormRuleGenerator {
             FormRule rule = new FormRule();
 
             Class<?> type = field.getType();
-            if (type.isAssignableFrom(String.class)) {
-                rule.setType("string");
-                setField = true;
-            }
             if (type.isAssignableFrom(Integer.class)
                 || type.isAssignableFrom(int.class)
                 || type.isAssignableFrom(Byte.class)
@@ -81,10 +83,20 @@ public class FormRuleGenerator {
                 rule.setMax(maxLen.get().value());
                 setField = true;
             }
-
             if (setField) {
+                if (rule.getType() == null && type.isAssignableFrom(String.class)) {
+                    rule.setType("string");
+                }
                 rules.add(rule);
             }
+
+            for (FormRuleHandler handler : handlers) {
+                Class<? extends Annotation> annotation = handler.getAnnotation();
+                findAnnotation(field, annotation)
+                    .map(value -> handler.handle(field, value))
+                    .ifPresent(rules::add);
+            }
+
             if (!rules.isEmpty()) {
                 map.put(field.getName(), rules);
             }
@@ -95,9 +107,11 @@ public class FormRuleGenerator {
     }
 
     static <A extends Annotation> Optional<A> findAnnotation(AnnotatedElement element, Class<A> annotationType) {
-        return MergedAnnotations.from(element, MergedAnnotations.SearchStrategy.INHERITED_ANNOTATIONS)
-            .get(annotationType)
-            .synthesize(MergedAnnotation::isPresent);
+        return Optional.ofNullable(element.getAnnotation(annotationType));
+    }
+
+    static void addHandler(FormRuleHandler<? extends Annotation> handler) {
+        handlers.add(handler);
     }
 
 }

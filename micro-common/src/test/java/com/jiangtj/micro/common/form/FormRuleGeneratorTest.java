@@ -2,8 +2,10 @@ package com.jiangtj.micro.common.form;
 
 import com.jiangtj.micro.common.JsonUtils;
 import com.jiangtj.micro.common.validation.MaxLength;
+import com.jiangtj.micro.common.validation.MobilePhone;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -11,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
@@ -24,7 +27,10 @@ class FormRuleGeneratorTest {
         private int age;
         private String address;
         @NotNull
+        @MobilePhone
         private String phone;
+        @Pattern(regexp = "^1[0-9]{2}$")
+        private String patternVar;
     }
 
     @Test
@@ -34,8 +40,9 @@ class FormRuleGeneratorTest {
         log.error(json);
         assertTrue(json.contains("\"name\":[{\"type\":\"string\",\"max\":5}]"));
         assertTrue(json.contains("\"age\":[{\"type\":\"number\",\"min\":18}]"));
-        assertTrue(json.contains("\"address\":[{\"type\":\"string\"}]"));
-        assertTrue(json.contains("\"phone\":[{\"type\":\"string\",\"required\":true}]"));
+        assertFalse(json.contains("\"address\""));
+        assertTrue(json.contains("\"phone\":[{\"type\":\"string\",\"required\":true},{\"type\":\"string\",\"pattern\":\"^1[0-9]{10}$\",\"message\":\"手机号格式不正确\"}]"));
+        assertTrue(json.contains("\"patternVar\":[{\"type\":\"string\",\"pattern\":\"^1[0-9]{2}$\",\"message\":\"需要匹配正则表达式: ^1[0-9]{2}$\"}]"));
     }
 
     @Test
