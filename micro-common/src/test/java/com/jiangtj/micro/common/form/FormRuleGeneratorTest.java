@@ -3,7 +3,9 @@ package com.jiangtj.micro.common.form;
 import com.jiangtj.micro.common.JsonUtils;
 import com.jiangtj.micro.common.validation.MaxLength;
 import com.jiangtj.micro.common.validation.MobilePhone;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
@@ -31,6 +33,14 @@ class FormRuleGeneratorTest {
         private String phone;
         @Pattern(regexp = "^1[0-9]{2}$")
         private String patternVar;
+        @Valid
+        private NestDto nest;
+    }
+
+    @Data
+    static class NestDto {
+        @NotBlank
+        private String name;
     }
 
     @Test
@@ -43,6 +53,7 @@ class FormRuleGeneratorTest {
         assertFalse(json.contains("\"address\""));
         assertTrue(json.contains("\"phone\":[{\"type\":\"string\",\"required\":true},{\"type\":\"string\",\"pattern\":\"^1[0-9]{10}$\",\"message\":\"手机号格式不正确\"}]"));
         assertTrue(json.contains("\"patternVar\":[{\"type\":\"string\",\"pattern\":\"^1[0-9]{2}$\",\"message\":\"需要匹配正则表达式: ^1[0-9]{2}$\"}]"));
+        assertTrue(json.contains("\"nest\":[{\"type\":\"object\",\"fields\":{\"name\":[{\"type\":\"string\",\"required\":true,\"whitespace\":true}]}}]"));
     }
 
     @Test
