@@ -4,10 +4,7 @@ import com.jiangtj.micro.common.JsonUtils;
 import com.jiangtj.micro.common.validation.MaxLength;
 import com.jiangtj.micro.common.validation.MobilePhone;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -35,6 +32,14 @@ class FormRuleGeneratorTest {
         private String patternVar;
         @Valid
         private NestDto nest;
+        @Size(min = 1)
+        private String[] arr1;
+        @Size(max = 2)
+        private List<String> arr2;
+        @Size(min = 3, max = 4)
+        private String char1;
+        @Email
+        private String mail;
     }
 
     @Data
@@ -54,6 +59,10 @@ class FormRuleGeneratorTest {
         assertTrue(json.contains("\"phone\":[{\"type\":\"string\",\"required\":true},{\"type\":\"string\",\"pattern\":\"^1[0-9]{10}$\",\"message\":\"手机号格式不正确\"}]"));
         assertTrue(json.contains("\"patternVar\":[{\"type\":\"string\",\"pattern\":\"^1[0-9]{2}$\",\"message\":\"需要匹配正则表达式: ^1[0-9]{2}$\"}]"));
         assertTrue(json.contains("\"nest\":[{\"type\":\"object\",\"fields\":{\"name\":[{\"type\":\"string\",\"required\":true,\"whitespace\":true}]}}]"));
+        assertTrue(json.contains("\"arr1\":[{\"type\":\"array\",\"min\":1}]"));
+        assertTrue(json.contains("\"arr2\":[{\"type\":\"array\",\"max\":2}]"));
+        assertTrue(json.contains("\"char1\":[{\"type\":\"string\",\"min\":3,\"max\":4}]"));
+        assertTrue(json.contains("\"mail\":[{\"type\":\"email\"}]"));
     }
 
     @Test

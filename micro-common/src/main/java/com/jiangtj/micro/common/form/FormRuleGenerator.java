@@ -36,12 +36,12 @@ public class FormRuleGenerator {
             FormRule rule = new FormRule();
 
             Class<?> type = field.getType();
-            if (type.isAssignableFrom(Integer.class)
-                || type.isAssignableFrom(int.class)
-                || type.isAssignableFrom(Byte.class)
-                || type.isAssignableFrom(byte.class)
-                || type.isAssignableFrom(Long.class)
-                || type.isAssignableFrom(long.class)
+            if (Integer.class.isAssignableFrom(type)
+                || int.class.isAssignableFrom(type)
+                || Byte.class.isAssignableFrom(type)
+                || byte.class.isAssignableFrom(type)
+                || Long.class.isAssignableFrom(type)
+                || long.class.isAssignableFrom(type)
             ) {
                 rule.setType("number");
                 setField = true;
@@ -84,6 +84,30 @@ public class FormRuleGenerator {
             if (max.isPresent()) {
                 rule.setType("number");
                 rule.setMax((int) max.get().value());
+                setField = true;
+            }
+
+            Optional<Size> size = findAnnotation(field, Size.class);
+            if (size.isPresent()) {
+                if (type.isAssignableFrom(CharSequence.class)) {
+                    rule.setType("string");
+                }
+                if (type.isArray() || Collection.class.isAssignableFrom(type)) {
+                    rule.setType("array");
+                }
+                Size v = size.get();
+                if (v.min() != 0) {
+                    rule.setMin(v.min());
+                }
+                if (v.max() != Integer.MAX_VALUE) {
+                    rule.setMax(v.max());
+                }
+                setField = true;
+            }
+
+            Optional<Email> email = findAnnotation(field, Email.class);
+            if (email.isPresent()) {
+                rule.setType("email");
                 setField = true;
             }
 
