@@ -5,10 +5,10 @@
     <parent>
         <groupId>com.jiangtj.micro</groupId>
         <artifactId>parent</artifactId>
-        <version>0.0.30</version>
+        <version>0.0.31</version>
     </parent>
     <artifactId>micro-auth-wechat</artifactId>
-    <version>0.0.30</version>
+    <version>0.0.31</version>
     <name>micro-auth</name>
     <description>micro-auth-wechat</description>
 
