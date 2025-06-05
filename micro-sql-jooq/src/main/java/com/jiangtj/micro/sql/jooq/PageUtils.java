@@ -64,15 +64,19 @@ public interface PageUtils {
     /**
      * 处理分页参数，将Spring Data的Pageable对象应用到JOOQ查询中。
      *
-     * @param where    查询条件步骤
-     * @param pageable 分页参数
-     * @param <R>      记录类型
+     * @param where        查询条件步骤
+     * @param pageable     分页参数
+     * @param <R>          记录类型
+     * @param orderFields  排序字段
      * @return 应用了分页参数的查询步骤
      */
     static <R extends Record> SelectLimitPercentAfterOffsetStep<R> handlePageable(SelectOrderByStep<R> where,
-            Pageable pageable) {
+            Pageable pageable, OrderField<?>... orderFields) {
         Sort sort = pageable.getSort();
-        if (!sort.isEmpty()) {
+        SelectLimitStep<R> rs;
+        if (orderFields.length > 0) {
+            rs = where.orderBy(orderFields);
+        } else if (!sort.isEmpty()) {
             List<SortField<Object>> list = sort.stream().map(order -> {
                 String property = order.getProperty();
                 if (order.isAscending()) {
@@ -83,10 +87,11 @@ public interface PageUtils {
                 }
                 return field(property).sortDefault();
             }).toList();
-            return where.orderBy(list).offset(pageable.getOffset()).limit(pageable.getPageSize());
+            rs = where.orderBy(list);
         } else {
-            return where.offset(pageable.getOffset()).limit(pageable.getPageSize());
+            rs = where;
         }
+        return rs.offset(pageable.getOffset()).limit(pageable.getPageSize());
     }
 
     /**
@@ -166,8 +171,8 @@ public interface PageUtils {
             return new ConditionStep<>(listStep.where(conditions), countStep.where(conditions));
         }
 
-        public LimitStep<R> pageable(Pageable pageable) {
-            return new LimitStep<>(handlePageable(listStep, pageable), countStep, pageable);
+        public LimitStep<R> pageable(Pageable pageable, OrderField<?>... orderFields) {
+            return new LimitStep<>(handlePageable(listStep, pageable, orderFields), countStep, pageable);
         }
     }
 
@@ -178,8 +183,8 @@ public interface PageUtils {
      */
     record ConditionStep<R extends Record>(SelectConditionStep<R> listStep,
             SelectConditionStep<Record1<Integer>> countStep) {
-        public LimitStep<R> pageable(Pageable pageable) {
-            return new LimitStep<>(handlePageable(listStep, pageable), countStep, pageable);
+        public LimitStep<R> pageable(Pageable pageable, OrderField<?>... orderFields) {
+            return new LimitStep<>(handlePageable(listStep, pageable, orderFields), countStep, pageable);
         }
     }
 
