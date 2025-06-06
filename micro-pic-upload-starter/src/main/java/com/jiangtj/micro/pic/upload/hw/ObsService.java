@@ -42,9 +42,9 @@ public class ObsService implements PicUploadProvider {
             // 请求失败,打印请求id
             log.error("Request ID:{}", e.getErrorRequestId());
             log.error("Host ID:{}", e.getErrorHostId());
-            throw new PicUploadInternalException(e.getErrorMessage(), e);
+            throw new PicUploadInternalException("华为云上传错误!", e);
         } catch (Exception e) {
-            throw new PicUploadInternalException(e.getMessage(), e);
+            throw new PicUploadInternalException("华为云客户端异常!", e);
         }
     }
 
