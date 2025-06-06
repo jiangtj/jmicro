@@ -1,6 +1,7 @@
 package com.jiangtj.micro.pic.upload;
 
 import com.jiangtj.micro.common.utils.FileNameUtils;
+import com.jiangtj.micro.pic.upload.ex.PicUploadCheckException;
 import com.jiangtj.micro.web.AnnotationUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
@@ -54,12 +55,12 @@ public class PicUploadService {
 
         // 检查文件是否为空
         if (file.isEmpty()) {
-            throw new PicUploadException("上传的文件不能为空");
+            throw new PicUploadCheckException("上传的文件不能为空");
         }
 
         // 检查文件大小
         if (file.getSize() > dir.getMaxFileSize().toBytes()) {
-            throw new PicUploadException("文件大小超过限制");
+            throw new PicUploadCheckException("文件大小超过限制");
         }
 
         // 获取文件扩展名
@@ -68,12 +69,12 @@ public class PicUploadService {
 
         // 检查文件类型
         if (!isAllowedExtension(dir, extension)) {
-            throw new PicUploadException("不支持的文件类型");
+            throw new PicUploadCheckException("不支持的文件类型");
         }
 
         PicUploadProvider provider = providers.get(dir.getProvider());
         if (provider == null) {
-            throw new PicUploadException("不存在的图片上传服务");
+            throw new PicUploadCheckException("不存在的图片上传服务");
         }
 
         PicUploadResult result = provider.upload(dir, file);
@@ -95,11 +96,11 @@ public class PicUploadService {
     @NonNull
     public PicUploadProperties.Dir getDir(String target) {
         if (!StringUtils.hasText(target)) {
-            throw new PicUploadException("请提供上传目标");
+            throw new PicUploadCheckException("请提供上传目标");
         }
         PicUploadProperties.Dir dir = properties.getDirs().get(target);
         if (dir == null) {
-            throw new PicUploadException("不存在上传的目标定义，请在配置文件中添加: micro.pic.upload." + target);
+            throw new PicUploadCheckException("不存在上传的目标定义，请在配置文件中添加: micro.pic.upload." + target);
         }
         return dir;
     }

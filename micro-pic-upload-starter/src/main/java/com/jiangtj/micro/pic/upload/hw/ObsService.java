@@ -1,6 +1,7 @@
 package com.jiangtj.micro.pic.upload.hw;
 
 import com.jiangtj.micro.pic.upload.*;
+import com.jiangtj.micro.pic.upload.ex.PicUploadInternalException;
 import com.obs.services.ObsClient;
 import com.obs.services.exception.ObsException;
 import com.obs.services.model.PutObjectResult;
@@ -41,10 +42,10 @@ public class ObsService implements PicUploadProvider {
             // 请求失败,打印请求id
             log.error("Request ID:{}", e.getErrorRequestId());
             log.error("Host ID:{}", e.getErrorHostId());
+            throw new PicUploadInternalException(e.getErrorMessage(), e);
         } catch (Exception e) {
-            log.error("putObject failed", e);
+            throw new PicUploadInternalException(e.getMessage(), e);
         }
-        throw new PicUploadException("文件上传错误!");
     }
 
     @Override
@@ -57,8 +58,8 @@ public class ObsService implements PicUploadProvider {
                 .fileUrl(url)
                 .build();
         } catch (IOException e) {
-            log.error("上传文件失败", e);
-            throw new PicUploadException("上传失败！");
+            log.error("获取图片失败", e);
+            throw new PicUploadInternalException("获取图片失败！", e);
         }
     }
 }

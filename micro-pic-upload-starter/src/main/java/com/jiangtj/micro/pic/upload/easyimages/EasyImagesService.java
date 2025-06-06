@@ -1,6 +1,10 @@
 package com.jiangtj.micro.pic.upload.easyimages;
 
-import com.jiangtj.micro.pic.upload.*;
+import com.jiangtj.micro.pic.upload.PicUploadProperties;
+import com.jiangtj.micro.pic.upload.PicUploadProvider;
+import com.jiangtj.micro.pic.upload.PicUploadResult;
+import com.jiangtj.micro.pic.upload.PicUploadType;
+import com.jiangtj.micro.pic.upload.ex.PicUploadInternalException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -35,12 +39,12 @@ public class EasyImagesService implements PicUploadProvider {
                 .retrieve()
                 .body(EasyImagesResponse.class);
             if (body != null && body.getCode() != 200) {
-                throw new PicUploadException("图片上传失败: 错误码" + body.getCode());
+                throw new PicUploadInternalException("EasyImages 错误码" + body.getCode(), null);
             }
             return body;
         } catch (Exception e) {
             log.error("图片上传失败", e);
-            throw new PicUploadException("图片上传服务异常: " + e.getMessage());
+            throw new PicUploadInternalException("EasyImages 异常", e);
         }
     }
 

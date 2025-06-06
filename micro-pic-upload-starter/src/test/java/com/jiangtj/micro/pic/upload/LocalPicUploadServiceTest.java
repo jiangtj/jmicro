@@ -1,5 +1,6 @@
 package com.jiangtj.micro.pic.upload;
 
+import com.jiangtj.micro.pic.upload.ex.PicUploadCheckException;
 import com.jiangtj.micro.pic.upload.local.LocalPicUploadProperties;
 import com.jiangtj.micro.pic.upload.local.LocalPicUploadService;
 import org.junit.jupiter.api.BeforeEach;
@@ -75,7 +76,7 @@ class LocalPicUploadServiceTest {
         );
 
         // 验证上传不支持的文件类型会抛出异常
-        Exception exception = assertThrows(PicUploadException.class, () -> {
+        Exception exception = assertThrows(PicUploadCheckException.class, () -> {
             picUploadService.upload("test", file);
         });
 
@@ -97,7 +98,7 @@ class LocalPicUploadServiceTest {
         );
 
         // 验证上传超过大小限制的文件会抛出异常
-        Exception exception = assertThrows(PicUploadException.class, () -> {
+        Exception exception = assertThrows(PicUploadCheckException.class, () -> {
             picUploadService.upload("test", file);
         });
 
