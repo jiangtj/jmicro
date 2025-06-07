@@ -14,19 +14,19 @@ public class MobilePhoneHandler implements FormRuleHandler<MobilePhone> {
     public FormRule handle(Field field, MobilePhone element) {
         Class<?> type = field.getType();
         if (type.isAssignableFrom(String.class)) {
-            return FormRule.builder()
-                .type("string")
-                .pattern("^1[0-9]{10}$")
-                .message(element.message())
-                .build();
+            FormRule rule = new FormRule();
+            rule.setType("string");
+            rule.setPattern("^1[0-9]{10}$");
+            rule.setMessage(element.message());
+            return rule;
         }
         if (type.isAssignableFrom(Long.class)) {
-            return FormRule.builder()
-                .type("number")
-                .min(1000000000)
-                .max(1999999999)
-                .message(element.message())
-                .build();
+            FormRule rule = new FormRule();
+            rule.setType("number");
+            rule.setMin(1000000000);
+            rule.setMax(1999999999);
+            rule.setMessage(element.message());
+            return rule;
         }
         throw new RuntimeException("不支持的规则类型");
     }

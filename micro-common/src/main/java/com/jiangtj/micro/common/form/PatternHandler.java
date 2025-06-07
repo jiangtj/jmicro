@@ -16,10 +16,10 @@ public class PatternHandler implements FormRuleHandler<Pattern> {
         if ("{jakarta.validation.constraints.Pattern.message}".equals(message)) {
             message = "需要匹配正则表达式: " + element.regexp();
         }
-        return FormRule.builder()
-            .type("string")
-            .pattern(element.regexp())
-            .message(message)
-            .build();
+        FormRule rule = new FormRule();
+        rule.setType("string");
+        rule.setPattern(element.regexp());
+        rule.setMessage(message);
+        return rule;
     }
 }

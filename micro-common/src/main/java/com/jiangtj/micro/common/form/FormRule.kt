@@ -1,34 +1,23 @@
-package com.jiangtj.micro.common.form;
+package com.jiangtj.micro.common.form
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonProperty
 
 /**
- * <a href="https://github.com/yiminghe/async-validator">表单校验规则</a>
+ * [表单校验规则](https://github.com/yiminghe/async-validator)
  */
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class FormRule {
-    private String type;
-    private Boolean required;
-    private String pattern;
-    private Integer min;
-    private Integer max;
-    private Integer len;
-    @JsonProperty("enum")
-    private List<String> enumAttrs;
-    private Boolean whitespace;
-    private Map<String, List<FormRule>> fields;
-    private String message;
-    private String trigger;
-}
+data class FormRule (
+    var type: String? = null,
+    var required: Boolean? = null,
+    var pattern: String? = null,
+    var min: Int? = null,
+    var max: Int? = null,
+    var len: Int? = null,
+    @get:JsonProperty("enum")
+    var enumAttrs: MutableList<String?>? = null,
+    var whitespace: Boolean? = null,
+    var fields: MutableMap<String?, MutableList<FormRule?>?>? = null,
+    var message: String? = null,
+    var trigger: String? = null
+)
