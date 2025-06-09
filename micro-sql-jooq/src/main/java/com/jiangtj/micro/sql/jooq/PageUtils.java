@@ -10,6 +10,7 @@ import org.springframework.data.domain.Sort;
 import java.util.List;
 import java.util.function.Function;
 
+import static com.jiangtj.micro.sql.jooq.QueryUtils.nec;
 import static org.jooq.impl.DSL.field;
 
 /**
@@ -30,7 +31,7 @@ public interface PageUtils {
      * @return 分页结果
      */
     static <R extends Record, T> Page<T> selectPage(DSLContext create, Table<R> table, Class<T> pojo, Pageable pageable,
-            Condition... conditions) {
+                                                    Condition... conditions) {
         return selectFrom(create, table).conditions(conditions).pageable(pageable).fetchPage(pojo);
     }
 
@@ -44,7 +45,7 @@ public interface PageUtils {
      * @return 查询结果
      */
     static <R extends Record> Result<R> selectLimitList(SelectJoinStep<R> joinStep, Pageable pageable,
-            Condition... conditions) {
+                                                        Condition... conditions) {
         SelectConditionStep<R> where = joinStep.where(conditions);
         SelectLimitPercentAfterOffsetStep<R> limited = handlePageable(where, pageable);
         return limited.fetch();
@@ -64,14 +65,14 @@ public interface PageUtils {
     /**
      * 处理分页参数，将Spring Data的Pageable对象应用到JOOQ查询中。
      *
-     * @param where        查询条件步骤
-     * @param pageable     分页参数
-     * @param <R>          记录类型
-     * @param orderFields  排序字段
+     * @param where       查询条件步骤
+     * @param pageable    分页参数
+     * @param <R>         记录类型
+     * @param orderFields 排序字段
      * @return 应用了分页参数的查询步骤
      */
     static <R extends Record> SelectLimitPercentAfterOffsetStep<R> handlePageable(SelectOrderByStep<R> where,
-            Pageable pageable, OrderField<?>... orderFields) {
+                                                                                  Pageable pageable, OrderField<?>... orderFields) {
         Sort sort = pageable.getSort();
         SelectLimitStep<R> rs;
         if (orderFields.length > 0) {
@@ -104,7 +105,7 @@ public interface PageUtils {
     static SelectStep<Record> select(DSLContext create, SelectFieldOrAsterisk... fields) {
         SelectSelectStep<Record> listStep = create.select(fields);
         SelectSelectStep<Record1<Integer>> countStep = create.selectCount();
-        return new SelectStep<>(listStep, countStep);
+        return new SelectStep<>(create, listStep, countStep);
     }
 
     /**
@@ -118,7 +119,7 @@ public interface PageUtils {
     static <R extends Record> SelectStep<Record1<R>> select(DSLContext create, Table<R> table) {
         SelectSelectStep<Record1<R>> listStep = create.select(table);
         SelectSelectStep<Record1<Integer>> countStep = create.selectCount();
-        return new SelectStep<>(listStep, countStep);
+        return new SelectStep<>(create, listStep, countStep);
     }
 
     /**
@@ -129,7 +130,7 @@ public interface PageUtils {
      * @param <R>    记录类型
      * @return FROM查询步骤
      */
-    static <R extends Record> FromStep<Record1<R>> selectFrom(DSLContext create, Table<R> table) {
+    static <R extends Record> FromStep<Record1<R>, R> selectFrom(DSLContext create, Table<R> table) {
         return select(create, table).from(table);
     }
 
@@ -149,22 +150,55 @@ public interface PageUtils {
     /**
      * 选择步骤记录，包含列表查询和计数查询。
      *
-     * @param <R> 记录类型
      */
-    record SelectStep<R extends Record>(SelectSelectStep<R> listStep, SelectSelectStep<Record1<Integer>> countStep) {
-        public FromStep<R> from(TableLike<?> table) {
-            return new FromStep<>(listStep.from(table), countStep.from(table));
+    class SelectStep<R extends Record> {
+        private final DSLContext ctx;
+        private final SelectSelectStep<R> listStep;
+        private final SelectSelectStep<Record1<Integer>> countStep;
+
+        public SelectStep(DSLContext ctx, SelectSelectStep<R> listStep, SelectSelectStep<Record1<Integer>> countStep) {
+            this.ctx = ctx;
+            this.listStep = listStep;
+            this.countStep = countStep;
+        }
+
+        public <T extends Record> FromStep<R, T> from(Table<T> table) {
+            return new FromStep<>(ctx, table, listStep.from(table), countStep.from(table));
+        }
+
+        public SelectSelectStep<R> listStep() {
+            return this.listStep;
+        }
+
+        public SelectSelectStep<Record1<Integer>> countStep() {
+            return this.countStep;
         }
     }
 
     /**
      * FROM步骤记录，包含列表查询和计数查询的JOIN步骤。
      *
-     * @param <R> 记录类型
      */
-    record FromStep<R extends Record>(SelectJoinStep<R> listStep, SelectJoinStep<Record1<Integer>> countStep) {
+    class FromStep<R extends Record, T extends Record> {
+        private final DSLContext ctx;
+        private final Table<T> table;
+        private final SelectJoinStep<R> listStep;
+        private final SelectJoinStep<Record1<Integer>> countStep;
+
+        public FromStep(DSLContext ctx, Table<T> table, SelectJoinStep<R> listStep, SelectJoinStep<Record1<Integer>> countStep) {
+            this.ctx = ctx;
+            this.table = table;
+            this.listStep = listStep;
+            this.countStep = countStep;
+        }
+
         public ConditionStep<R> where(Condition... conditions) {
             return new ConditionStep<>(listStep.where(conditions), countStep.where(conditions));
+        }
+
+        public ConditionStep<R> conditionByExample(Object example) {
+            Condition exampleConditions = nec(ctx, table, example);
+            return new ConditionStep<>(listStep.where(exampleConditions), countStep.where(exampleConditions));
         }
 
         public ConditionStep<R> conditions(Condition... conditions) {
@@ -174,6 +208,14 @@ public interface PageUtils {
         public LimitStep<R> pageable(Pageable pageable, OrderField<?>... orderFields) {
             return new LimitStep<>(handlePageable(listStep, pageable, orderFields), countStep, pageable);
         }
+
+        public SelectJoinStep<R> listStep() {
+            return this.listStep;
+        }
+
+        public SelectJoinStep<Record1<Integer>> countStep() {
+            return this.countStep;
+        }
     }
 
     /**
@@ -182,7 +224,12 @@ public interface PageUtils {
      * @param <R> 记录类型
      */
     record ConditionStep<R extends Record>(SelectConditionStep<R> listStep,
-            SelectConditionStep<Record1<Integer>> countStep) {
+                                           SelectConditionStep<Record1<Integer>> countStep) {
+
+        public ConditionStep<R> and(Condition conditions) {
+            return new ConditionStep<>(listStep.and(conditions), countStep.and(conditions));
+        }
+
         public LimitStep<R> pageable(Pageable pageable, OrderField<?>... orderFields) {
             return new LimitStep<>(handlePageable(listStep, pageable, orderFields), countStep, pageable);
         }
@@ -194,7 +241,7 @@ public interface PageUtils {
      * @param <R> 记录类型
      */
     record LimitStep<R extends Record>(SelectLimitPercentAfterOffsetStep<R> listStep,
-            SelectConnectByStep<Record1<Integer>> countStep, Pageable pageable) {
+                                       SelectConnectByStep<Record1<Integer>> countStep, Pageable pageable) {
         /**
          * 执行查询并获取结果。
          *
@@ -240,7 +287,7 @@ public interface PageUtils {
          * @return 包含处理后的结果的结果步骤
          */
         public <L, C> ResultStep<L, C> subscribe(Function<SelectLimitPercentAfterOffsetStep<R>, L> l,
-                Function<SelectConnectByStep<Record1<Integer>>, C> c) {
+                                                 Function<SelectConnectByStep<Record1<Integer>>, C> c) {
             return new ResultStep<>(l.apply(listStep), c.apply(countStep), pageable);
         }
     }

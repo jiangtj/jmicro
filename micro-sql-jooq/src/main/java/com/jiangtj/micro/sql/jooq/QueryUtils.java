@@ -26,7 +26,7 @@ public abstract class QueryUtils {
      * @param <R>    记录类型
      * @return 分页查询步骤对象
      */
-    public static <R extends Record> PageUtils.FromStep<Record1<R>> page(DSLContext create, Table<R> table) {
+    public static <R extends Record> PageUtils.FromStep<Record1<R>, R> page(DSLContext create, Table<R> table) {
         return PageUtils.selectFrom(create, table);
     }
 

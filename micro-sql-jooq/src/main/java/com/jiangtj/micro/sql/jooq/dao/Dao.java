@@ -61,7 +61,7 @@ public class Dao<R extends UpdatableRecord<R>, T> {
             .fetch();
     }
 
-    public PageUtils.FromStep<Record1<R>> fetchPage(DSLContext create) {
+    public PageUtils.FromStep<Record1<R>, R> fetchPage(DSLContext create) {
         return PageUtils.selectFrom(create, table);
     }
 
