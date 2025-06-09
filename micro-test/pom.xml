@@ -5,10 +5,10 @@
     <parent>
         <groupId>com.jiangtj.micro</groupId>
         <artifactId>parent</artifactId>
-        <version>0.0.32</version>
+        <version>0.0.33</version>
     </parent>
     <artifactId>micro-test</artifactId>
-    <version>0.0.32</version>
+    <version>0.0.33</version>
     <name>micro-test</name>
     <description>SQL Tools</description>
 
