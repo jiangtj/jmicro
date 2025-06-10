@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.lang.Nullable;
 
 import java.util.List;
 import java.util.function.Function;
@@ -196,8 +197,8 @@ public interface PageUtils {
             return new ConditionStep<>(listStep.where(conditions), countStep.where(conditions));
         }
 
-        public ConditionStep<R> conditionByExample(Object example) {
-            Condition exampleConditions = nec(ctx, table, example);
+        public ConditionStep<R> conditionByExample(Object example, Field<?>... ignoredFields) {
+            Condition exampleConditions = nec(ctx, table, example, ignoredFields);
             return new ConditionStep<>(listStep.where(exampleConditions), countStep.where(exampleConditions));
         }
 
@@ -226,7 +227,10 @@ public interface PageUtils {
     record ConditionStep<R extends Record>(SelectConditionStep<R> listStep,
                                            SelectConditionStep<Record1<Integer>> countStep) {
 
-        public ConditionStep<R> and(Condition conditions) {
+        public ConditionStep<R> and(@Nullable Condition conditions) {
+            if (conditions == null) {
+                return this;
+            }
             return new ConditionStep<>(listStep.and(conditions), countStep.and(conditions));
         }
 
