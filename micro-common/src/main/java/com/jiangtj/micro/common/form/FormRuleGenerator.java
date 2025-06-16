@@ -9,6 +9,8 @@ import lombok.Getter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.*;
 
 public class FormRuleGenerator {
@@ -60,7 +62,7 @@ public class FormRuleGenerator {
 
             Optional<NotEmpty> notEmpty = findAnnotation(field, NotEmpty.class);
             if (notEmpty.isPresent()) {
-                rule.setType("string");
+                rule.setType(isList(type) ? "array" : "string");
                 rule.setRequired(true);
                 setField = true;
             }
@@ -136,8 +138,17 @@ public class FormRuleGenerator {
             Optional<Valid> valid = findAnnotation(field, Valid.class);
             if (valid.isPresent()) {
                 FormRule validRule = new FormRule();
-                validRule.setType("object");
-                validRule.setFields(generate(field.getType()));
+                if (isList(type)) {
+                    validRule.setType("array");
+                    Type genericType = field.getGenericType();
+                    if (genericType instanceof ParameterizedType t) {
+                        Type actualType = t.getActualTypeArguments()[0];
+                        validRule.setDefaultField(generate((Class<?>) actualType));
+                    }
+                } else {
+                    validRule.setType("object");
+                    validRule.setDefaultField(generate(field.getType()));
+                }
                 rules.add(validRule);
             }
 
@@ -148,6 +159,10 @@ public class FormRuleGenerator {
 
         cache.put(clazz.getName(), map);
         return map;
+    }
+
+    private static boolean isList(Class<?> type) {
+        return type.isArray() || List.class.isAssignableFrom(type);
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

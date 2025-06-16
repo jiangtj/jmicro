@@ -28,7 +28,7 @@ public class FormRule {
     @JsonProperty("enum")
     private List<String> enumAttrs;
     private Boolean whitespace;
-    private Map<String, List<FormRule>> fields;
+    private Map<String, List<FormRule>> defaultField;
     private String message;
     private String trigger;
 }
