@@ -1,20 +1,23 @@
-package com.jiangtj.micro.common;
+@file:JvmName("DatetimeFormatters")
+package com.jiangtj.micro.common
 
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatterBuilder
 
-public interface DatetimeFormatters {
-    DateTimeFormatter DateTime = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    DateTimeFormatter Date = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    DateTimeFormatter Time = DateTimeFormatter.ofPattern("HH:mm:ss");
-    // RFC3339 for wechat pay v3
-    DateTimeFormatter RFC3339 = new DateTimeFormatterBuilder()
-        .parseCaseInsensitive()
-        .append(Date)
-        .appendLiteral("T")
-        .append(Time)
-        .parseLenient()
-        .appendOffsetId()
-        .parseStrict()
-        .toFormatter();
-}
+@JvmField
+val DateTime = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")!!
+@JvmField
+val Date = DateTimeFormatter.ofPattern("yyyy-MM-dd")!!
+@JvmField
+val Time = DateTimeFormatter.ofPattern("HH:mm:ss")!!
+// RFC3339 for wechat pay v3
+@JvmField
+val RFC3339 = DateTimeFormatterBuilder()
+    .parseCaseInsensitive()
+    .append(Date)
+    .appendLiteral("T")
+    .append(Time)
+    .parseLenient()
+    .appendOffsetId()
+    .parseStrict()
+    .toFormatter()!!
