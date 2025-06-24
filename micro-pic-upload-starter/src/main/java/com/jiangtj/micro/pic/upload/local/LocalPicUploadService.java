@@ -1,7 +1,11 @@
 package com.jiangtj.micro.pic.upload.local;
 
 import com.jiangtj.micro.common.utils.FileNameUtils;
-import com.jiangtj.micro.pic.upload.*;
+import com.jiangtj.micro.pic.upload.PicUploadProperties;
+import com.jiangtj.micro.pic.upload.PicUploadProvider;
+import com.jiangtj.micro.pic.upload.PicUploadResult;
+import com.jiangtj.micro.pic.upload.PicUploadType;
+import com.jiangtj.micro.pic.upload.ex.PicUploadInternalException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
@@ -54,7 +58,8 @@ public class LocalPicUploadService implements PicUploadProvider {
             log.info("图片上传成功: {}", result);
             return result;
         } catch (IOException e) {
-            throw new PicUploadException("本地文件上传失败");
+            log.error("获取图片失败", e);
+            throw new PicUploadInternalException("获取图片失败！", e);
         }
     }
 }

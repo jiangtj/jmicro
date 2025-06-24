@@ -49,7 +49,7 @@ class PageUtilsTest {
 
     @Test
     void fromStep() {
-        PageUtils.FromStep<Record1<SystemUserRecord>> step = PageUtils.selectFrom(create, SYSTEM_USER);
+        PageUtils.FromStep<Record1<SystemUserRecord>, SystemUserRecord> step = PageUtils.selectFrom(create, SYSTEM_USER);
         log.info(step.listStep().getSQL());
         log.info(step.countStep().getSQL());
     }

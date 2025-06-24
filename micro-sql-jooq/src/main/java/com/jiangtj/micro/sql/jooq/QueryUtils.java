@@ -26,7 +26,7 @@ public abstract class QueryUtils {
      * @param <R>    记录类型
      * @return 分页查询步骤对象
      */
-    public static <R extends Record> PageUtils.FromStep<Record1<R>> page(DSLContext create, Table<R> table) {
+    public static <R extends Record> PageUtils.FromStep<Record1<R>, R> page(DSLContext create, Table<R> table) {
         return PageUtils.selectFrom(create, table);
     }
 
@@ -39,8 +39,11 @@ public abstract class QueryUtils {
      * @param <R>     记录类型
      * @return 条件表达式
      */
-    public static <R extends Record> Condition notEmptyCondition(DSLContext create, Table<R> table, Object example) {
+    public static <R extends Record> Condition notEmptyCondition(DSLContext create, Table<R> table, Object example, Field<?>... ignoredFields) {
         R record = create.newRecord(table, example);
+        for (Field<?> field : ignoredFields) {
+            record.set(field, null);
+        }
         replaceEmptyWithNull(record);
         return condition(record);
     }
@@ -104,8 +107,8 @@ public abstract class QueryUtils {
         return notEmpty(condition, fieldValue);
     }
 
-    public static <R extends Record> Condition nec(DSLContext create, Table<R> table, Object example) {
-        return notEmptyCondition(create, table, example);
+    public static <R extends Record> Condition nec(DSLContext create, Table<R> table, Object example, Field<?>... ignoredFields) {
+        return notEmptyCondition(create, table, example, ignoredFields);
     }
 
     public static <T> Condition nn(Function<T, Condition> condition, T fieldValue) {

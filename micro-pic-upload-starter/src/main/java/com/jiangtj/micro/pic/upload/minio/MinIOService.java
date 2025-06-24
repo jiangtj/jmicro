@@ -1,6 +1,7 @@
 package com.jiangtj.micro.pic.upload.minio;
 
 import com.jiangtj.micro.pic.upload.*;
+import com.jiangtj.micro.pic.upload.ex.PicUploadInternalException;
 import io.minio.BucketExistsArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
@@ -65,10 +66,10 @@ public class MinIOService implements PicUploadProvider {
         } catch (MinioException e) {
             log.error("Error occurred: {}", String.valueOf(e));
             log.error("HTTP trace: {}", e.httpTrace());
-            throw new PicUploadException("文件上传错误!");
+            throw new PicUploadInternalException("MinIO 上传失败！", e);
         } catch (IOException | NoSuchAlgorithmException | InvalidKeyException e) {
-            log.error("上传文件失败", e);
-            throw new PicUploadException("文件上传错误!");
+            log.error("获取图片失败", e);
+            throw new PicUploadInternalException("获取图片失败！", e);
         }
     }
 }

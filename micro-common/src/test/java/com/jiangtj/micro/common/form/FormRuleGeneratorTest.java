@@ -12,8 +12,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 class FormRuleGeneratorTest {
@@ -58,7 +57,7 @@ class FormRuleGeneratorTest {
         assertFalse(json.contains("\"address\""));
         assertTrue(json.contains("\"phone\":[{\"type\":\"string\",\"required\":true},{\"type\":\"string\",\"pattern\":\"^1[0-9]{10}$\",\"message\":\"手机号格式不正确\"}]"));
         assertTrue(json.contains("\"patternVar\":[{\"type\":\"string\",\"pattern\":\"^1[0-9]{2}$\",\"message\":\"需要匹配正则表达式: ^1[0-9]{2}$\"}]"));
-        assertTrue(json.contains("\"nest\":[{\"type\":\"object\",\"fields\":{\"name\":[{\"type\":\"string\",\"required\":true,\"whitespace\":true}]}}]"));
+        assertTrue(json.contains("\"nest\":[{\"type\":\"object\",\"defaultField\":{\"name\":[{\"type\":\"string\",\"required\":true,\"whitespace\":true}]}}]"));
         assertTrue(json.contains("\"arr1\":[{\"type\":\"array\",\"min\":1}]"));
         assertTrue(json.contains("\"arr2\":[{\"type\":\"array\",\"max\":2}]"));
         assertTrue(json.contains("\"char1\":[{\"type\":\"string\",\"min\":3,\"max\":4}]"));
@@ -70,5 +69,30 @@ class FormRuleGeneratorTest {
         FormRuleGenerator.generate(Example.class);
         Map<String, Map<String, List<FormRule>>> cache = FormRuleGenerator.getCache();
         assertTrue(cache.containsKey(Example.class.getName()));
+    }
+
+    @Data
+    static class ExampleForArr {
+        @NotEmpty
+        private List<String> mail;
+        @Valid
+        private List<NestL> nestLS;
+    }
+
+    @Data
+    static class NestL {
+        @NotBlank
+        private String name;
+    }
+
+    @Test
+    void testListV() {
+        Map<String, List<FormRule>> generate = FormRuleGenerator.generate(ExampleForArr.class);
+        String json = JsonUtils.toJson(generate);
+        log.error(json);
+        assertEquals("{" +
+            "\"mail\":[{\"type\":\"array\",\"required\":true}]," +
+            "\"nestLS\":[{\"type\":\"array\",\"defaultField\":{\"name\":[{\"type\":\"string\",\"required\":true,\"whitespace\":true}]}}]" +
+            "}", json);
     }
 }
