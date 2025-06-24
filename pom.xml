@@ -45,6 +45,7 @@
         <casdoor.version>1.15.0</casdoor.version>
         <wxJava.version>4.7.0</wxJava.version>
         <jjwt.version>0.12.6</jjwt.version>
+        <jb-annotations.version>26.0.2</jb-annotations.version>
         <!-- <maven.test.skip>true</maven.test.skip> -->
     </properties>
 
@@ -52,6 +53,12 @@
         <dependency>
             <groupId>com.google.code.findbugs</groupId>
             <artifactId>jsr305</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>${jb-annotations.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

@@ -5,6 +5,7 @@ import com.jiangtj.micro.common.validation.MinLength;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
+import org.springframework.lang.NonNull;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
@@ -25,7 +26,9 @@ public class FormRuleGenerator {
         addHandler(new MobilePhoneHandler());
     }
 
-    public static Map<String, List<FormRule>> generate(Class<?> clazz) {
+    @org.jetbrains.annotations.NotNull
+    @NonNull
+    public static Map<String, List<FormRule>> generate(@org.jetbrains.annotations.NotNull @NonNull Class<?> clazz) {
         Map<String, List<FormRule>> map = cache.get(clazz.getName());
         if (map != null) {
             return map;
