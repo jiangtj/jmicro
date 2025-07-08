@@ -7,30 +7,30 @@
         <artifactId>parent</artifactId>
         <version>0.0.35</version>
     </parent>
-    <artifactId>micro-auth-casdoor</artifactId>
+    <artifactId>micro-flyway-starter</artifactId>
     <version>0.0.35</version>
-    <name>micro-auth</name>
-    <description>micro-auth-casdoor</description>
+    <name>micro-flyway-starter</name>
+    <description>micro-flyway-starter</description>
 
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/org.casbin/casdoor-spring-boot-starter -->
-        <dependency>
-            <groupId>org.casbin</groupId>
-            <artifactId>casdoor-spring-boot-starter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.jiangtj.micro</groupId>
-            <artifactId>micro-auth</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-            <optional>true</optional>
+            <artifactId>spring-boot-starter</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
+
+        <!-- tools -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
         </dependency>
         <dependency>
