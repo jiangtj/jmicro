@@ -175,6 +175,10 @@ public Mono<Page<AdminUser>> fetchPage() {
 }
 ```
 
+### [Flyway 扩展](micro-flyway-starter)
+
+修改 `spring.flyway.clean-on-validation-error` 为 `mirco.flyway.clean-on-validation-error`, 在 `Spring Boot 3.5+` 中，支持在校验失败时清理数据库
+
 ### [Starter 模块](micro-spring-boot-starter)
 
 ```xml
