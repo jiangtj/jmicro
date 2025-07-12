@@ -5,10 +5,10 @@
     <parent>
         <groupId>com.jiangtj.micro</groupId>
         <artifactId>parent</artifactId>
-        <version>0.0.36</version>
+        <version>0.1.0-b1</version>
     </parent>
     <artifactId>demo-backend</artifactId>
-    <version>0.0.36</version>
+    <version>0.1.0-b1</version>
     <name>demo-backend</name>
     <description>demo-backend</description>
 

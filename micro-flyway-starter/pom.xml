@@ -5,10 +5,10 @@
     <parent>
         <groupId>com.jiangtj.micro</groupId>
         <artifactId>parent</artifactId>
-        <version>0.0.36</version>
+        <version>0.1.0-b1</version>
     </parent>
     <artifactId>micro-flyway-starter</artifactId>
-    <version>0.0.36</version>
+    <version>0.1.0-b1</version>
     <name>micro-flyway-starter</name>
     <description>micro-flyway-starter</description>
 
