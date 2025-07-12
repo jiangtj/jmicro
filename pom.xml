@@ -90,6 +90,7 @@
                 <module>micro-dependencies</module>
                 <module>micro-pic-upload-starter</module>
                 <module>micro-flyway-starter</module>
+                <module>micro-payment</module>
             </modules>
             <activation>
                 <activeByDefault>true</activeByDefault>
