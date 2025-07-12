@@ -19,7 +19,7 @@ public class FormRuleGenerator {
     @Getter
     private static final Map<String, Map<String, List<FormRule>>> cache = new HashMap<>();
     @Getter
-    private static final List<FormRuleHandler<? extends Annotation>> handlers = new ArrayList<>();
+    private static final List<BaseHandler> handlers = new ArrayList<>();
 
     static {
         addHandler(new PatternHandler());
@@ -168,13 +168,12 @@ public class FormRuleGenerator {
         return type.isArray() || List.class.isAssignableFrom(type);
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
     private static void handle(Field field, List<FormRule> rules) {
-        for (FormRuleHandler handler : handlers) {
-            Class<? extends Annotation> annotation = handler.getAnnotation();
-            findAnnotation(field, annotation)
-                .map(value -> handler.handle(field, value))
-                .ifPresent(rules::add);
+        for (BaseHandler handler : handlers) {
+            FormRule rule = handler.handle(field);
+            if (rule != null) {
+                rules.add(rule);
+            }
         }
     }
 
@@ -182,7 +181,7 @@ public class FormRuleGenerator {
         return Optional.ofNullable(element.getAnnotation(annotationType));
     }
 
-    static void addHandler(FormRuleHandler<? extends Annotation> handler) {
+    static void addHandler(BaseHandler handler) {
         handlers.add(handler);
     }
 
