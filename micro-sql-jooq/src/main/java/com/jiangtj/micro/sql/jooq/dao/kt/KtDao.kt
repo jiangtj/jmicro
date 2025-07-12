@@ -1,17 +1,49 @@
 package com.jiangtj.micro.sql.jooq.dao.kt
 
-import org.jooq.DSLContext
-import org.jooq.Table
-import org.jooq.TableField
-import org.jooq.TableRecord
+import com.jiangtj.micro.sql.jooq.PageUtils
+import com.jiangtj.micro.sql.jooq.QueryUtils
+import org.jooq.*
 
-abstract class KtDao<R1 : TableRecord<R1>, T1, R2 : TableRecord<R2>>(
-    val queryField: TableField<R1, T1>,
-    val table: Table<R2>
-) {
-    abstract fun fetch(create: DSLContext, vararg value: T1): Array<R2>
+class KtDao<R : UpdatableRecord<R>, T> {
 
-    abstract fun delete(create: DSLContext, vararg value: T1)
+    val idField: TableField<R, T>
+    val table: Table<R>
 
-    abstract fun insert(create: DSLContext, value: T1, vararg record: R1)
+    constructor(idField: TableField<R, T>) {
+        this.idField = idField
+        this.table = idField.table!!
+    }
+
+    fun fetchPage(create: DSLContext) = PageUtils.selectFrom(create, table)!!
+
+    fun <V> fetch(create: DSLContext, field: TableField<R, V>, vararg value: V) = create.selectFrom(table)
+        .where(conditionVararg(field, *value))
+        .fetchArray()
+
+    fun fetchByIds(create: DSLContext, vararg value: T) = fetch(create, idField, *value)
+
+    fun fetchById(create: DSLContext, value: T) = create.selectFrom(table)
+        .where(idField.eq(value))
+        .fetchOne()
+
+    fun insert(create: DSLContext, example: Any): R {
+        val record: R = create.newRecord(table, example)
+        record.insert()
+        return record
+    }
+
+    fun update(create: DSLContext, example: Any): R {
+        val record: R = create.newRecord(table, example)
+        QueryUtils.replaceEmptyWithNullForUpdate(record)
+        val id = record.getValue(idField)
+        val condition: Condition = idField.eq(id)
+        create.executeUpdate(record, condition)
+        return record
+    }
+
+    fun deleteById(create: DSLContext, vararg value: T) {
+        create.deleteFrom(table)
+            .where(conditionVararg(idField, *value))
+            .execute()
+    }
 }
