@@ -1,20 +1,14 @@
-package com.jiangtj.micro.common.form;
+package com.jiangtj.micro.common.form
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
+import java.lang.reflect.Field
 
-import static com.jiangtj.micro.common.form.FormRuleGenerator.findAnnotation;
+interface FormRuleHandler<A : Annotation> : BaseHandler {
+    val annotation: Class<A>
 
-public interface FormRuleHandler<A extends Annotation> extends BaseHandler {
-    Class<A> getAnnotation();
+    fun handle(field: Field, element: A): FormRule
 
-    FormRule handle(Field field, A element);
-
-    @Override
-    default FormRule handle(Field field) {
-        Class<A> annotation = this.getAnnotation();
-        return findAnnotation(field, annotation)
-            .map(value -> this.handle(field, value))
-            .orElse(null);
+    override fun handle(field: Field): FormRule? {
+        return field.getAnnotation(this.annotation)
+            ?.let { this.handle(field, it) }
     }
 }

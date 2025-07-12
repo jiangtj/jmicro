@@ -1,25 +1,21 @@
-package com.jiangtj.micro.common.form;
+package com.jiangtj.micro.common.form
 
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Pattern
+import java.lang.reflect.Field
 
-import java.lang.reflect.Field;
+class PatternHandler : FormRuleHandler<Pattern> {
+    override val annotation: Class<Pattern>
+        get() = Pattern::class.java
 
-public class PatternHandler implements FormRuleHandler<Pattern> {
-    @Override
-    public Class<Pattern> getAnnotation() {
-        return Pattern.class;
-    }
-
-    @Override
-    public FormRule handle(Field field, Pattern element) {
-        String message = element.message();
-        if ("{jakarta.validation.constraints.Pattern.message}".equals(message)) {
-            message = "需要匹配正则表达式: " + element.regexp();
+    override fun handle(field: Field, element: Pattern): FormRule {
+        var message = element.message
+        if ("{jakarta.validation.constraints.Pattern.message}" == message) {
+            message = "需要匹配正则表达式: " + element.regexp
         }
-        FormRule rule = new FormRule();
-        rule.setType("string");
-        rule.setPattern(element.regexp());
-        rule.setMessage(message);
-        return rule;
+        val rule = FormRule()
+        rule.type = "string"
+        rule.pattern = element.regexp
+        rule.message = message
+        return rule
     }
 }
