@@ -26,8 +26,9 @@ public class FormRuleGenerator {
         addHandler(new MobilePhoneHandler());
     }
 
+    @org.jetbrains.annotations.NotNull
     @NonNull
-    public static Map<String, List<FormRule>> generate(@NonNull Class<?> clazz) {
+    public static Map<String, List<FormRule>> generate(@org.jetbrains.annotations.NotNull @NonNull Class<?> clazz) {
         Map<String, List<FormRule>> map = cache.get(clazz.getName());
         if (map != null) {
             return map;
