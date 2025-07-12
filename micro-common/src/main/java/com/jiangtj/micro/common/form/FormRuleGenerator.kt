@@ -160,6 +160,7 @@ object FormRuleGenerator {
         }
     }
 
+    @JvmStatic
     fun addHandler(handler: BaseHandler) {
         handlers.add(handler)
     }

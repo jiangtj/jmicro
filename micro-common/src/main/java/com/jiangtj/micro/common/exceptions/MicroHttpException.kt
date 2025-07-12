@@ -1,25 +1,18 @@
-package com.jiangtj.micro.common.exceptions;
+package com.jiangtj.micro.common.exceptions
 
-import lombok.Getter;
-import org.springframework.lang.Nullable;
+open class MicroHttpException : MicroException {
+    val status: Int
 
-@Getter
-public class MicroHttpException extends MicroException {
-
-    private final int status;
-
-    public MicroHttpException(int status) {
-        super("status: " + status);
-        this.status = status;
+    constructor(status: Int) : super("status: $status") {
+        this.status = status
     }
 
-    public MicroHttpException(int status, String message) {
-        super(message + "(" + status + ")");
-        this.status = status;
+    constructor(status: Int, message: String) : super("$message($status)") {
+        this.status = status
     }
 
-    public MicroHttpException(int status, String message, @Nullable Throwable cause) {
-        super(message + "(" + status + ")", cause);
-        this.status = status;
+    constructor(status: Int, message: String, cause: Throwable?) :
+            super("$message($status)", cause) {
+        this.status = status
     }
 }

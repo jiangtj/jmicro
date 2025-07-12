@@ -1,34 +1,34 @@
-package com.jiangtj.micro.common.utils;
+package com.jiangtj.micro.common.utils
 
-import org.springframework.util.StringUtils;
+import com.jiangtj.micro.common.utils.UUIDUtils.generateBase64Compressed
 
 /**
  * 文件名工具类
  */
-public class FileNameUtils {
-
+object FileNameUtils {
     /**
      * 获取文件名字的前缀
      */
-    public static String getRandomFileNameWithSuffix(String suffix) {
+    @JvmStatic
+    fun getRandomFileNameWithSuffix(suffix: String): String {
         if (suffix.startsWith(".")) {
-            return UUIDUtils.generateBase64Compressed() + suffix;
+            return generateBase64Compressed() + suffix
         }
-        return UUIDUtils.generateBase64Compressed() + "." + suffix;
+        return generateBase64Compressed() + "." + suffix
     }
 
     /**
      * 获取文件扩展名
      */
-    public static String getFileExtension(String filename) {
-        if (!StringUtils.hasText(filename)) {
-            return "";
+    @JvmStatic
+    fun getFileExtension(filename: String?): String {
+        if (filename == null) {
+            return ""
         }
-        int dotIndex = filename.lastIndexOf('.');
+        val dotIndex = filename.lastIndexOf('.')
         if (dotIndex < 0) {
-            return "";
+            return ""
         }
-        return filename.substring(dotIndex + 1).toLowerCase();
+        return filename.substring(dotIndex + 1).lowercase()
     }
-
 }

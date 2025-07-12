@@ -1,20 +1,9 @@
-package com.jiangtj.micro.common.exceptions;
+package com.jiangtj.micro.common.exceptions
 
-import lombok.Getter;
-import org.springframework.lang.Nullable;
+open class MicroException : RuntimeException {
+    constructor() : super()
 
-@Getter
-public class MicroException extends RuntimeException {
+    constructor(message: String) : super(message)
 
-    public MicroException() {
-        super();
-    }
-
-    public MicroException(String message) {
-        super(message);
-    }
-
-    public MicroException(String message, @Nullable Throwable cause) {
-        super(message, cause);
-    }
+    constructor(message: String, cause: Throwable?) : super(message, cause)
 }
