@@ -43,8 +43,8 @@ object FormRuleGenerator {
                 rule.type = "number"
                 setField = true
             }
-            if (type.isAssignableFrom(Boolean::class.java)
-                || type.isAssignableFrom(Boolean::class.javaPrimitiveType)
+            if (Boolean::class.java.isAssignableFrom(type)
+                || Boolean::class.javaPrimitiveType!!.isAssignableFrom(type)
             ) {
                 rule.type = "boolean"
                 setField = true
@@ -84,7 +84,7 @@ object FormRuleGenerator {
                 if (type.isAssignableFrom(CharSequence::class.java)) {
                     rule.type = "string"
                 }
-                if (type.isArray() || MutableCollection::class.java.isAssignableFrom(type)) {
+                if (isList(type)) {
                     rule.type = "array"
                 }
                 if (it.min != 0) {
@@ -148,7 +148,7 @@ object FormRuleGenerator {
     }
 
     private fun isList(type: Class<*>): Boolean {
-        return type.isArray || MutableList::class.java.isAssignableFrom(type)
+        return type.isArray || MutableCollection::class.java.isAssignableFrom(type)
     }
 
     private fun handle(field: Field, rules: MutableList<FormRule>) {
