@@ -1,188 +1,166 @@
-package com.jiangtj.micro.common.form;
+package com.jiangtj.micro.common.form
 
-import com.jiangtj.micro.common.validation.MaxLength;
-import com.jiangtj.micro.common.validation.MinLength;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
-import lombok.Getter;
-import org.springframework.lang.NonNull;
+import com.jiangtj.micro.common.validation.MaxLength
+import com.jiangtj.micro.common.validation.MinLength
+import jakarta.validation.Valid
+import jakarta.validation.constraints.*
+import java.lang.reflect.Field
+import java.lang.reflect.ParameterizedType
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.*;
+object FormRuleGenerator {
 
-public class FormRuleGenerator {
+    val cache: MutableMap<String, MutableMap<String, MutableList<FormRule>>> = mutableMapOf()
+    val handlers: MutableList<BaseHandler> = mutableListOf()
 
-    @Getter
-    private static final Map<String, Map<String, List<FormRule>>> cache = new HashMap<>();
-    @Getter
-    private static final List<BaseHandler> handlers = new ArrayList<>();
-
-    static {
-        addHandler(new PatternHandler());
-        addHandler(new MobilePhoneHandler());
+    init {
+        addHandler(PatternHandler())
+        addHandler(MobilePhoneHandler())
     }
 
-    @org.jetbrains.annotations.NotNull
-    @NonNull
-    public static Map<String, List<FormRule>> generate(@org.jetbrains.annotations.NotNull @NonNull Class<?> clazz) {
-        Map<String, List<FormRule>> map = cache.get(clazz.getName());
+    @JvmStatic
+    fun generate(clazz: Class<*>): MutableMap<String, MutableList<FormRule>> {
+        var map = cache[clazz.getName()]
         if (map != null) {
-            return map;
+            return map
         }
-        map = new LinkedHashMap<>();
-        Field[] fields = clazz.getDeclaredFields();
-        for (Field field : fields) {
-            List<FormRule> rules = new ArrayList<>();
-            boolean setField = false;
-            FormRule rule = new FormRule();
 
-            Class<?> type = field.getType();
-            if (Integer.class.isAssignableFrom(type)
-                || int.class.isAssignableFrom(type)
-                || Byte.class.isAssignableFrom(type)
-                || byte.class.isAssignableFrom(type)
-                || Long.class.isAssignableFrom(type)
-                || long.class.isAssignableFrom(type)
+        map = mutableMapOf()
+
+        val fields = clazz.getDeclaredFields()
+        for (field in fields) {
+            val rules: MutableList<FormRule> = mutableListOf()
+            var setField = false
+            val rule = FormRule()
+
+            val type = field.type
+            if (Int::class.java.isAssignableFrom(type)
+                || Int::class.javaPrimitiveType!!.isAssignableFrom(type)
+                || Byte::class.java.isAssignableFrom(type)
+                || Byte::class.javaPrimitiveType!!.isAssignableFrom(type)
+                || Long::class.java.isAssignableFrom(type)
+                || Long::class.javaPrimitiveType!!.isAssignableFrom(type)
             ) {
-                rule.setType("number");
-                setField = true;
+                rule.type = "number"
+                setField = true
             }
-            if (type.isAssignableFrom(Boolean.class)
-                || type.isAssignableFrom(boolean.class)) {
-                rule.setType("boolean");
-                setField = true;
-            }
-
-            Optional<NotNull> notNull = findAnnotation(field, NotNull.class);
-            if (notNull.isPresent()) {
-                rule.setRequired(true);
-                setField = true;
+            if (type.isAssignableFrom(Boolean::class.java)
+                || type.isAssignableFrom(Boolean::class.javaPrimitiveType)
+            ) {
+                rule.type = "boolean"
+                setField = true
             }
 
-            Optional<NotEmpty> notEmpty = findAnnotation(field, NotEmpty.class);
-            if (notEmpty.isPresent()) {
-                rule.setType(isList(type) ? "array" : "string");
-                rule.setRequired(true);
-                setField = true;
+            field.getAnnotation(NotNull::class.java)?.let {
+                rule.required = true
+                setField = true
             }
 
-            Optional<NotBlank> notBlank = findAnnotation(field, NotBlank.class);
-            if (notBlank.isPresent()) {
-                rule.setType("string");
-                rule.setRequired(true);
-                rule.setWhitespace(true);
-                setField = true;
+            field.getAnnotation(NotEmpty::class.java)?.let {
+                rule.type = if (isList(type)) "array" else "string"
+                rule.required = true
+                setField = true
             }
 
-            Optional<Min> min = findAnnotation(field, Min.class);
-            if (min.isPresent()) {
-                rule.setType("number");
-                rule.setMin((int) min.get().value());
-                setField = true;
+            field.getAnnotation(NotBlank::class.java)?.let {
+                rule.type = "string"
+                rule.required = true
+                rule.whitespace = true
+                setField = true
             }
 
-            Optional<Max> max = findAnnotation(field, Max.class);
-            if (max.isPresent()) {
-                rule.setType("number");
-                rule.setMax((int) max.get().value());
-                setField = true;
+            field.getAnnotation(Min::class.java)?.let {
+                rule.type = "number"
+                rule.min = it.value.toInt()
+                setField = true
             }
 
-            Optional<Size> size = findAnnotation(field, Size.class);
-            if (size.isPresent()) {
-                if (type.isAssignableFrom(CharSequence.class)) {
-                    rule.setType("string");
+            field.getAnnotation(Max::class.java)?.let {
+                rule.type = "number"
+                rule.max = it.value.toInt()
+                setField = true
+            }
+
+            field.getAnnotation(Size::class.java)?.let {
+                if (type.isAssignableFrom(CharSequence::class.java)) {
+                    rule.type = "string"
                 }
-                if (type.isArray() || Collection.class.isAssignableFrom(type)) {
-                    rule.setType("array");
+                if (type.isArray() || MutableCollection::class.java.isAssignableFrom(type)) {
+                    rule.type = "array"
                 }
-                Size v = size.get();
-                if (v.min() != 0) {
-                    rule.setMin(v.min());
+                if (it.min != 0) {
+                    rule.min = it.min
                 }
-                if (v.max() != Integer.MAX_VALUE) {
-                    rule.setMax(v.max());
+                if (it.max != Int.MAX_VALUE) {
+                    rule.max = it.max
                 }
-                setField = true;
+                setField = true
             }
 
-            Optional<Email> email = findAnnotation(field, Email.class);
-            if (email.isPresent()) {
-                rule.setType("email");
-                setField = true;
+            field.getAnnotation(Email::class.java)?.let {
+                rule.type = "email"
+                setField = true
             }
 
-            Optional<MinLength> minLen = findAnnotation(field, MinLength.class);
-            if (minLen.isPresent()) {
-                rule.setType("string");
-                rule.setMin(minLen.get().value());
-                setField = true;
+            field.getAnnotation(MinLength::class.java)?.let {
+                rule.type = "string"
+                rule.min = it.value
+                setField = true
             }
 
-            Optional<MaxLength> maxLen = findAnnotation(field, MaxLength.class);
-            if (maxLen.isPresent()) {
-                rule.setType("string");
-                rule.setMax(maxLen.get().value());
-                setField = true;
+            field.getAnnotation(MaxLength::class.java)?.let {
+                rule.type = "string"
+                rule.max = it.value
+                setField = true
             }
+
             if (setField) {
-                if (rule.getType() == null && type.isAssignableFrom(String.class)) {
-                    rule.setType("string");
+                if (rule.type == null && type.isAssignableFrom(String::class.java)) {
+                    rule.type = "string"
                 }
-                rules.add(rule);
+                rules.add(rule)
             }
 
-            handle(field, rules);
+            handle(field, rules)
 
-            Optional<Valid> valid = findAnnotation(field, Valid.class);
-            if (valid.isPresent()) {
-                FormRule validRule = new FormRule();
+            field.getAnnotation(Valid::class.java)?.let {
+                val validRule = FormRule()
                 if (isList(type)) {
-                    validRule.setType("array");
-                    Type genericType = field.getGenericType();
-                    if (genericType instanceof ParameterizedType t) {
-                        Type actualType = t.getActualTypeArguments()[0];
-                        validRule.setDefaultField(generate((Class<?>) actualType));
+                    validRule.type = "array"
+                    val genericType = field.genericType
+                    if (genericType is ParameterizedType) {
+                        val actualType = genericType.actualTypeArguments[0]
+                        validRule.defaultField = generate(actualType as Class<*>)
                     }
                 } else {
-                    validRule.setType("object");
-                    validRule.setDefaultField(generate(field.getType()));
+                    validRule.type = "object"
+                    validRule.defaultField = generate(field.getType())
                 }
-                rules.add(validRule);
+                rules.add(validRule)
             }
 
             if (!rules.isEmpty()) {
-                map.put(field.getName(), rules);
+                map[field.name] = rules
             }
         }
 
-        cache.put(clazz.getName(), map);
-        return map;
+        cache[clazz.getName()] = map
+        return map
     }
 
-    private static boolean isList(Class<?> type) {
-        return type.isArray() || List.class.isAssignableFrom(type);
+    private fun isList(type: Class<*>): Boolean {
+        return type.isArray || MutableList::class.java.isAssignableFrom(type)
     }
 
-    private static void handle(Field field, List<FormRule> rules) {
-        for (BaseHandler handler : handlers) {
-            FormRule rule = handler.handle(field);
+    private fun handle(field: Field, rules: MutableList<FormRule>) {
+        for (handler in handlers) {
+            val rule = handler.handle(field)
             if (rule != null) {
-                rules.add(rule);
+                rules.add(rule)
             }
         }
     }
 
-    static <A extends Annotation> Optional<A> findAnnotation(AnnotatedElement element, Class<A> annotationType) {
-        return Optional.ofNullable(element.getAnnotation(annotationType));
+    fun addHandler(handler: BaseHandler) {
+        handlers.add(handler)
     }
-
-    static void addHandler(BaseHandler handler) {
-        handlers.add(handler);
-    }
-
 }
