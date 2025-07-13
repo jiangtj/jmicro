@@ -83,6 +83,11 @@
                 <artifactId>micro-flyway-starter</artifactId>
                 <version>0.1.0-b1</version>
             </dependency>
+            <dependency>
+                <groupId>com.jiangtj.micro</groupId>
+                <artifactId>micro-payment</artifactId>
+                <version>0.1.0-b1</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
