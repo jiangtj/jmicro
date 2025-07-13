@@ -6,9 +6,11 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import io.github.oshai.kotlinlogging.KotlinLogging
 import lombok.extern.slf4j.Slf4j
 import java.io.IOException
 
+private val log = KotlinLogging.logger {}
 
 @Slf4j
 object JsonUtils {
@@ -33,19 +35,17 @@ object JsonUtils {
     }
 
     @JvmStatic
-    fun toJson(`object`: Any?): String? {
-        if (`object` == null) {
+    fun toJson(obj: Any?): String? {
+        if (obj == null) {
             return null
         }
 
-        var json: String? = null
-
         try {
-            json = objectMapper.writeValueAsString(`object`)
+            return objectMapper.writeValueAsString(obj)
         } catch (e: JsonProcessingException) {
-            e.printStackTrace()
+            log.error(e) { "JsonUtils error" }
         }
-        return json
+        return null
     }
 
     @JvmStatic
@@ -54,15 +54,13 @@ object JsonUtils {
             return null
         }
 
-        var `object`: T? = null
-
         try {
-            `object` = objectMapper.readValue<T>(json, classType)
+            return objectMapper.readValue<T>(json, classType)
         } catch (e: IOException) {
-            e.printStackTrace()
+            log.error(e) { "JsonUtils error" }
         }
 
-        return `object`
+        return null
     }
 
     @JvmStatic
@@ -71,16 +69,13 @@ object JsonUtils {
             return null
         }
 
-        var lists: MutableList<T>? = null
-
         try {
-            val javaType: JavaType? =
-                objectMapper.getTypeFactory().constructCollectionType(ArrayList::class.java, classType)
-            lists = objectMapper.readValue<MutableList<T>>(json, javaType)
+            val javaType = objectMapper.typeFactory.constructCollectionType(ArrayList::class.java, classType)
+            return objectMapper.readValue<MutableList<T>>(json, javaType)
         } catch (e: IOException) {
-            e.printStackTrace()
+            log.error(e) { "JsonUtils error" }
         }
 
-        return lists
+        return null
     }
 }
