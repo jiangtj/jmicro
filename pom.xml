@@ -4,11 +4,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.jiangtj.micro</groupId>
-    <artifactId>parent</artifactId>
+    <artifactId>jmicro-aggregator</artifactId>
     <packaging>pom</packaging>
     <version>0.1.0-b1</version>
     <url>https://github.com/jiangtj/jmicro</url>
-    <name>micro-parent</name>
+    <name>JMicro</name>
     <description>An open-source framework based on Spring Boot, helps you create applications more easily</description>
 
     <parent>
