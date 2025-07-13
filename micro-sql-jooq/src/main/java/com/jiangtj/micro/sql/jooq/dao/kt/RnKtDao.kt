@@ -1,6 +1,7 @@
 package com.jiangtj.micro.sql.jooq.dao.kt
 
 import org.jooq.DSLContext
+import org.jooq.Result
 import org.jooq.TableField
 import org.jooq.TableRecord
 
@@ -8,10 +9,10 @@ class RnKtDao<R : TableRecord<R>, T>(
     val tableField: TableField<R, T>,
 ) : AbstractKtDao<R, T, R>(tableField, tableField.table!!) {
 
-    override fun fetch(create: DSLContext, vararg value: T): Array<R> {
+    override fun fetch(create: DSLContext, vararg value: T): Result<R> {
         return create.selectFrom(table)
             .where(conditionVararg(tableField, *value))
-            .fetchArray()
+            .fetch()
     }
 
     override fun delete(create: DSLContext, vararg value: T) {

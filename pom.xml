@@ -48,6 +48,7 @@
         <jb-annotations.version>26.0.2</jb-annotations.version>
         <kotlin.version>2.1.21</kotlin.version>
         <kotlin-logging.version>7.0.3</kotlin-logging.version>
+        <dokka.version>2.0.0</dokka.version>
         <!-- <maven.test.skip>true</maven.test.skip> -->
     </properties>
 
@@ -312,6 +313,19 @@
                         <version>${kotlin.version}</version>
                     </dependency>
                 </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>org.jetbrains.dokka</groupId>
+                <artifactId>dokka-maven-plugin</artifactId>
+                <version>${dokka.version}</version>
+                <executions>
+                    <execution>
+                        <phase>pre-site</phase>
+                        <goals>
+                            <goal>dokka</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

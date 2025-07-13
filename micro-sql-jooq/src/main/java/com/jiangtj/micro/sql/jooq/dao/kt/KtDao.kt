@@ -16,15 +16,19 @@ class KtDao<R : UpdatableRecord<R>, T> {
 
     fun fetchPage(create: DSLContext) = PageUtils.selectFrom(create, table)!!
 
-    fun <V> fetch(create: DSLContext, field: TableField<R, V>, vararg value: V) = create.selectFrom(table)
-        .where(conditionVararg(field, *value))
-        .fetchArray()
+    fun <V> fetch(create: DSLContext, field: TableField<R, V>, vararg value: V): Result<R> {
+        return create.selectFrom(table)
+            .where(conditionVararg(field, *value))
+            .fetch()
+    }
 
     fun fetchByIds(create: DSLContext, vararg value: T) = fetch(create, idField, *value)
 
-    fun fetchById(create: DSLContext, value: T) = create.selectFrom(table)
-        .where(idField.eq(value))
-        .fetchOne()
+    fun fetchById(create: DSLContext, value: T): R? {
+        return create.selectFrom(table)
+            .where(idField.eq(value))
+            .fetchOne()
+    }
 
     fun insert(create: DSLContext, example: Any): R {
         val record: R = create.newRecord(table, example)
