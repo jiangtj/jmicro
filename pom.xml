@@ -46,8 +46,9 @@
         <wxJava.version>4.7.0</wxJava.version>
         <jjwt.version>0.12.6</jjwt.version>
         <jb-annotations.version>26.0.2</jb-annotations.version>
-        <!-- <maven.test.skip>true</maven.test.skip> -->
         <kotlin.version>2.1.21</kotlin.version>
+        <kotlin-logging.version>7.0.3</kotlin-logging.version>
+        <!-- <maven.test.skip>true</maven.test.skip> -->
     </properties>
 
     <dependencies>
@@ -69,10 +70,10 @@
             <artifactId>kotlin-test-junit5</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
+        <!--<dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-kotlin</artifactId>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
@@ -177,6 +178,11 @@
                 <version>0.1.0-b1</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.github.oshai</groupId>
+                <artifactId>kotlin-logging-jvm</artifactId>
+                <version>${kotlin-logging.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.code.findbugs</groupId>
