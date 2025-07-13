@@ -14,7 +14,7 @@ class KtDao<R : UpdatableRecord<R>, T> {
         this.table = idField.table!!
     }
 
-    fun fetchPage(create: DSLContext) = PageUtils.selectFrom(create, table)!!
+    fun fetchPage(create: DSLContext) = create.selectPage(table)
 
     fun <V> fetch(create: DSLContext, field: TableField<R, V>, vararg value: V): Result<R> {
         return create.selectFrom(table)
