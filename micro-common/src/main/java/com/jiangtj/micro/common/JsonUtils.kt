@@ -48,6 +48,8 @@ object JsonUtils {
         return null
     }
 
+    inline fun <reified T> fromJson(json: String?) = fromJson(json, T::class.java)
+
     @JvmStatic
     fun <T> fromJson(json: String?, classType: Class<T>): T? {
         if (json == null) {
@@ -62,6 +64,8 @@ object JsonUtils {
 
         return null
     }
+
+    inline fun <reified T> getListFromJson(json: String?) = getListFromJson(json, T::class.java)
 
     @JvmStatic
     fun <T> getListFromJson(json: String?, classType: Class<T>): MutableList<T>? {
