@@ -20,7 +20,7 @@ class FormRuleGeneratorKtTest {
         @field:MaxLength(5)
         val name: String? = null,
         @field:Min(18)
-        val age: Int = 0,
+        val age: Int? = null,
         val address: String? = null,
         @field:MobilePhone
         @field:NotNull
@@ -93,6 +93,23 @@ class FormRuleGeneratorKtTest {
                     "\"mail\":[{\"type\":\"array\",\"required\":true}]," +
                     "\"nestLS\":[{\"type\":\"array\",\"defaultField\":{\"name\":[{\"type\":\"string\",\"required\":true,\"whitespace\":true}]}}]" +
                     "}", json
+        )
+    }
+
+    @Data
+    data class ExampleWithKNullMaker(
+        val name: String,
+        val displayName: String? = null,
+        val age: Int = 0
+    )
+
+    @Test
+    fun testExampleWithKNullMaker() {
+        val generate: MutableMap<String, MutableList<FormRule>> = generate<ExampleWithKNullMaker>()
+        val json = toJson(generate)
+        log.error { json }
+        Assertions.assertEquals(
+            "{\"name\":[{\"type\":\"string\",\"required\":true}],\"age\":[{\"type\":\"number\",\"required\":true}]}", json
         )
     }
 }

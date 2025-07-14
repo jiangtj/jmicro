@@ -6,6 +6,7 @@ import jakarta.validation.Valid
 import jakarta.validation.constraints.*
 import java.lang.reflect.Field
 import java.lang.reflect.ParameterizedType
+import kotlin.reflect.jvm.kotlinProperty
 
 object FormRuleGenerator {
 
@@ -113,6 +114,14 @@ object FormRuleGenerator {
                 rule.type = "string"
                 rule.max = it.value
                 setField = true
+            }
+
+            val kProperty = field.kotlinProperty
+            if (kProperty!= null) {
+                if (!kProperty.returnType.isMarkedNullable) {
+                    rule.required = true
+                    setField = true
+                }
             }
 
             if (setField) {
