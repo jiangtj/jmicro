@@ -4,11 +4,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.jiangtj.micro</groupId>
-        <artifactId>parent</artifactId>
-        <version>0.0.36</version>
+        <artifactId>jmicro-aggregator</artifactId>
+        <version>0.1.0-b3</version>
     </parent>
     <artifactId>micro-sql-jooq</artifactId>
-    <version>0.0.36</version>
+    <version>0.1.0-b3</version>
     <name>micro-sql-jooq</name>
     <description>JOOQ sql tools, for page query.</description>
 

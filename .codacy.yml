@@ -1,0 +1,6 @@
+---
+exclude_paths:
+  - "demo-backend/**/*"
+  - "demo-front/**/*"
+  - "demo-reactive/**/*"
+  - "**/test/java/com/jiangtj/**/*"

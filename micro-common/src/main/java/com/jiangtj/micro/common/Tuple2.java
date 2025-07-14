@@ -3,6 +3,12 @@ package com.jiangtj.micro.common;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+/**
+ * 过期，使用 kotlin pair 代替
+ * @author jiangtj
+ * @since 2024/2/3
+ */
+@Deprecated
 public record Tuple2<T1, T2>(T1 t1, T2 t2) {
 
 	public <V> V map(BiFunction<T1, T2, V> biFunction) {

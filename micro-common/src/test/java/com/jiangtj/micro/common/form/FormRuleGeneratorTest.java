@@ -67,7 +67,7 @@ class FormRuleGeneratorTest {
     @Test
     void testCache() {
         FormRuleGenerator.generate(Example.class);
-        Map<String, Map<String, List<FormRule>>> cache = FormRuleGenerator.getCache();
+        Map<String, Map<String, List<FormRule>>> cache = FormRuleGenerator.INSTANCE.getCache();
         assertTrue(cache.containsKey(Example.class.getName()));
     }
 
