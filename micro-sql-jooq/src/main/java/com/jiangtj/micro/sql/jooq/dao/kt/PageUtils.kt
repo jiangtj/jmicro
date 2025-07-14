@@ -3,6 +3,7 @@ package com.jiangtj.micro.sql.jooq.dao.kt
 import com.jiangtj.micro.sql.jooq.PageUtils
 import com.jiangtj.micro.sql.jooq.QueryUtils
 import org.jooq.*
+import org.jooq.impl.DSL
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
@@ -28,7 +29,7 @@ fun <R : Record> DSLContext.selectPage(table: Table<R>): WhereStep<R> {
 /**
  * Where 步骤
  */
-class WhereStep<R : Record>( ctx: PageContext<R>):PageableStep<R>(ctx) {
+class WhereStep<R : Record>(ctx: PageContext<R>) : PageableStep<R>(ctx) {
     /**
      * 添加查询条件
      */
@@ -57,7 +58,7 @@ class WhereStep<R : Record>( ctx: PageContext<R>):PageableStep<R>(ctx) {
 /**
  * 条件步骤记录
  */
-class ConditionStep<R : Record>(ctx: PageContext<R>):PageableStep<R>(ctx) {
+class ConditionStep<R : Record>(ctx: PageContext<R>) : PageableStep<R>(ctx) {
     /**
      * 添加查询条件
      */
@@ -89,11 +90,16 @@ class ResultStep<R : Record>(val ctx: PageContext<R>) {
      * 执行查询并获取结果。
      */
     fun fetch(): Pair<Result<R>, Int> {
-        val conditions = ctx.conditions.filterNotNull().reduce { acc, condition -> acc.and(condition) }
+        val notNullConditions = ctx.conditions.filterNotNull()
+        val conditions =
+            if (notNullConditions.isEmpty())
+                DSL.noCondition()
+            else
+                notNullConditions.reduce { acc, condition -> acc.and(condition) }
         val listC = ctx.create.selectFrom(ctx.table).where(conditions)
         val pageC = PageUtils.handlePageable(listC, ctx.pageable!!, *ctx.orderField.toTypedArray())
         val result = pageC.fetch()
-        val count = ctx.create.selectCount().where(conditions).fetchSingle().value1()
+        val count = ctx.create.selectCount().from(ctx.table).where(conditions).fetchSingle().value1()
         return Pair(result, count)
     }
 
