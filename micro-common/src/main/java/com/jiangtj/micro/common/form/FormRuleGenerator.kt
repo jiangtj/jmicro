@@ -17,6 +17,8 @@ object FormRuleGenerator {
         addHandler(MobilePhoneHandler())
     }
 
+    inline fun <reified T> generate() = generate(T::class.java)
+
     @JvmStatic
     fun generate(clazz: Class<*>): MutableMap<String, MutableList<FormRule>> {
         var map = cache[clazz.getName()]
