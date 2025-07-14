@@ -1,5 +1,6 @@
 package com.jiangtj.micro.common.form
 
+import com.fasterxml.jackson.module.kotlin.isKotlinClass
 import com.jiangtj.micro.common.validation.MaxLength
 import com.jiangtj.micro.common.validation.MinLength
 import jakarta.validation.Valid
@@ -30,6 +31,7 @@ object FormRuleGenerator {
         map = mutableMapOf()
 
         val fields = clazz.getDeclaredFields()
+        val isKt = clazz.isKotlinClass()
         for (field in fields) {
             val rules: MutableList<FormRule> = mutableListOf()
             var setField = false
@@ -116,11 +118,13 @@ object FormRuleGenerator {
                 setField = true
             }
 
-            val kProperty = field.kotlinProperty
-            if (kProperty != null) {
-                if (!kProperty.returnType.isMarkedNullable) {
-                    rule.required = true
-                    setField = true
+            if (isKt) {
+                val kProperty = field.kotlinProperty
+                if (kProperty != null) {
+                    if (!kProperty.returnType.isMarkedNullable) {
+                        rule.required = true
+                        setField = true
+                    }
                 }
             }
 
