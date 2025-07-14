@@ -5,10 +5,10 @@
     <parent>
         <groupId>com.jiangtj.micro</groupId>
         <artifactId>jmicro-aggregator</artifactId>
-        <version>0.1.0-b2</version>
+        <version>0.1.0-b3</version>
     </parent>
     <artifactId>micro-payment</artifactId>
-    <version>0.1.0-b2</version>
+    <version>0.1.0-b3</version>
     <name>micro-payment</name>
     <description>Payment module for JMicro framework, supporting balance, WeChat and Alipay payments</description>
 
