@@ -3,9 +3,12 @@ package com.jiangtj.micro.common.form
 import com.jiangtj.micro.common.validation.MobilePhone
 import java.lang.reflect.Field
 
+/**
+ * MobilePhoneHandler 类实现了 FormRuleHandler 接口，用于处理带有 MobilePhone 注解的字段，
+ * 根据字段类型生成相应的手机格式验证规则。
+ */
 class MobilePhoneHandler : FormRuleHandler<MobilePhone> {
-    override val annotation: Class<MobilePhone>
-        get() = MobilePhone::class.java
+    override fun annotation() = MobilePhone::class.java
 
     override fun handle(field: Field, element: MobilePhone): FormRule {
         val type = field.type

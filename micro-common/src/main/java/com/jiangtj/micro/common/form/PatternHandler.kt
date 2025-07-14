@@ -3,9 +3,12 @@ package com.jiangtj.micro.common.form
 import jakarta.validation.constraints.Pattern
 import java.lang.reflect.Field
 
+/**
+ * PatternHandler 类用于处理 `@Pattern` 注解，将其转换为表单验证规则。
+ * 实现了 `FormRuleHandler` 接口，专门处理 `Pattern` 类型的注解。
+ */
 class PatternHandler : FormRuleHandler<Pattern> {
-    override val annotation: Class<Pattern>
-        get() = Pattern::class.java
+    override fun annotation() = Pattern::class.java
 
     override fun handle(field: Field, element: Pattern): FormRule {
         var message = element.message
@@ -19,3 +22,4 @@ class PatternHandler : FormRuleHandler<Pattern> {
         return rule
     }
 }
+
