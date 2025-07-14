@@ -7,6 +7,9 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 
+/**
+ * 分页查询上下文
+ */
 data class PageContext<R : Record>(
     var create: DSLContext,
     var table: Table<R>,
@@ -26,17 +29,26 @@ fun <R : Record> DSLContext.selectPage(table: Table<R>): WhereStep<R> {
  * Where 步骤
  */
 class WhereStep<R : Record>( ctx: PageContext<R>):PageableStep<R>(ctx) {
+    /**
+     * 添加查询条件
+     */
     fun where(vararg conditions: Condition?): ConditionStep<R> {
         ctx.conditions = conditions.toMutableList()
         return ConditionStep(ctx)
     }
 
+    /**
+     * 依据 Example 生成查询条件
+     */
     fun conditionByExample(example: Any?, vararg ignoredFields: Field<*>): ConditionStep<R> {
         val exampleConditions = QueryUtils.nec(ctx.create, ctx.table, example, *ignoredFields)
         ctx.conditions += exampleConditions
         return ConditionStep(ctx)
     }
 
+    /**
+     * 添加查询条件
+     */
     fun conditions(vararg conditions: Condition?): ConditionStep<R> {
         return where(*conditions)
     }
@@ -46,6 +58,9 @@ class WhereStep<R : Record>( ctx: PageContext<R>):PageableStep<R>(ctx) {
  * 条件步骤记录
  */
 class ConditionStep<R : Record>(ctx: PageContext<R>):PageableStep<R>(ctx) {
+    /**
+     * 添加查询条件
+     */
     fun and(conditions: Condition?): ConditionStep<R> {
         ctx.conditions += conditions
         return this
@@ -56,7 +71,9 @@ class ConditionStep<R : Record>(ctx: PageContext<R>):PageableStep<R>(ctx) {
  * 分页步骤
  */
 open class PageableStep<R : Record>(val ctx: PageContext<R>) {
-
+    /**
+     * 添加分页参数
+     */
     fun pageable(pageable: Pageable, vararg orderFields: OrderField<*>): ResultStep<R> {
         ctx.pageable = pageable
         ctx.orderField = orderFields.toMutableList()
