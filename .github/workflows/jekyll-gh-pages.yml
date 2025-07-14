@@ -49,17 +49,17 @@ jobs:
         run: mvn site
       - name: Move site to pages artifact dir
         run: |
-          mv ./micro-common/target/site ./_site/micro-common
-          mv ./micro-web/target/site ./_site/micro-web
-          mv ./micro-auth/target/site ./_site/micro-auth
-          mv ./micro-auth-casdoor/target/site ./_site/micro-auth-casdoor
-          mv ./micro-auth-wechat/target/site ./_site/micro-auth-wechat
-          mv ./micro-spring-boot-starter/target/site ./_site/micro-spring-boot-starter
-          mv ./micro-sql-jooq/target/site ./_site/micro-sql-jooq
-          mv ./micro-test/target/site ./_site/micro-test
-          mv ./micro-pic-upload-starter/target/site ./_site/micro-pic-upload-starter
-          mv ./micro-flyway-starter/target/site ./_site/micro-flyway-starter
-          mv ./micro-payment/target/site ./_site/micro-payment
+          mv ./micro-common/target/site ./temp_site/micro-common
+          mv ./micro-web/target/site ./temp_site/micro-web
+          mv ./micro-auth/target/site ./temp_site/micro-auth
+          mv ./micro-auth-casdoor/target/site ./temp_site/micro-auth-casdoor
+          mv ./micro-auth-wechat/target/site ./temp_site/micro-auth-wechat
+          mv ./micro-spring-boot-starter/target/site ./temp_site/micro-spring-boot-starter
+          mv ./micro-sql-jooq/target/site ./temp_site/micro-sql-jooq
+          mv ./micro-test/target/site ./temp_site/micro-test
+          mv ./micro-pic-upload-starter/target/site ./temp_site/micro-pic-upload-starter
+          mv ./micro-flyway-starter/target/site ./temp_site/micro-flyway-starter
+          mv ./micro-payment/target/site ./temp_site/micro-payment
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
