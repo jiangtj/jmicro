@@ -1,6 +1,5 @@
 package com.jiangtj.micro.sql.jooq.dao.kt
 
-import com.jiangtj.micro.sql.jooq.PageUtils
 import com.jiangtj.micro.sql.jooq.QueryUtils
 import org.jooq.*
 

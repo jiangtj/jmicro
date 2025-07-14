@@ -117,7 +117,7 @@ object FormRuleGenerator {
             }
 
             val kProperty = field.kotlinProperty
-            if (kProperty!= null) {
+            if (kProperty != null) {
                 if (!kProperty.returnType.isMarkedNullable) {
                     rule.required = true
                     setField = true

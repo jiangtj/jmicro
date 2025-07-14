@@ -2,14 +2,10 @@ package com.jiangtj.micro.sql.jooq.dao.kt
 
 import com.jiangtj.micro.sql.jooq.PageUtils
 import com.jiangtj.micro.sql.jooq.QueryUtils
-import com.jiangtj.micro.sql.jooq.ResultStepHandler
 import org.jooq.*
-import org.jooq.impl.DSL
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
-import org.springframework.data.domain.Sort
-import java.util.function.Function
 
 data class PageContext<R : Record>(
     var create: DSLContext,
