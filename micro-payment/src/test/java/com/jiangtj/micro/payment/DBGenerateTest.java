@@ -41,6 +41,8 @@ public class DBGenerateTest {
                     .withPojosAsKotlinDataClasses(true)
                     .withDaos(false)
                     .withSpringAnnotations(false)
+                    .withDefaultSchema(false)
+                    .withDefaultCatalog(false)
                 )
             ));
     }

@@ -4,7 +4,6 @@
 package com.jiangtj.micro.payment.jooq.tables
 
 
-import com.jiangtj.micro.payment.jooq.DefaultSchema
 import com.jiangtj.micro.payment.jooq.indexes.PAYMENT_RECORD_IDX_ORDER_ID
 import com.jiangtj.micro.payment.jooq.indexes.PAYMENT_RECORD_IDX_PAYMENT_ID
 import com.jiangtj.micro.payment.jooq.indexes.PAYMENT_RECORD_IDX_USER_ID
@@ -32,7 +31,7 @@ open class PaymentRecord(
     where: Condition?
 ): TableImpl<PaymentRecordRecord>(
     alias,
-    DefaultSchema.DEFAULT_SCHEMA,
+    null,
     path,
     childPath,
     parentPath,
@@ -128,7 +127,6 @@ open class PaymentRecord(
      * Create a <code>payment_record</code> table reference
      */
     constructor(): this(DSL.name("payment_record"), null)
-    override fun getSchema(): Schema? = if (aliased()) null else DefaultSchema.DEFAULT_SCHEMA
     override fun getIndexes(): List<Index> = listOf(PAYMENT_RECORD_IDX_ORDER_ID, PAYMENT_RECORD_IDX_PAYMENT_ID, PAYMENT_RECORD_IDX_USER_ID)
     override fun getIdentity(): Identity<PaymentRecordRecord, Int?> = super.getIdentity() as Identity<PaymentRecordRecord, Int?>
     override fun getPrimaryKey(): UniqueKey<PaymentRecordRecord> = KEY_PAYMENT_RECORD_PRIMARY
