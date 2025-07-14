@@ -3,6 +3,8 @@
 ![status](https://img.shields.io/badge/status-developing-yellow.svg)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/1d836355f32d423cb487081709b5890d)](https://app.codacy.com/gh/jiangtj/jmicro/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 ![Maven Central Version](https://img.shields.io/maven-central/v/com.jiangtj.micro/parent)
+![Java](https://img.shields.io/badge/java-grey.svg?logo=openjdk)
+![Kotlin](https://img.shields.io/badge/kotlin-grey.svg?logo=kotlin)
 
 J Micro 是一个基于 Spring Boot 的轻量框架，方便开发者更轻松的开发应用(提供基于 vue 的前后端分离的 Demo), 由 [JCPlatform](https://github.com/JiangTJ/jc-platform) 拆分出来专于基础应用的工具集，之后也将重构另一个项目，基于该项目专注微服务应用。
 
@@ -25,7 +27,9 @@ J Micro 是一个基于 Spring Boot 的轻量框架，方便开发者更轻松�
 </dependencyManagement>
 ```
 
-### [认证与鉴权模块](micro-auth)
+## 认证与鉴权模块
+[![doc](https://img.shields.io/badge/document-grey.svg?logo=readme)](./micro-auth)
+[![dokka](https://img.shields.io/badge/dokka-grey.svg?logo=kotlin)](https://jiangtj.com/jmicro/micro-auth/dokka)
 
 ```xml
 <dependency>
@@ -75,7 +79,9 @@ class ExampleService {
 
 `micro-auth-casdoor` 是这个鉴权模块的扩展，用于支持 casdoor 的 token 认证，你可以参考他创建自己的鉴权模块
 
-### [Web 模块](micro-web)
+## Web 模块
+[![doc](https://img.shields.io/badge/document-grey.svg?logo=readme)](./micro-web)
+[![dokka](https://img.shields.io/badge/dokka-grey.svg?logo=kotlin)](https://jiangtj.com/jmicro/micro-web/dokka)
 
 ```xml
 <dependency>
@@ -107,7 +113,9 @@ public class MyConfiguration {
 > 另外如果你使用 Spring Boot 3.5+, 你可以使用官方的 `@FilterRegistration` 例如
 `@FilterRegistration(name = "my-filter", urlPatterns = "/test/*", order = 0)`
 
-### [通用模块](micro-common)
+## 通用模块
+[![doc](https://img.shields.io/badge/document-grey.svg?logo=readme)](./micro-common)
+[![dokka](https://img.shields.io/badge/dokka-grey.svg?logo=kotlin)](https://jiangtj.com/jmicro/micro-common/dokka)
 
 #### FormRule 规则生成
 
@@ -118,7 +126,9 @@ public class MyConfiguration {
 Map<String, List<FormRule>> generate = FormRuleGenerator.generate(Example.class);
 ```
 
-### [图片上传模块](micro-pic-upload-starter)
+## 图片上传模块
+[![doc](https://img.shields.io/badge/document-grey.svg?logo=readme)](./micro-pic-upload-starter)
+[![dokka](https://img.shields.io/badge/dokka-grey.svg?logo=kotlin)](https://jiangtj.com/jmicro/micro-pic-upload-starter/dokka)
 
 ```xml
 
@@ -136,7 +146,9 @@ Map<String, List<FormRule>> generate = FormRuleGenerator.generate(Example.class)
 - [x] MinIO (aka S3)
 - [x] EasyImages 2.0
 
-### [JOOQ 扩展](micro-sql-jooq)
+## JOOQ 扩展
+[![doc](https://img.shields.io/badge/document-grey.svg?logo=readme)](./micro-sql-jooq)
+[![dokka](https://img.shields.io/badge/dokka-grey.svg?logo=kotlin)](https://jiangtj.com/jmicro/micro-sql-jooq/dokka)
 
 ```xml
 <dependency>
@@ -175,7 +187,9 @@ public Mono<Page<AdminUser>> fetchPage() {
 }
 ```
 
-### [Flyway 扩展](micro-flyway-starter)
+## Flyway 扩展
+[![doc](https://img.shields.io/badge/document-grey.svg?logo=readme)](./micro-flyway-starter)
+[![dokka](https://img.shields.io/badge/dokka-grey.svg?logo=kotlin)](https://jiangtj.com/jmicro/micro-flyway-starter/dokka)
 
 ```xml
 <dependency>
@@ -186,7 +200,9 @@ public Mono<Page<AdminUser>> fetchPage() {
 
 修改 `spring.flyway.clean-on-validation-error` 为 `micro.flyway.clean-on-validation-error`, 在 `Spring Boot 3.5+` 中，支持在校验失败时清理数据库
 
-### [Starter 模块](micro-spring-boot-starter)
+## Starter 模块
+[![doc](https://img.shields.io/badge/document-grey.svg?logo=readme)](./micro-spring-boot-starter)
+[![dokka](https://img.shields.io/badge/dokka-grey.svg?logo=kotlin)](https://jiangtj.com/jmicro/micro-spring-boot-starter/dokka)
 
 ```xml
 <dependency>
