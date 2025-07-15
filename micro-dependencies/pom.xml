@@ -50,6 +50,11 @@
             </dependency>
             <dependency>
                 <groupId>com.jiangtj.micro</groupId>
+                <artifactId>micro-auth-oidc</artifactId>
+                <version>0.1.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.jiangtj.micro</groupId>
                 <artifactId>micro-common</artifactId>
                 <version>0.1.0</version>
             </dependency>

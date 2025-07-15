@@ -100,6 +100,7 @@
                 <module>micro-auth</module>
                 <module>micro-auth-casdoor</module>
                 <module>micro-auth-wechat</module>
+                <module>micro-auth-oidc</module>
                 <module>micro-spring-boot-starter</module>
                 <module>micro-sql-jooq</module>
                 <module>micro-test</module>
