@@ -22,18 +22,23 @@ data class PaymentRefund(
     var modifyTime: LocalDateTime? = null,
     @get:NotNull
     @get:Size(max = 50)
-    var refundNo: String? = null,
-    @get:NotNull
-    @get:Size(max = 50)
     var orderNo: String? = null,
     @get:NotNull
+    @get:Size(max = 50)
+    var refundNo: String? = null,
+    @get:NotNull
     var paymentId: Int? = null,
+    @get:NotNull
+    @get:Size(max = 50)
+    var paymentNo: String? = null,
     @get:Size(max = 50)
     var channelRefundId: String? = null,
     @get:NotNull
     var amount: BigDecimal? = null,
     @get:NotNull
     var status: Byte? = null,
+    @get:Size(max = 255)
+    var refundReason: String? = null,
     var refundTime: LocalDateTime? = null
 ): Serializable {
 

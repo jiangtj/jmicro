@@ -6,10 +6,8 @@ import java.math.BigDecimal;
 
 @Data
 public class PaymentRequest {
-    private String orderId;
+    private String orderNo;
     private BigDecimal amount;
     private String description;
-    private String clientIp;
-    private String returnUrl;
     private String notifyUrl;
 }

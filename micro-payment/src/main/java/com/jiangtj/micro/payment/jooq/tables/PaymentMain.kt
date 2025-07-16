@@ -74,14 +74,19 @@ open class PaymentMain(
     val ORDER_NO: TableField<PaymentMainRecord, String?> = createField(DSL.name("order_no"), SQLDataType.VARCHAR(50).nullable(false), this, "订单编号")
 
     /**
+     * The column <code>payment_main.payment_no</code>. 支付编号
+     */
+    val PAYMENT_NO: TableField<PaymentMainRecord, String?> = createField(DSL.name("payment_no"), SQLDataType.VARCHAR(50).nullable(false), this, "支付编号")
+
+    /**
      * The column <code>payment_main.transaction_id</code>. 第三方交易ID
      */
     val TRANSACTION_ID: TableField<PaymentMainRecord, String?> = createField(DSL.name("transaction_id"), SQLDataType.VARCHAR(50), this, "第三方交易ID")
 
     /**
-     * The column <code>payment_main.user_id</code>. 用户ID
+     * The column <code>payment_main.user_id</code>. 支付用户ID
      */
-    val USER_ID: TableField<PaymentMainRecord, Int?> = createField(DSL.name("user_id"), SQLDataType.INTEGER.nullable(false), this, "用户ID")
+    val USER_ID: TableField<PaymentMainRecord, String?> = createField(DSL.name("user_id"), SQLDataType.VARCHAR(50).nullable(false), this, "支付用户ID")
 
     /**
      * The column <code>payment_main.amount</code>. 支付金额
@@ -95,19 +100,20 @@ open class PaymentMain(
     val STATUS: TableField<PaymentMainRecord, Byte?> = createField(DSL.name("status"), SQLDataType.TINYINT.nullable(false), this, "支付状态 1 待支付 2 已支付 3 已取消 4 已退款 5 已失败")
 
     /**
-     * The column <code>payment_main.pay_time</code>. 支付时间
+     * The column <code>payment_main.payment_time</code>. 支付时间
      */
-    val PAY_TIME: TableField<PaymentMainRecord, LocalDateTime?> = createField(DSL.name("pay_time"), SQLDataType.LOCALDATETIME(0), this, "支付时间")
+    val PAYMENT_TIME: TableField<PaymentMainRecord, LocalDateTime?> = createField(DSL.name("payment_time"), SQLDataType.LOCALDATETIME(0), this, "支付时间")
 
     /**
-     * The column <code>payment_main.pay_method</code>. 支付平台 1 余额 2 微信 3 支付宝
+     * The column <code>payment_main.payment_method</code>. 支付平台 1 余额 2 微信 3 支付宝
      */
-    val PAY_METHOD: TableField<PaymentMainRecord, Byte?> = createField(DSL.name("pay_method"), SQLDataType.TINYINT.nullable(false), this, "支付平台 1 余额 2 微信 3 支付宝")
+    val PAYMENT_METHOD: TableField<PaymentMainRecord, Byte?> = createField(DSL.name("payment_method"), SQLDataType.TINYINT.nullable(false), this, "支付平台 1 余额 2 微信 3 支付宝")
 
     /**
-     * The column <code>payment_main.pay_channel</code>. 支付渠道 支付宝当面付 微信JSAPI等
+     * The column <code>payment_main.payment_channel</code>. 支付渠道 支付宝当面付
+     * 微信JSAPI等
      */
-    val PAY_CHANNEL: TableField<PaymentMainRecord, String?> = createField(DSL.name("pay_channel"), SQLDataType.VARCHAR(50).nullable(false), this, "支付渠道 支付宝当面付 微信JSAPI等")
+    val PAYMENT_CHANNEL: TableField<PaymentMainRecord, String?> = createField(DSL.name("payment_channel"), SQLDataType.VARCHAR(50).nullable(false), this, "支付渠道 支付宝当面付 微信JSAPI等")
 
     private constructor(alias: Name, aliased: Table<PaymentMainRecord>?): this(alias, null, null, null, aliased, null, null)
     private constructor(alias: Name, aliased: Table<PaymentMainRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)

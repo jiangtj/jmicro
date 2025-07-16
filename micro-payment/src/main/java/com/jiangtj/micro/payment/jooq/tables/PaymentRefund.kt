@@ -70,19 +70,24 @@ open class PaymentRefund(
     val MODIFY_TIME: TableField<PaymentRefundRecord, LocalDateTime?> = createField(DSL.name("modify_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field(DSL.raw("CURRENT_TIMESTAMP"), SQLDataType.LOCALDATETIME)), this, "更新时间")
 
     /**
-     * The column <code>payment_refund.refund_no</code>. 退款编号
-     */
-    val REFUND_NO: TableField<PaymentRefundRecord, String?> = createField(DSL.name("refund_no"), SQLDataType.VARCHAR(50).nullable(false), this, "退款编号")
-
-    /**
      * The column <code>payment_refund.order_no</code>. 退款的订单编号
      */
     val ORDER_NO: TableField<PaymentRefundRecord, String?> = createField(DSL.name("order_no"), SQLDataType.VARCHAR(50).nullable(false), this, "退款的订单编号")
 
     /**
-     * The column <code>payment_refund.payment_id</code>. 退款的订单ID
+     * The column <code>payment_refund.refund_no</code>. 退款编号
      */
-    val PAYMENT_ID: TableField<PaymentRefundRecord, Int?> = createField(DSL.name("payment_id"), SQLDataType.INTEGER.nullable(false), this, "退款的订单ID")
+    val REFUND_NO: TableField<PaymentRefundRecord, String?> = createField(DSL.name("refund_no"), SQLDataType.VARCHAR(50).nullable(false), this, "退款编号")
+
+    /**
+     * The column <code>payment_refund.payment_id</code>. 退款的支付ID
+     */
+    val PAYMENT_ID: TableField<PaymentRefundRecord, Int?> = createField(DSL.name("payment_id"), SQLDataType.INTEGER.nullable(false), this, "退款的支付ID")
+
+    /**
+     * The column <code>payment_refund.payment_no</code>. 退款的支付编号
+     */
+    val PAYMENT_NO: TableField<PaymentRefundRecord, String?> = createField(DSL.name("payment_no"), SQLDataType.VARCHAR(50).nullable(false), this, "退款的支付编号")
 
     /**
      * The column <code>payment_refund.channel_refund_id</code>. 第三方退款ID
@@ -99,6 +104,11 @@ open class PaymentRefund(
      * 已取消 5 已失败
      */
     val STATUS: TableField<PaymentRefundRecord, Byte?> = createField(DSL.name("status"), SQLDataType.TINYINT.nullable(false), this, "退款状态 1 待退款 2 退款中 3 已退款 4 已取消 5 已失败")
+
+    /**
+     * The column <code>payment_refund.refund_reason</code>. 退款原因
+     */
+    val REFUND_REASON: TableField<PaymentRefundRecord, String?> = createField(DSL.name("refund_reason"), SQLDataType.VARCHAR(255), this, "退款原因")
 
     /**
      * The column <code>payment_refund.refund_time</code>. 退款时间

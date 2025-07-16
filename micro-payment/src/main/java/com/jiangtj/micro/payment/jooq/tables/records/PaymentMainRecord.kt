@@ -37,40 +37,47 @@ open class PaymentMainRecord() : UpdatableRecordImpl<PaymentMainRecord>(PaymentM
         set(value): Unit = set(3, value)
         get(): String? = get(3) as String?
 
+    @get:NotNull
     @get:Size(max = 50)
-    open var transactionId: String?
+    open var paymentNo: String?
         set(value): Unit = set(4, value)
         get(): String? = get(4) as String?
 
-    @get:NotNull
-    open var userId: Int?
+    @get:Size(max = 50)
+    open var transactionId: String?
         set(value): Unit = set(5, value)
-        get(): Int? = get(5) as Int?
-
-    @get:NotNull
-    open var amount: BigDecimal?
-        set(value): Unit = set(6, value)
-        get(): BigDecimal? = get(6) as BigDecimal?
-
-    @get:NotNull
-    open var status: Byte?
-        set(value): Unit = set(7, value)
-        get(): Byte? = get(7) as Byte?
-
-    open var payTime: LocalDateTime?
-        set(value): Unit = set(8, value)
-        get(): LocalDateTime? = get(8) as LocalDateTime?
-
-    @get:NotNull
-    open var payMethod: Byte?
-        set(value): Unit = set(9, value)
-        get(): Byte? = get(9) as Byte?
+        get(): String? = get(5) as String?
 
     @get:NotNull
     @get:Size(max = 50)
-    open var payChannel: String?
+    open var userId: String?
+        set(value): Unit = set(6, value)
+        get(): String? = get(6) as String?
+
+    @get:NotNull
+    open var amount: BigDecimal?
+        set(value): Unit = set(7, value)
+        get(): BigDecimal? = get(7) as BigDecimal?
+
+    @get:NotNull
+    open var status: Byte?
+        set(value): Unit = set(8, value)
+        get(): Byte? = get(8) as Byte?
+
+    open var paymentTime: LocalDateTime?
+        set(value): Unit = set(9, value)
+        get(): LocalDateTime? = get(9) as LocalDateTime?
+
+    @get:NotNull
+    open var paymentMethod: Byte?
         set(value): Unit = set(10, value)
-        get(): String? = get(10) as String?
+        get(): Byte? = get(10) as Byte?
+
+    @get:NotNull
+    @get:Size(max = 50)
+    open var paymentChannel: String?
+        set(value): Unit = set(11, value)
+        get(): String? = get(11) as String?
 
     // -------------------------------------------------------------------------
     // Primary key information
@@ -81,18 +88,19 @@ open class PaymentMainRecord() : UpdatableRecordImpl<PaymentMainRecord>(PaymentM
     /**
      * Create a detached, initialised PaymentMainRecord
      */
-    constructor(id: Int? = null, createTime: LocalDateTime? = null, modifyTime: LocalDateTime? = null, orderNo: String? = null, transactionId: String? = null, userId: Int? = null, amount: BigDecimal? = null, status: Byte? = null, payTime: LocalDateTime? = null, payMethod: Byte? = null, payChannel: String? = null): this() {
+    constructor(id: Int? = null, createTime: LocalDateTime? = null, modifyTime: LocalDateTime? = null, orderNo: String? = null, paymentNo: String? = null, transactionId: String? = null, userId: String? = null, amount: BigDecimal? = null, status: Byte? = null, paymentTime: LocalDateTime? = null, paymentMethod: Byte? = null, paymentChannel: String? = null): this() {
         this.id = id
         this.createTime = createTime
         this.modifyTime = modifyTime
         this.orderNo = orderNo
+        this.paymentNo = paymentNo
         this.transactionId = transactionId
         this.userId = userId
         this.amount = amount
         this.status = status
-        this.payTime = payTime
-        this.payMethod = payMethod
-        this.payChannel = payChannel
+        this.paymentTime = paymentTime
+        this.paymentMethod = paymentMethod
+        this.paymentChannel = paymentChannel
         resetChangedOnNotNull()
     }
 
@@ -105,13 +113,14 @@ open class PaymentMainRecord() : UpdatableRecordImpl<PaymentMainRecord>(PaymentM
             this.createTime = value.createTime
             this.modifyTime = value.modifyTime
             this.orderNo = value.orderNo
+            this.paymentNo = value.paymentNo
             this.transactionId = value.transactionId
             this.userId = value.userId
             this.amount = value.amount
             this.status = value.status
-            this.payTime = value.payTime
-            this.payMethod = value.payMethod
-            this.payChannel = value.payChannel
+            this.paymentTime = value.paymentTime
+            this.paymentMethod = value.paymentMethod
+            this.paymentChannel = value.paymentChannel
             resetChangedOnNotNull()
         }
     }

@@ -23,20 +23,24 @@ data class PaymentMain(
     @get:NotNull
     @get:Size(max = 50)
     var orderNo: String? = null,
+    @get:NotNull
+    @get:Size(max = 50)
+    var paymentNo: String? = null,
     @get:Size(max = 50)
     var transactionId: String? = null,
     @get:NotNull
-    var userId: Int? = null,
+    @get:Size(max = 50)
+    var userId: String? = null,
     @get:NotNull
     var amount: BigDecimal? = null,
     @get:NotNull
     var status: Byte? = null,
-    var payTime: LocalDateTime? = null,
+    var paymentTime: LocalDateTime? = null,
     @get:NotNull
-    var payMethod: Byte? = null,
+    var paymentMethod: Byte? = null,
     @get:NotNull
     @get:Size(max = 50)
-    var payChannel: String? = null
+    var paymentChannel: String? = null
 ): Serializable {
 
 }

@@ -20,9 +20,6 @@ data class PaymentCallback(
     var createTime: LocalDateTime? = null,
     var modifyTime: LocalDateTime? = null,
     @get:NotNull
-    @get:Size(max = 50)
-    var notifyId: String? = null,
-    @get:NotNull
     var type: Byte? = null,
     @get:NotNull
     @get:Size(max = 50)

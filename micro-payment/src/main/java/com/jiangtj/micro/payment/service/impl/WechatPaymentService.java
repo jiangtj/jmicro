@@ -3,12 +3,10 @@ package com.jiangtj.micro.payment.service.impl;
 import com.jiangtj.micro.common.exceptions.MicroHttpException;
 import com.jiangtj.micro.payment.dto.PaymentRequest;
 import com.jiangtj.micro.payment.dto.PaymentResponse;
-import com.jiangtj.micro.payment.enums.PaymentMethod;
 import com.jiangtj.micro.payment.service.PaymentService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.jetbrains.annotations.NotNull;
 
-@Service
 @RequiredArgsConstructor
 public class WechatPaymentService implements PaymentService {
 
@@ -131,7 +129,12 @@ public class WechatPaymentService implements PaymentService {
     }
 
     @Override
-    public PaymentMethod getPaymentMethod() {
-        return PaymentMethod.WECHAT;
+    public @NotNull String refund(@NotNull String notifyData) {
+        return "";
+    }
+
+    @Override
+    public @NotNull String handleRefundNotify(@NotNull String notifyData) {
+        return "";
     }
 }

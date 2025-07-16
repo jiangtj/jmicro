@@ -32,37 +32,31 @@ open class PaymentCallbackRecord() : UpdatableRecordImpl<PaymentCallbackRecord>(
         get(): LocalDateTime? = get(2) as LocalDateTime?
 
     @get:NotNull
-    @get:Size(max = 50)
-    open var notifyId: String?
-        set(value): Unit = set(3, value)
-        get(): String? = get(3) as String?
-
-    @get:NotNull
     open var type: Byte?
-        set(value): Unit = set(4, value)
-        get(): Byte? = get(4) as Byte?
+        set(value): Unit = set(3, value)
+        get(): Byte? = get(3) as Byte?
 
     @get:NotNull
     @get:Size(max = 50)
     open var orderNo: String?
-        set(value): Unit = set(5, value)
-        get(): String? = get(5) as String?
+        set(value): Unit = set(4, value)
+        get(): String? = get(4) as String?
 
     @get:NotNull
     @get:Size(max = 50)
     open var transactionId: String?
-        set(value): Unit = set(6, value)
-        get(): String? = get(6) as String?
+        set(value): Unit = set(5, value)
+        get(): String? = get(5) as String?
 
     @get:NotNull
     open var status: Byte?
-        set(value): Unit = set(7, value)
-        get(): Byte? = get(7) as Byte?
+        set(value): Unit = set(6, value)
+        get(): Byte? = get(6) as Byte?
 
     @get:NotNull
     open var callbackInfo: JSON?
-        set(value): Unit = set(8, value)
-        get(): JSON? = get(8) as JSON?
+        set(value): Unit = set(7, value)
+        get(): JSON? = get(7) as JSON?
 
     // -------------------------------------------------------------------------
     // Primary key information
@@ -73,11 +67,10 @@ open class PaymentCallbackRecord() : UpdatableRecordImpl<PaymentCallbackRecord>(
     /**
      * Create a detached, initialised PaymentCallbackRecord
      */
-    constructor(id: Int? = null, createTime: LocalDateTime? = null, modifyTime: LocalDateTime? = null, notifyId: String? = null, type: Byte? = null, orderNo: String? = null, transactionId: String? = null, status: Byte? = null, callbackInfo: JSON? = null): this() {
+    constructor(id: Int? = null, createTime: LocalDateTime? = null, modifyTime: LocalDateTime? = null, type: Byte? = null, orderNo: String? = null, transactionId: String? = null, status: Byte? = null, callbackInfo: JSON? = null): this() {
         this.id = id
         this.createTime = createTime
         this.modifyTime = modifyTime
-        this.notifyId = notifyId
         this.type = type
         this.orderNo = orderNo
         this.transactionId = transactionId
@@ -94,7 +87,6 @@ open class PaymentCallbackRecord() : UpdatableRecordImpl<PaymentCallbackRecord>(
             this.id = value.id
             this.createTime = value.createTime
             this.modifyTime = value.modifyTime
-            this.notifyId = value.notifyId
             this.type = value.type
             this.orderNo = value.orderNo
             this.transactionId = value.transactionId

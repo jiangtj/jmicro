@@ -33,13 +33,13 @@ open class PaymentRefundRecord() : UpdatableRecordImpl<PaymentRefundRecord>(Paym
 
     @get:NotNull
     @get:Size(max = 50)
-    open var refundNo: String?
+    open var orderNo: String?
         set(value): Unit = set(3, value)
         get(): String? = get(3) as String?
 
     @get:NotNull
     @get:Size(max = 50)
-    open var orderNo: String?
+    open var refundNo: String?
         set(value): Unit = set(4, value)
         get(): String? = get(4) as String?
 
@@ -48,24 +48,35 @@ open class PaymentRefundRecord() : UpdatableRecordImpl<PaymentRefundRecord>(Paym
         set(value): Unit = set(5, value)
         get(): Int? = get(5) as Int?
 
+    @get:NotNull
     @get:Size(max = 50)
-    open var channelRefundId: String?
+    open var paymentNo: String?
         set(value): Unit = set(6, value)
         get(): String? = get(6) as String?
 
+    @get:Size(max = 50)
+    open var channelRefundId: String?
+        set(value): Unit = set(7, value)
+        get(): String? = get(7) as String?
+
     @get:NotNull
     open var amount: BigDecimal?
-        set(value): Unit = set(7, value)
-        get(): BigDecimal? = get(7) as BigDecimal?
+        set(value): Unit = set(8, value)
+        get(): BigDecimal? = get(8) as BigDecimal?
 
     @get:NotNull
     open var status: Byte?
-        set(value): Unit = set(8, value)
-        get(): Byte? = get(8) as Byte?
+        set(value): Unit = set(9, value)
+        get(): Byte? = get(9) as Byte?
+
+    @get:Size(max = 255)
+    open var refundReason: String?
+        set(value): Unit = set(10, value)
+        get(): String? = get(10) as String?
 
     open var refundTime: LocalDateTime?
-        set(value): Unit = set(9, value)
-        get(): LocalDateTime? = get(9) as LocalDateTime?
+        set(value): Unit = set(11, value)
+        get(): LocalDateTime? = get(11) as LocalDateTime?
 
     // -------------------------------------------------------------------------
     // Primary key information
@@ -76,16 +87,18 @@ open class PaymentRefundRecord() : UpdatableRecordImpl<PaymentRefundRecord>(Paym
     /**
      * Create a detached, initialised PaymentRefundRecord
      */
-    constructor(id: Int? = null, createTime: LocalDateTime? = null, modifyTime: LocalDateTime? = null, refundNo: String? = null, orderNo: String? = null, paymentId: Int? = null, channelRefundId: String? = null, amount: BigDecimal? = null, status: Byte? = null, refundTime: LocalDateTime? = null): this() {
+    constructor(id: Int? = null, createTime: LocalDateTime? = null, modifyTime: LocalDateTime? = null, orderNo: String? = null, refundNo: String? = null, paymentId: Int? = null, paymentNo: String? = null, channelRefundId: String? = null, amount: BigDecimal? = null, status: Byte? = null, refundReason: String? = null, refundTime: LocalDateTime? = null): this() {
         this.id = id
         this.createTime = createTime
         this.modifyTime = modifyTime
-        this.refundNo = refundNo
         this.orderNo = orderNo
+        this.refundNo = refundNo
         this.paymentId = paymentId
+        this.paymentNo = paymentNo
         this.channelRefundId = channelRefundId
         this.amount = amount
         this.status = status
+        this.refundReason = refundReason
         this.refundTime = refundTime
         resetChangedOnNotNull()
     }
@@ -98,12 +111,14 @@ open class PaymentRefundRecord() : UpdatableRecordImpl<PaymentRefundRecord>(Paym
             this.id = value.id
             this.createTime = value.createTime
             this.modifyTime = value.modifyTime
-            this.refundNo = value.refundNo
             this.orderNo = value.orderNo
+            this.refundNo = value.refundNo
             this.paymentId = value.paymentId
+            this.paymentNo = value.paymentNo
             this.channelRefundId = value.channelRefundId
             this.amount = value.amount
             this.status = value.status
+            this.refundReason = value.refundReason
             this.refundTime = value.refundTime
             resetChangedOnNotNull()
         }

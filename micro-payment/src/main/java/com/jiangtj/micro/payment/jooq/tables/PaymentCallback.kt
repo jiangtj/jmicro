@@ -66,11 +66,6 @@ open class PaymentCallback(
     val MODIFY_TIME: TableField<PaymentCallbackRecord, LocalDateTime?> = createField(DSL.name("modify_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field(DSL.raw("CURRENT_TIMESTAMP"), SQLDataType.LOCALDATETIME)), this, "更新时间")
 
     /**
-     * The column <code>payment_callback.notify_id</code>. 通知ID
-     */
-    val NOTIFY_ID: TableField<PaymentCallbackRecord, String?> = createField(DSL.name("notify_id"), SQLDataType.VARCHAR(50).nullable(false), this, "通知ID")
-
-    /**
      * The column <code>payment_callback.type</code>. 回调类型 1 支付回调 2 退款回调
      */
     val TYPE: TableField<PaymentCallbackRecord, Byte?> = createField(DSL.name("type"), SQLDataType.TINYINT.nullable(false), this, "回调类型 1 支付回调 2 退款回调")
