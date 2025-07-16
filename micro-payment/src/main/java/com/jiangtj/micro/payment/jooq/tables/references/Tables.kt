@@ -4,11 +4,23 @@
 package com.jiangtj.micro.payment.jooq.tables.references
 
 
-import com.jiangtj.micro.payment.jooq.tables.PaymentRecord
+import com.jiangtj.micro.payment.jooq.tables.PaymentCallback
+import com.jiangtj.micro.payment.jooq.tables.PaymentMain
+import com.jiangtj.micro.payment.jooq.tables.PaymentRefund
 
 
 
 /**
+ * 支付回调
+ */
+val PAYMENT_CALLBACK: PaymentCallback = PaymentCallback.PAYMENT_CALLBACK
+
+/**
  * 支付记录
  */
-val PAYMENT_RECORD: PaymentRecord = PaymentRecord.PAYMENT_RECORD
+val PAYMENT_MAIN: PaymentMain = PaymentMain.PAYMENT_MAIN
+
+/**
+ * 支付退款记录
+ */
+val PAYMENT_REFUND: PaymentRefund = PaymentRefund.PAYMENT_REFUND

@@ -4,7 +4,8 @@
 package com.jiangtj.micro.payment.jooq.indexes
 
 
-import com.jiangtj.micro.payment.jooq.tables.PaymentRecord
+import com.jiangtj.micro.payment.jooq.tables.PaymentMain
+import com.jiangtj.micro.payment.jooq.tables.PaymentRefund
 
 import org.jooq.Index
 import org.jooq.impl.DSL
@@ -16,6 +17,8 @@ import org.jooq.impl.Internal
 // INDEX definitions
 // -------------------------------------------------------------------------
 
-val PAYMENT_RECORD_IDX_ORDER_ID: Index = Internal.createIndex(DSL.name("idx_order_id"), PaymentRecord.PAYMENT_RECORD, arrayOf(PaymentRecord.PAYMENT_RECORD.ORDER_ID), false)
-val PAYMENT_RECORD_IDX_PAYMENT_ID: Index = Internal.createIndex(DSL.name("idx_payment_id"), PaymentRecord.PAYMENT_RECORD, arrayOf(PaymentRecord.PAYMENT_RECORD.PAYMENT_ID), false)
-val PAYMENT_RECORD_IDX_USER_ID: Index = Internal.createIndex(DSL.name("idx_user_id"), PaymentRecord.PAYMENT_RECORD, arrayOf(PaymentRecord.PAYMENT_RECORD.USER_ID), false)
+val PAYMENT_MAIN_IDX_ORDER_NO: Index = Internal.createIndex(DSL.name("idx_order_no"), PaymentMain.PAYMENT_MAIN, arrayOf(PaymentMain.PAYMENT_MAIN.ORDER_NO), false)
+val PAYMENT_REFUND_IDX_ORDER_NO: Index = Internal.createIndex(DSL.name("idx_order_no"), PaymentRefund.PAYMENT_REFUND, arrayOf(PaymentRefund.PAYMENT_REFUND.ORDER_NO), false)
+val PAYMENT_REFUND_IDX_PAYMENT_ID: Index = Internal.createIndex(DSL.name("idx_payment_id"), PaymentRefund.PAYMENT_REFUND, arrayOf(PaymentRefund.PAYMENT_REFUND.PAYMENT_ID), false)
+val PAYMENT_REFUND_IDX_REFUND_NO: Index = Internal.createIndex(DSL.name("idx_refund_no"), PaymentRefund.PAYMENT_REFUND, arrayOf(PaymentRefund.PAYMENT_REFUND.REFUND_NO), false)
+val PAYMENT_MAIN_IDX_USER_ID: Index = Internal.createIndex(DSL.name("idx_user_id"), PaymentMain.PAYMENT_MAIN, arrayOf(PaymentMain.PAYMENT_MAIN.USER_ID), false)

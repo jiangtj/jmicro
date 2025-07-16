@@ -6,38 +6,34 @@ package com.jiangtj.micro.payment.jooq.tables.pojos
 
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
-
+import org.jooq.JSON
 import java.io.Serializable
-import java.math.BigDecimal
 import java.time.LocalDateTime
 
 
 /**
- * 支付记录
+ * 支付回调
  */
 @Suppress("UNCHECKED_CAST")
-data class PaymentRecord(
+data class PaymentCallback(
     var id: Int? = null,
     var createTime: LocalDateTime? = null,
     var modifyTime: LocalDateTime? = null,
     @get:NotNull
-    @get:Size(max = 255)
-    var paymentId: String? = null,
+    @get:Size(max = 50)
+    var notifyId: String? = null,
     @get:NotNull
-    @get:Size(max = 255)
-    var orderId: String? = null,
-    @get:NotNull
-    var userId: Int? = null,
-    @get:NotNull
-    var amount: BigDecimal? = null,
+    var type: Byte? = null,
     @get:NotNull
     @get:Size(max = 50)
-    var status: String? = null,
-    var paymentTime: LocalDateTime? = null,
-    @get:Size(max = 255)
+    var orderNo: String? = null,
+    @get:NotNull
+    @get:Size(max = 50)
     var transactionId: String? = null,
-    @get:Size(max = 255)
-    var paymentMethod: String? = null
+    @get:NotNull
+    var status: Byte? = null,
+    @get:NotNull
+    var callbackInfo: JSON? = null
 ): Serializable {
 
 }

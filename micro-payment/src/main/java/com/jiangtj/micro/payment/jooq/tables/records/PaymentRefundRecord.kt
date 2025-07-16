@@ -4,7 +4,7 @@
 package com.jiangtj.micro.payment.jooq.tables.records
 
 
-import com.jiangtj.micro.payment.jooq.tables.PaymentRecord
+import com.jiangtj.micro.payment.jooq.tables.PaymentRefund
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 import org.jooq.Record1
@@ -14,10 +14,10 @@ import java.time.LocalDateTime
 
 
 /**
- * 支付记录
+ * 支付退款记录
  */
 @Suppress("UNCHECKED_CAST")
-open class PaymentRecordRecord() : UpdatableRecordImpl<PaymentRecordRecord>(PaymentRecord.PAYMENT_RECORD) {
+open class PaymentRefundRecord() : UpdatableRecordImpl<PaymentRefundRecord>(PaymentRefund.PAYMENT_REFUND) {
 
     open var id: Int?
         set(value): Unit = set(0, value)
@@ -32,46 +32,40 @@ open class PaymentRecordRecord() : UpdatableRecordImpl<PaymentRecordRecord>(Paym
         get(): LocalDateTime? = get(2) as LocalDateTime?
 
     @get:NotNull
-    @get:Size(max = 255)
-    open var paymentId: String?
+    @get:Size(max = 50)
+    open var refundNo: String?
         set(value): Unit = set(3, value)
         get(): String? = get(3) as String?
 
     @get:NotNull
-    @get:Size(max = 255)
-    open var orderId: String?
+    @get:Size(max = 50)
+    open var orderNo: String?
         set(value): Unit = set(4, value)
         get(): String? = get(4) as String?
 
     @get:NotNull
-    open var userId: Int?
+    open var paymentId: Int?
         set(value): Unit = set(5, value)
         get(): Int? = get(5) as Int?
 
+    @get:Size(max = 50)
+    open var channelRefundId: String?
+        set(value): Unit = set(6, value)
+        get(): String? = get(6) as String?
+
     @get:NotNull
     open var amount: BigDecimal?
-        set(value): Unit = set(6, value)
-        get(): BigDecimal? = get(6) as BigDecimal?
+        set(value): Unit = set(7, value)
+        get(): BigDecimal? = get(7) as BigDecimal?
 
     @get:NotNull
-    @get:Size(max = 50)
-    open var status: String?
-        set(value): Unit = set(7, value)
-        get(): String? = get(7) as String?
-
-    open var paymentTime: LocalDateTime?
+    open var status: Byte?
         set(value): Unit = set(8, value)
-        get(): LocalDateTime? = get(8) as LocalDateTime?
+        get(): Byte? = get(8) as Byte?
 
-    @get:Size(max = 255)
-    open var transactionId: String?
+    open var refundTime: LocalDateTime?
         set(value): Unit = set(9, value)
-        get(): String? = get(9) as String?
-
-    @get:Size(max = 255)
-    open var paymentMethod: String?
-        set(value): Unit = set(10, value)
-        get(): String? = get(10) as String?
+        get(): LocalDateTime? = get(9) as LocalDateTime?
 
     // -------------------------------------------------------------------------
     // Primary key information
@@ -80,39 +74,37 @@ open class PaymentRecordRecord() : UpdatableRecordImpl<PaymentRecordRecord>(Paym
     override fun key(): Record1<Int?> = super.key() as Record1<Int?>
 
     /**
-     * Create a detached, initialised PaymentRecordRecord
+     * Create a detached, initialised PaymentRefundRecord
      */
-    constructor(id: Int? = null, createTime: LocalDateTime? = null, modifyTime: LocalDateTime? = null, paymentId: String? = null, orderId: String? = null, userId: Int? = null, amount: BigDecimal? = null, status: String? = null, paymentTime: LocalDateTime? = null, transactionId: String? = null, paymentMethod: String? = null): this() {
+    constructor(id: Int? = null, createTime: LocalDateTime? = null, modifyTime: LocalDateTime? = null, refundNo: String? = null, orderNo: String? = null, paymentId: Int? = null, channelRefundId: String? = null, amount: BigDecimal? = null, status: Byte? = null, refundTime: LocalDateTime? = null): this() {
         this.id = id
         this.createTime = createTime
         this.modifyTime = modifyTime
+        this.refundNo = refundNo
+        this.orderNo = orderNo
         this.paymentId = paymentId
-        this.orderId = orderId
-        this.userId = userId
+        this.channelRefundId = channelRefundId
         this.amount = amount
         this.status = status
-        this.paymentTime = paymentTime
-        this.transactionId = transactionId
-        this.paymentMethod = paymentMethod
+        this.refundTime = refundTime
         resetChangedOnNotNull()
     }
 
     /**
-     * Create a detached, initialised PaymentRecordRecord
+     * Create a detached, initialised PaymentRefundRecord
      */
-    constructor(value: com.jiangtj.micro.payment.jooq.tables.pojos.PaymentRecord?): this() {
+    constructor(value: com.jiangtj.micro.payment.jooq.tables.pojos.PaymentRefund?): this() {
         if (value != null) {
             this.id = value.id
             this.createTime = value.createTime
             this.modifyTime = value.modifyTime
+            this.refundNo = value.refundNo
+            this.orderNo = value.orderNo
             this.paymentId = value.paymentId
-            this.orderId = value.orderId
-            this.userId = value.userId
+            this.channelRefundId = value.channelRefundId
             this.amount = value.amount
             this.status = value.status
-            this.paymentTime = value.paymentTime
-            this.transactionId = value.transactionId
-            this.paymentMethod = value.paymentMethod
+            this.refundTime = value.refundTime
             resetChangedOnNotNull()
         }
     }

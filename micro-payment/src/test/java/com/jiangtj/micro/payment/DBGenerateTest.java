@@ -42,7 +42,7 @@ public class DBGenerateTest {
                     .withDaos(false)
                     .withSpringAnnotations(false)
                     .withDefaultSchema(false)
-                    .withDefaultCatalog(false)
+                    .withDefaultCatalog(true)
                 )
             ));
     }
