@@ -1,18 +1,15 @@
-package com.jiangtj.micro.payment.service.impl;
+package com.jiangtj.micro.payment.service.impl
 
-import com.jiangtj.micro.common.exceptions.MicroHttpException;
-import com.jiangtj.micro.payment.dto.PaymentRequest;
-import com.jiangtj.micro.payment.dto.PaymentResponse;
-import com.jiangtj.micro.payment.service.PaymentService;
-import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+import com.jiangtj.micro.common.exceptions.MicroHttpException
+import com.jiangtj.micro.payment.dto.PaymentRequest
+import com.jiangtj.micro.payment.dto.PaymentResponse
+import com.jiangtj.micro.payment.service.PaymentService
+import lombok.RequiredArgsConstructor
 
 @RequiredArgsConstructor
-public class WechatPaymentService implements PaymentService {
-
-    @Override
-    public PaymentResponse createPayment(PaymentRequest request) {
-        throw new MicroHttpException(500, "Not implemented");
+class WechatPaymentService : PaymentService {
+    override fun createPayment(request: PaymentRequest): PaymentResponse {
+        throw MicroHttpException(500, "Not implemented")
         /*try {
             // 创建微信支付订单
             com.github.binarywang.wxpay.bean.order.WxPayUnifiedOrderRequest orderRequest = new com.github.binarywang.wxpay.bean.order.WxPayUnifiedOrderRequest();
@@ -45,9 +42,8 @@ public class WechatPaymentService implements PaymentService {
         }*/
     }
 
-    @Override
-    public PaymentResponse queryPayment(String paymentId) {
-        throw new MicroHttpException(500, "Not implemented");
+    override fun queryPayment(paymentId: String): PaymentResponse {
+        throw MicroHttpException(500, "Not implemented")
         /*try {
             com.github.binarywang.wxpay.bean.result.WxPayOrderQueryResult result = wxPayService.queryOrder(null, paymentId);
 
@@ -96,9 +92,8 @@ public class WechatPaymentService implements PaymentService {
         }*/
     }
 
-    @Override
-    public PaymentResponse cancelPayment(String paymentId) {
-        throw new MicroHttpException(500, "Not implemented");
+    override fun cancelPayment(paymentId: String): PaymentResponse {
+        throw MicroHttpException(500, "Not implemented")
         /*try {
             com.github.binarywang.wxpay.bean.result.WxPayOrderCloseResult result = wxPayService.closeOrder(paymentId);
 
@@ -116,9 +111,8 @@ public class WechatPaymentService implements PaymentService {
         }*/
     }
 
-    @Override
-    public String handlePaymentNotify(String notifyData) {
-        throw new MicroHttpException(500, "Not implemented");
+    override fun handlePaymentNotify(notifyData: String): String {
+        throw MicroHttpException(500, "Not implemented")
         /*try {
             com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyResult result = wxPayService.parseOrderNotifyResult(notifyData);
             // 这里应该更新数据库中的订单状态
@@ -128,13 +122,11 @@ public class WechatPaymentService implements PaymentService {
         }*/
     }
 
-    @Override
-    public @NotNull String refund(@NotNull String notifyData) {
-        return "";
+    override fun refund(notifyData: String): String {
+        return ""
     }
 
-    @Override
-    public @NotNull String handleRefundNotify(@NotNull String notifyData) {
-        return "";
+    override fun handleRefundNotify(notifyData: String): String {
+        return ""
     }
 }
