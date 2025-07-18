@@ -55,7 +55,7 @@ public class SystemDb extends SchemaImpl {
      * No further instances allowed
      */
     private SystemDb() {
-        super("system-db", null);
+        super("", null);
     }
 
 
