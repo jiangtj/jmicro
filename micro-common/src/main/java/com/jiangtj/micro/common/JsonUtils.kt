@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.readValue
+import com.jiangtj.micro.common.JsonUtils.objectMapper
 import io.github.oshai.kotlinlogging.KotlinLogging
 import lombok.extern.slf4j.Slf4j
 import java.io.IOException
@@ -129,3 +130,19 @@ object JsonUtils {
         return null
     }
 }
+
+/**
+ * 扩展函数：将对象序列化为JSON字符串
+ * 使用预配置的ObjectMapper实例进行序列化操作
+ * @return 序列化后的JSON字符串
+ * @throws JsonProcessingException 当序列化过程中发生错误时抛出
+ */
+fun <T> T.toJson(): String = objectMapper.writeValueAsString(this)
+
+/**
+ * 内联扩展函数：将JSON字符串反序列化为指定类型的对象
+ * 使用Kotlin的reified泛型特性，无需显式传入Class对象
+ * @return 反序列化后的指定类型对象
+ * @throws IOException 当反序列化过程中发生错误时抛出
+ */
+inline fun <reified T> String.fromJson() = objectMapper.readValue<T>(this)

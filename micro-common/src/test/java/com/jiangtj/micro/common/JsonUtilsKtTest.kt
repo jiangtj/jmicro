@@ -15,15 +15,23 @@ class JsonUtilsKtTest {
 
     @Test
     fun toJson() {
-        val text = JsonUtils.toJson(Pair2(1, "2"))
-        log.info { text }
+        val obj = Pair2(1, "2")
+        val text = JsonUtils.toJson(obj)
+        assertEquals("{\"first\":1,\"second\":\"2\"}", text)
+        assertEquals("{\"first\":1,\"second\":\"2\"}", obj.toJson())
     }
+
     @Test
     fun fromJson() {
         val fromJson = JsonUtils.fromJson("{\"first\":1,\"second\":\"2\"}", Pair2::class.java)
-        log.info { fromJson }
+        assertEquals(1, fromJson?.first)
+        assertEquals("2", fromJson?.second)
         val fromJson2 = JsonUtils.fromJson<Pair2>("{\"first\":1,\"second\":\"2\"}")
-        log.info { fromJson2 }
+        assertEquals(1, fromJson2?.first)
+        assertEquals("2", fromJson2?.second)
+        val fromJson3 = "{\"first\":1,\"second\":\"2\"}".fromJson<Pair2>()
+        assertEquals(1, fromJson3.first)
+        assertEquals("2", fromJson3.second)
     }
 
     @Test
@@ -36,6 +44,10 @@ class JsonUtilsKtTest {
         assertEquals(2, fromJson2?.size)
         assertEquals(1, fromJson2?.first()?.first)
         assertEquals("2", fromJson2?.first()?.second)
+        val fromJson3 = "[{\"first\":1,\"second\":\"2\"},{\"first\":3,\"second\":\"x\"}]".fromJson<List<Pair2>>()
+        assertEquals(2, fromJson3.size)
+        assertEquals(1, fromJson3.first().first)
+        assertEquals("2", fromJson3.first().second)
     }
 
     @Test
@@ -43,6 +55,9 @@ class JsonUtilsKtTest {
         val generic = JsonUtils.fromJson<Generic<Pair2>>("{\"data\":{\"first\":1,\"second\":\"2\"}}")
         assertEquals(1, generic?.data?.first)
         assertEquals("2", generic?.data?.second)
+        val generic2 = "{\"data\":{\"first\":1,\"second\":\"2\"}}".fromJson<Generic<Pair2>>()
+        assertEquals(1, generic2.data.first)
+        assertEquals("2", generic2.data.second)
     }
 
 }
