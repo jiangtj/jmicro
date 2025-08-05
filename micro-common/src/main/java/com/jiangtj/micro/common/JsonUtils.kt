@@ -5,15 +5,15 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import com.fasterxml.jackson.module.kotlin.readValue
 import io.github.oshai.kotlinlogging.KotlinLogging
 import lombok.extern.slf4j.Slf4j
 import java.io.IOException
 
-private val log = KotlinLogging.logger {}
-
 @Slf4j
 object JsonUtils {
-    private var objectMapper: ObjectMapper
+    val log = KotlinLogging.logger {}
+    var objectMapper: ObjectMapper
 
     init {
         objectMapper = ObjectMapper()
@@ -58,16 +58,6 @@ object JsonUtils {
     }
 
     /**
-     * 使用 Kotlin 的 reified 特性，将 JSON 字符串反序列化为指定类型的对象。
-     * 该方法为内联函数，允许在运行时获取泛型类型信息，调用 `fromJson(json, T::class.java)` 方法进行实际的反序列化操作。
-     *
-     * @param json 需要反序列化的 JSON 字符串，若为 null 则直接返回 null。
-     * @param T 反序列化目标对象的类型。
-     * @return 反序列化后的对象，若 JSON 字符串为 null 或反序列化失败则返回 null。
-     */
-    inline fun <reified T> fromJson(json: String?) = fromJson(json, T::class.java)
-
-    /**
      * 将 JSON 字符串反序列化为指定类型的对象。
      * 该方法使用预配置的 ObjectMapper 对 JSON 字符串进行反序列化。
      * 如果传入的 JSON 字符串为 null，则直接返回 null；若反序列化过程中出现异常，会记录错误日志并返回 null。
@@ -93,16 +83,6 @@ object JsonUtils {
     }
 
     /**
-     * 使用 Kotlin 的 reified 特性，将 JSON 字符串反序列化为指定类型的可变列表对象。
-     * 该方法为内联函数，允许在运行时获取泛型类型信息，调用 `getListFromJson(json, T::class.java)` 方法进行实际的反序列化操作。
-     *
-     * @param json 需要反序列化的 JSON 字符串，若为 null 则直接返回 null。
-     * @param T 反序列化目标列表中元素的类型。
-     * @return 反序列化后的可变列表对象，若 JSON 字符串为 null 或反序列化失败则返回 null。
-     */
-    inline fun <reified T> getListFromJson(json: String?) = getListFromJson(json, T::class.java)
-
-    /**
      * 将 JSON 字符串反序列化为指定类型的可变列表对象。
      * 该方法使用预配置的 ObjectMapper 对 JSON 字符串进行反序列化，构建一个包含指定类型元素的可变列表。
      * 如果传入的 JSON 字符串为 null，则直接返回 null；若反序列化过程中出现异常，会记录错误日志并返回 null。
@@ -121,6 +101,27 @@ object JsonUtils {
         try {
             val javaType = objectMapper.typeFactory.constructCollectionType(ArrayList::class.java, classType)
             return objectMapper.readValue<MutableList<T>>(json, javaType)
+        } catch (e: IOException) {
+            log.error(e) { "JsonUtils error" }
+        }
+
+        return null
+    }
+
+    /**
+     * 使用 Kotlin 的 reified 特性，将 JSON 字符串反序列化为指定类型的对象。
+     *
+     * @param json 需要反序列化的 JSON 字符串，若为 null 则直接返回 null。
+     * @param T 反序列化目标对象的类型。
+     * @return 反序列化后的对象，若 JSON 字符串为 null 或反序列化失败则返回 null。
+     */
+    inline fun <reified T> fromJson(json: String?): T? {
+        if (json == null) {
+            return null
+        }
+
+        try {
+            return objectMapper.readValue<T>(json)
         } catch (e: IOException) {
             log.error(e) { "JsonUtils error" }
         }
