@@ -35,7 +35,7 @@ class JacksonTest {
     fun testWithJSONModule() {
         val mapper = ObjectMapper()
         mapper.registerModule(KotlinModule.Builder().build())
-        mapper.registerModule(JSONSimpleModule())
+        mapper.registerModule(JSONModule())
         val example = mapper.readValue<JSONExample>("{\"json\":\"{\\\"name\\\":\\\"Jack\\\"}\"}")
         assertEquals("{\"name\":\"Jack\"}", example.json.data())
         val example2 = mapper.readValue<JSONExample>("{\"json\":{\"name\":\"Jack\"}}")
