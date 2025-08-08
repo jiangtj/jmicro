@@ -45,6 +45,8 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
+      - name: Install Dependencies Local
+        run: mvn install -P lib
       - name: Build Maven Site
         run: mvn site
       - name: Move site to pages artifact dir
