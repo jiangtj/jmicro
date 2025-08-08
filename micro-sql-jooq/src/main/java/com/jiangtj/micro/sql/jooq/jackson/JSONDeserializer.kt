@@ -1,7 +1,6 @@
 package com.jiangtj.micro.sql.jooq.jackson
 
 import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.core.JsonToken
 import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonNode
@@ -13,9 +12,6 @@ class JSONDeserializer : JsonDeserializer<JSON>() {
         p: JsonParser,
         ctx: DeserializationContext
     ): JSON {
-        if (p.currentToken() == JsonToken.START_OBJECT) {
-            p.nextToken();
-        }
         val tree = p.codec.readTree(p) as JsonNode
         if (tree.isTextual) {
             return JSON.valueOf(tree.textValue())
