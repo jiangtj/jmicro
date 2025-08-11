@@ -47,7 +47,7 @@
         <jjwt.version>0.12.6</jjwt.version>
         <jb-annotations.version>26.0.2</jb-annotations.version>
         <kotlin.version>2.1.21</kotlin.version>
-        <kotlin-logging.version>7.0.3</kotlin-logging.version>
+        <kotlin-logging.version>7.0.12</kotlin-logging.version>
         <dokka.version>2.0.0</dokka.version>
         <!-- <maven.test.skip>true</maven.test.skip> -->
     </properties>
