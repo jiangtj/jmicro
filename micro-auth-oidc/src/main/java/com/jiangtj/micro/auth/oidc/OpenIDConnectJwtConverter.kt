@@ -1,10 +1,13 @@
 package com.jiangtj.micro.auth.oidc
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.github.benmanes.caffeine.cache.Cache
+import com.github.benmanes.caffeine.cache.Caffeine
 import com.jiangtj.micro.auth.context.AuthContext
 import com.jiangtj.micro.auth.context.AuthContextConverter
 import com.jiangtj.micro.auth.context.AuthRequest
 import com.jiangtj.micro.common.JsonUtils
+import com.jiangtj.micro.common.exceptions.MicroException
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.jsonwebtoken.JwtParser
 import io.jsonwebtoken.Jwts
@@ -12,6 +15,7 @@ import io.jsonwebtoken.security.Jwks
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
 import java.security.Key
+import java.util.concurrent.TimeUnit
 
 class OpenIDConnectJwtConverter(private val wellKnownProperties: WellKnownProperties) : AuthContextConverter {
 
@@ -27,7 +31,9 @@ class OpenIDConnectJwtConverter(private val wellKnownProperties: WellKnownProper
     val log = KotlinLogging.logger {}
     val rest = RestClient.create()
 
-    val cache = mutableMapOf<String, Key>()
+    val cache:Cache<String, Key> = Caffeine.newBuilder()
+        .expireAfterAccess(10, TimeUnit.DAYS)
+        .build()
 
     override fun convert(request: AuthRequest): AuthContext {
         val headers = request.getHeaders("Authorization")
@@ -38,21 +44,26 @@ class OpenIDConnectJwtConverter(private val wellKnownProperties: WellKnownProper
             val parser: JwtParser = Jwts.parser()
                 .keyLocator { header ->
                     val kid = header["kid"] as String
-                    val key = cache[kid]
-                    if (key != null) {
-                        return@keyLocator key
+                    return@keyLocator cache.get(kid) {
+                        val oicf = rest.get().uri(wellKnownProperties.openidConfiguration!!)
+                            .retrieve()
+                            .body<OICF>()
+                        var rKey: Key? = null
+                        oicf?.let { rest.get().uri(it.jwks_uri) }
+                            ?.retrieve()
+                            ?.body<JwksSet>()
+                            ?.keys
+                            ?.forEach { key ->
+                                val parse = Jwks.parser().build().parse(JsonUtils.toJson(key))
+                                val fetchKid = parse["kid"] as String
+                                val fetchKey = parse.toKey()
+                                cache.put(fetchKid, fetchKey)
+                                if (fetchKid == kid) {
+                                    rKey = fetchKey
+                                }
+                            }
+                        return@get rKey ?: throw MicroException("no key")
                     }
-                    val oicf = rest.get().uri(wellKnownProperties.openidConfiguration!!)
-                        .retrieve()
-                        .body<OICF>()
-                    oicf?.let { rest.get().uri(it.jwks_uri) }
-                        ?.retrieve()
-                        ?.body<JwksSet>()
-                        ?.keys?.forEach { key ->
-                            val parse = Jwks.parser().build().parse(JsonUtils.toJson(key))
-                            cache[parse["kid"] as String] = parse.toKey()
-                        }
-                    return@keyLocator cache[kid]
                 }
                 .build()
             val claims = parser.parseSignedClaims(headers[0].substring(7))
