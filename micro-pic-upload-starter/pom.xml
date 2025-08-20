@@ -16,13 +16,13 @@
         <dependency>
             <groupId>com.aliyun.oss</groupId>
             <artifactId>aliyun-sdk-oss</artifactId>
-            <version>3.18.2</version>
+            <version>3.18.3</version>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.huaweicloud</groupId>
             <artifactId>esdk-obs-java-bundle</artifactId>
-            <version>3.25.4</version>
+            <version>3.25.7</version>
             <optional>true</optional>
         </dependency>
         <dependency>
