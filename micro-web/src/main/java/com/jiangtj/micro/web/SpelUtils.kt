@@ -1,23 +1,20 @@
-package com.jiangtj.micro.web;
+package com.jiangtj.micro.web
 
-import org.springframework.expression.EvaluationContext;
-import org.springframework.expression.spel.support.SimpleEvaluationContext;
+import org.springframework.expression.EvaluationContext
+import org.springframework.expression.spel.support.SimpleEvaluationContext
+import java.lang.reflect.Method
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-
-public interface SpelUtils {
-
-    static EvaluationContext getMethodContext(Method method, Object[] args) {
-        SimpleEvaluationContext context = SimpleEvaluationContext.forReadOnlyDataBinding().build();
-        context.setVariable("args", args);
-        Parameter[] parameters = method.getParameters();
-        for (int i = 0; i < parameters.length; i++) {
-            Parameter parameter = parameters[i];
-            Object arg = args[i];
-            context.setVariable(parameter.getName(), arg);
+object SpelUtils {
+    @JvmStatic
+    fun getMethodContext(method: Method, vararg args: Any?): EvaluationContext {
+        val context = SimpleEvaluationContext.forReadOnlyDataBinding().build()
+        context.setVariable("args", args)
+        val parameters = method.parameters
+        for (i in parameters.indices) {
+            val parameter = parameters[i]
+            val arg = args[i]
+            context.setVariable(parameter.name, arg)
         }
-        return context;
+        return context
     }
-
 }
