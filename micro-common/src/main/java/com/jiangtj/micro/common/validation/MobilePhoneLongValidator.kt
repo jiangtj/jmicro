@@ -1,15 +1,13 @@
-package com.jiangtj.micro.common.validation;
+package com.jiangtj.micro.common.validation
 
-import jakarta.validation.ConstraintValidator;
-import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator
+import jakarta.validation.ConstraintValidatorContext
 
-public class MobilePhoneLongValidator implements ConstraintValidator<MobilePhone, Long> {
-
-    @Override
-    public boolean isValid(Long value, ConstraintValidatorContext context) {
+class MobilePhoneLongValidator : ConstraintValidator<MobilePhone, Long?> {
+    override fun isValid(value: Long?, context: ConstraintValidatorContext?): Boolean {
         if (value == null) {
-            return true;
+            return true
         }
-        return value >= 10000000000L && value < 20000000000L;
+        return value in 10000000000L..<20000000000L
     }
 }

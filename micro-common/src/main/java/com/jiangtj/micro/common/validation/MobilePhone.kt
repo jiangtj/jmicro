@@ -1,26 +1,25 @@
-package com.jiangtj.micro.common.validation;
+package com.jiangtj.micro.common.validation
 
-import jakarta.validation.Constraint;
-import jakarta.validation.Payload;
+import jakarta.validation.Constraint
+import jakarta.validation.Payload
+import kotlin.reflect.KClass
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-
-import static java.lang.annotation.ElementType.*;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-
-@Documented
-@Constraint(validatedBy = {
-    MobilePhoneStringValidator.class,
-    MobilePhoneLongValidator.class
-})
-@Target({METHOD, FIELD, PARAMETER})
-@Retention(RUNTIME)
-public @interface MobilePhone {
-    String message() default "手机号格式不正确";
-
-    Class<?>[] groups() default {};
-
-    Class<? extends Payload>[] payload() default {};
-}
+@MustBeDocumented
+@Constraint(
+    validatedBy = [
+        MobilePhoneStringValidator::class, MobilePhoneLongValidator::class
+    ]
+)
+@Target(
+    AnnotationTarget.FUNCTION,
+    AnnotationTarget.PROPERTY_GETTER,
+    AnnotationTarget.PROPERTY_SETTER,
+    AnnotationTarget.FIELD,
+    AnnotationTarget.VALUE_PARAMETER
+)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class MobilePhone(
+    val message: String = "手机号格式不正确",
+    val groups: Array<KClass<*>> = [],
+    val payload: Array<KClass<out Payload>> = []
+)

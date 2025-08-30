@@ -1,28 +1,23 @@
-package com.jiangtj.micro.common.validation;
+package com.jiangtj.micro.common.validation
 
-import jakarta.validation.ConstraintValidator;
-import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator
+import jakarta.validation.ConstraintValidatorContext
 
-public class MaxLengthValidator implements ConstraintValidator<MaxLength, String> {
+class MaxLengthValidator : ConstraintValidator<MaxLength, String?> {
+    private var max = 0
+    private var trim = false
 
-    private int max;
-    private boolean trim;
-
-    @Override
-    public void initialize(MaxLength constraintAnnotation) {
-        this.max = constraintAnnotation.value();
-        this.trim = constraintAnnotation.trim();
+    override fun initialize(constraintAnnotation: MaxLength) {
+        this.max = constraintAnnotation.value
+        this.trim = constraintAnnotation.trim
     }
 
-    @Override
-    public boolean isValid(String value, ConstraintValidatorContext context) {
-        if (value == null) {
-            return true;
-        }
+    override fun isValid(value: String?, context: ConstraintValidatorContext?): Boolean {
+        var value = value ?: return true
         if (trim) {
-            value = value.trim();
+            value = value.trim()
         }
-        int length = value.length();
-        return length <= max;
+        val length = value.length
+        return length <= max
     }
 }

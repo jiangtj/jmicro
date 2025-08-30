@@ -1,28 +1,23 @@
-package com.jiangtj.micro.common.validation;
+package com.jiangtj.micro.common.validation
 
-import jakarta.validation.ConstraintValidator;
-import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator
+import jakarta.validation.ConstraintValidatorContext
 
-public class MinLengthValidator implements ConstraintValidator<MinLength, String> {
+class MinLengthValidator : ConstraintValidator<MinLength, String?> {
+    private var min = 0
+    private var trim = false
 
-    private int min;
-    private boolean trim;
-
-    @Override
-    public void initialize(MinLength constraintAnnotation) {
-        this.min = constraintAnnotation.value();
-        this.trim = constraintAnnotation.trim();
+    override fun initialize(constraintAnnotation: MinLength) {
+        this.min = constraintAnnotation.value
+        this.trim = constraintAnnotation.trim
     }
 
-    @Override
-    public boolean isValid(String value, ConstraintValidatorContext context) {
-        if (value == null) {
-            return true;
-        }
+    override fun isValid(value: String?, context: ConstraintValidatorContext?): Boolean {
+        var value = value ?: return true
         if (trim) {
-            value = value.trim();
+            value = value.trim()
         }
-        int length = value.length();
-        return length >= min;
+        val length = value.length
+        return length >= min
     }
 }
