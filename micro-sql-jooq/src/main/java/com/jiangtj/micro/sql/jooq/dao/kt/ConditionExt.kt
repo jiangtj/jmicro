@@ -36,7 +36,7 @@ fun <R: org.jooq.Record> SelectConditionStep<R>.andNotDeleted(): SelectCondition
  */
 fun <R1 : TableRecord<R1>, T1> conditionVararg(queryField: TableField<R1, T1>, vararg value: T1): Condition {
     if (value.isEmpty()) {
-        throw MicroProblemDetailException(500, "参数错误 ", "至少需要一个值")
+        throw MicroProblemDetailException(500, "参数错误", "至少需要一个值")
     }
     if (value.size == 1) {
         return queryField.eq(value[0])
@@ -68,6 +68,7 @@ private fun <T : ChronoLocalDate> validateDateRange(dates: List<T>): Pair<T, T> 
  * @return 基于给定日期列表生成的 [Condition] 对象。
  * @throws MicroProblemDetailException 当日期列表为空或长度不为 2 时抛出该异常。
  */
+@JvmName("betweenLocalDate")
 fun Field<LocalDateTime>.between(dates: List<LocalDate>?): Condition {
     if (dates.isNullOrEmpty()) {
         return DSL.noCondition()
@@ -83,6 +84,7 @@ fun Field<LocalDateTime>.between(dates: List<LocalDate>?): Condition {
  * @return 基于给定日期列表生成的 [Condition] 对象。
  * @throws MicroProblemDetailException 当日期列表为空或长度不为 2 时抛出该异常。
  */
+@JvmName("betweenLocalDateTime")
 fun Field<LocalDateTime>.between(dates: List<LocalDateTime>?): Condition {
     if (dates.isNullOrEmpty()) {
         return DSL.noCondition()
@@ -104,6 +106,7 @@ fun Field<LocalDateTime>.between(dates: List<LocalDateTime>?): Condition {
  * @return 基于给定日期列表生成的 [Condition] 对象。
  * @throws MicroProblemDetailException 当日期列表为空或长度不为 2 时抛出该异常。
  */
+@JvmName("between")
 fun Field<LocalDate>.between(dates: List<LocalDate>?): Condition {
     if (dates.isNullOrEmpty()) {
         return DSL.noCondition()
