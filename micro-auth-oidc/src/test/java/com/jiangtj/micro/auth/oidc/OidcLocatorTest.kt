@@ -1,15 +1,12 @@
 package com.jiangtj.micro.auth.oidc
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.benmanes.caffeine.cache.Cache
 import com.jiangtj.micro.common.exceptions.MicroException
 import com.jiangtj.micro.common.fromJson
 import io.jsonwebtoken.Header
-import io.jsonwebtoken.security.Jwks
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.*
 import org.springframework.test.util.ReflectionTestUtils
@@ -161,5 +158,99 @@ class OidcLocatorTest {
         val result = oidcLocator.handle("https://example.com/.well-known/openid-configuration", "test-kid")
         
         assertNull(result)
+    }
+
+    @Test
+    fun `test match with ANT style pattern`() {
+        // 测试 ANT 模式匹配
+        val oidcProperties = OidcProperties(
+            pattern = "/api/**",
+            matcherStyle = MatcherStyle.ANT,
+            pathSeparator = "/"
+        )
+        
+        // 应该匹配的模式
+        assertTrue(oidcLocator.match(oidcProperties, "/api/users/123"))
+        assertTrue(oidcLocator.match(oidcProperties, "/api/admin/settings"))
+        assertTrue(oidcLocator.match(oidcProperties, "/api/"))
+        
+        // 不应该匹配的模式
+        assertFalse(oidcLocator.match(oidcProperties, "/users/api/123"))
+        assertFalse(oidcLocator.match(oidcProperties, "api/users/123"))
+        assertFalse(oidcLocator.match(oidcProperties, "/other/path"))
+    }
+
+    @Test
+    fun `test match with REGEX style pattern`() {
+        // 测试正则表达式模式匹配
+        val oidcProperties = OidcProperties(
+            pattern = "^user_.*$",
+            matcherStyle = MatcherStyle.REGEX
+        )
+        
+        // 应该匹配的模式
+        assertTrue(oidcLocator.match(oidcProperties, "user_123"))
+        assertTrue(oidcLocator.match(oidcProperties, "user_admin"))
+        assertTrue(oidcLocator.match(oidcProperties, "user_"))
+        
+        // 不应该匹配的模式
+        assertFalse(oidcLocator.match(oidcProperties, "admin_user_123"))
+        assertFalse(oidcLocator.match(oidcProperties, "123_user"))
+        assertFalse(oidcLocator.match(oidcProperties, "user"))
+    }
+
+    @Test
+    fun `test match with PREFIX style pattern`() {
+        // 测试前缀模式匹配
+        val oidcProperties = OidcProperties(
+            pattern = "app-",
+            matcherStyle = MatcherStyle.PREFIX
+        )
+        
+        // 应该匹配的模式
+        assertTrue(oidcLocator.match(oidcProperties, "app-123"))
+        assertTrue(oidcLocator.match(oidcProperties, "app-user-admin"))
+        assertTrue(oidcLocator.match(oidcProperties, "app-"))
+        
+        // 不应该匹配的模式
+        assertFalse(oidcLocator.match(oidcProperties, "my-app-123"))
+        assertFalse(oidcLocator.match(oidcProperties, "123-app-"))
+        assertFalse(oidcLocator.match(oidcProperties, "app"))
+    }
+
+    @Test
+    fun `test match with default ANT pattern`() {
+        // 测试默认的 ANT 模式（通配符 *）
+        val oidcProperties = OidcProperties(
+            pattern = "*",
+            matcherStyle = MatcherStyle.ANT
+        )
+        
+        // 应该匹配所有内容
+        assertTrue(oidcLocator.match(oidcProperties, "anything"))
+        assertTrue(oidcLocator.match(oidcProperties, "123"))
+        assertTrue(oidcLocator.match(oidcProperties, "user_123"))
+        // todo fix?
+        // assertTrue(oidcLocator.match(oidcProperties, ""))
+    }
+
+    @Test
+    fun `test match with complex ANT pattern`() {
+        // 测试复杂的 ANT 模式
+        val oidcProperties = OidcProperties(
+            pattern = "**/admin/*.json",
+            matcherStyle = MatcherStyle.ANT,
+            pathSeparator = "/"
+        )
+        
+        // 应该匹配的模式
+        assertTrue(oidcLocator.match(oidcProperties, "api/admin/config.json"))
+        assertTrue(oidcLocator.match(oidcProperties, "v1/api/admin/settings.json"))
+        assertTrue(oidcLocator.match(oidcProperties, "admin/data.json"))
+        
+        // 不应该匹配的模式
+        assertFalse(oidcLocator.match(oidcProperties, "/api/user/config.json"))
+        assertFalse(oidcLocator.match(oidcProperties, "/api/admin/config.xml"))
+        assertFalse(oidcLocator.match(oidcProperties, "admin/config"))
     }
 }

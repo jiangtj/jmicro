@@ -3,14 +3,12 @@ package com.jiangtj.micro.auth.oidc
 import com.fasterxml.jackson.databind.JsonNode
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
-import com.jiangtj.micro.auth.AntPathMatcherUtils
 import com.jiangtj.micro.common.JsonUtils
 import com.jiangtj.micro.common.exceptions.MicroException
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.jsonwebtoken.Header
 import io.jsonwebtoken.Locator
 import io.jsonwebtoken.security.Jwks
-import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
 import org.springframework.util.AntPathMatcher
 import org.springframework.web.client.RestClient
@@ -43,7 +41,7 @@ class OidcLocator(private val jwtProperties: JwtProperties) : Locator<Key> {
     override fun locate(header: Header): Key? {
         val kid = header.getKid() ?: return null
         jwtProperties.oidc.forEach {
-            if (matcher.match(it.pattern, kid)) {
+            if (match(it, kid)) {
                 log.debug { "matched oidc configuration: $it" }
                 val key = handle(
                     it.openidConfiguration ?: throw MicroException("no openid-configuration"),
@@ -56,6 +54,19 @@ class OidcLocator(private val jwtProperties: JwtProperties) : Locator<Key> {
         }
         log.debug { "no matched oidc for kid: $kid" }
         return null
+    }
+
+    fun match(oidc: OidcProperties, kid: String): Boolean {
+        if (oidc.matcherStyle == MatcherStyle.ANT) {
+            return AntPathMatcher(oidc.pathSeparator).match(oidc.pattern, kid)
+        }
+        if (oidc.matcherStyle == MatcherStyle.REGEX) {
+            return oidc.pattern.toRegex().matches(kid)
+        }
+        if (oidc.matcherStyle == MatcherStyle.PREFIX) {
+            return kid.startsWith(oidc.pattern)
+        }
+        return false
     }
 
     fun handle(openidConfiguration: String, kid: String): Key? {
