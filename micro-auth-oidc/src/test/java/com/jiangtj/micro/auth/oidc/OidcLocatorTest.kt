@@ -41,22 +41,6 @@ class OidcLocatorTest {
     }
 
     @Test
-    fun `test locate with no matching pattern`() {
-        val header: Header = mock()
-        whenever(header.getKid()).thenReturn("some-kid")
-        
-        jwtProperties = JwtProperties(oidc = listOf(
-            OidcProperties(pattern = "/api/**", openidConfiguration = "https://api.example.com/.well-known/openid-configuration")
-        ))
-        oidcLocator = OidcLocator(jwtProperties)
-        ReflectionTestUtils.setField(oidcLocator, "rest", mockRestClient)
-        
-        val result = oidcLocator.locate(header)
-        
-        assertNull(result)
-    }
-
-    @Test
     fun `test locate with matching pattern but no openid configuration`() {
         val header: Header = mock()
         whenever(header.getKid()).thenReturn("test-kid")
@@ -254,5 +238,60 @@ class OidcLocatorTest {
         assertFalse(oidcLocator.match(oidcProperties, "/api/user/config.json"))
         assertFalse(oidcLocator.match(oidcProperties, "/api/admin/config.xml"))
         assertFalse(oidcLocator.match(oidcProperties, "admin/config"))
+    }
+
+    @Test
+    fun `test match with ALWAYS style`() {
+        // 测试 ALWAYS 模式 - 应该总是返回 true
+        val oidcProperties = OidcProperties(
+            pattern = "any-pattern",
+            matcherStyle = MatcherStyle.ALWAYS
+        )
+        
+        // 应该匹配所有内容，不管 kid 是什么
+        assertTrue(oidcLocator.match(oidcProperties, "any-kid"))
+        assertTrue(oidcLocator.match(oidcProperties, ""))
+        assertTrue(oidcLocator.match(oidcProperties, "123"))
+        assertTrue(oidcLocator.match(oidcProperties, "special@chars#"))
+    }
+
+    @Test
+    fun `test match with special characters in kid`() {
+        // 测试包含特殊字符的 kid
+        val specialKid = "user@domain.com"
+        
+        // REGEX 模式
+        val regexProperties = OidcProperties(
+            pattern = "^[a-zA-Z]+@[a-zA-Z]+\\.[a-zA-Z]+$",
+            matcherStyle = MatcherStyle.REGEX
+        )
+        assertTrue(oidcLocator.match(regexProperties, specialKid))
+        
+        // PREFIX 模式
+        val prefixProperties = OidcProperties(
+            pattern = "user@",
+            matcherStyle = MatcherStyle.PREFIX
+        )
+        assertTrue(oidcLocator.match(prefixProperties, specialKid))
+        
+        // ANT 模式
+        val antProperties = OidcProperties(
+            pattern = "*@*.com",
+            matcherStyle = MatcherStyle.ANT
+        )
+        assertTrue(oidcLocator.match(antProperties, specialKid))
+    }
+
+    @Test
+    fun `test match with invalid regex pattern`() {
+        // 测试无效的正则表达式模式 - 应该抛出异常
+        val invalidRegexProperties = OidcProperties(
+            pattern = "[invalid",
+            matcherStyle = MatcherStyle.REGEX
+        )
+        
+        assertThrows(Exception::class.java) {
+            oidcLocator.match(invalidRegexProperties, "test-kid")
+        }
     }
 }

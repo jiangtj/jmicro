@@ -61,6 +61,9 @@ class OidcLocator(private val jwtProperties: JwtProperties) : Locator<Key> {
     }
 
     fun match(oidc: OidcProperties, kid: String): Boolean {
+        if (oidc.matcherStyle == MatcherStyle.ALWAYS) {
+            return true
+        }
         if (oidc.matcherStyle == MatcherStyle.ANT) {
             return AntPathMatcher(oidc.pathSeparator).match(oidc.pattern, kid)
         }

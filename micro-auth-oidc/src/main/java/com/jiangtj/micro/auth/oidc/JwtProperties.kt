@@ -8,6 +8,7 @@ data class JwtProperties(
 )
 
 enum class MatcherStyle {
+    ALWAYS,
     PREFIX,
     REGEX,
     ANT
