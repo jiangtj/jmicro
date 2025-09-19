@@ -3,6 +3,7 @@ package com.jiangtj.micro.auth.oidc
 import com.fasterxml.jackson.databind.JsonNode
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
+import com.jiangtj.micro.auth.AntPathMatcherUtils
 import com.jiangtj.micro.common.JsonUtils
 import com.jiangtj.micro.common.exceptions.MicroException
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -11,6 +12,7 @@ import io.jsonwebtoken.Locator
 import io.jsonwebtoken.security.Jwks
 import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
+import org.springframework.util.AntPathMatcher
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
 import java.security.Key
@@ -20,6 +22,8 @@ val log = KotlinLogging.logger {}
 
 @Order(10000)
 class OidcLocator(private val jwtProperties: JwtProperties) : Locator<Key> {
+
+    private val matcher = AntPathMatcher()
 
     data class OICF(
         val issuer: String,
@@ -39,7 +43,7 @@ class OidcLocator(private val jwtProperties: JwtProperties) : Locator<Key> {
     override fun locate(header: Header): Key? {
         val kid = header.getKid() ?: return null
         jwtProperties.oidc.forEach {
-            if (kid.matches(Regex(it.pattern))) {
+            if (matcher.match(it.pattern, kid)) {
                 log.debug { "matched oidc configuration: $it" }
                 val key = handle(
                     it.openidConfiguration ?: throw MicroException("no openid-configuration"),
