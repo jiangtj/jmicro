@@ -1,0 +1,81 @@
+package com.jiangtj.micro.auth.oidc
+
+import com.fasterxml.jackson.databind.JsonNode
+import com.github.benmanes.caffeine.cache.Cache
+import com.github.benmanes.caffeine.cache.Caffeine
+import com.jiangtj.micro.common.JsonUtils
+import com.jiangtj.micro.common.exceptions.MicroException
+import io.github.oshai.kotlinlogging.KotlinLogging
+import io.jsonwebtoken.Header
+import io.jsonwebtoken.Locator
+import io.jsonwebtoken.security.Jwks
+import org.springframework.core.Ordered
+import org.springframework.core.annotation.Order
+import org.springframework.web.client.RestClient
+import org.springframework.web.client.body
+import java.security.Key
+import java.util.concurrent.TimeUnit
+
+val log = KotlinLogging.logger {}
+
+@Order(10000)
+class OidcLocator(private val jwtProperties: JwtProperties) : Locator<Key> {
+
+    data class OICF(
+        val issuer: String,
+        val jwks_uri: String
+    )
+
+    data class JwksSet(
+        val keys: List<JsonNode>
+    )
+
+    val rest = RestClient.create()
+
+    val cache: Cache<String, Key> = Caffeine.newBuilder()
+        .expireAfterAccess(10, TimeUnit.DAYS)
+        .build()
+
+    override fun locate(header: Header): Key? {
+        val kid = header.getKid() ?: return null
+        jwtProperties.oidc.forEach {
+            if (kid.matches(Regex(it.pattern))) {
+                log.debug { "matched oidc configuration: $it" }
+                val key = handle(
+                    it.openidConfiguration ?: throw MicroException("no openid-configuration"),
+                    kid)
+                if (key != null) {
+                    return key
+                }
+                log.debug { "no key for oidc kid: $kid" }
+            }
+        }
+        log.debug { "no matched oidc for kid: $kid" }
+        return null
+    }
+
+    fun handle(openidConfiguration: String, kid: String): Key? {
+        val key = cache.getIfPresent(kid)
+        if (key != null) {
+            return key
+        }
+
+        val oicf = rest.get().uri(openidConfiguration)
+            .retrieve()
+            .body<OICF>()
+        log.debug { "oidc configuration: $oicf" }
+        oicf?.let { rest.get().uri(it.jwks_uri) }
+            ?.retrieve()
+            ?.body<JwksSet>()
+            ?.keys
+            ?.forEach { key ->
+                val parse = Jwks.parser().build().parse(JsonUtils.toJson(key))
+                log.debug { "oidc key: $parse" }
+                val fetchKid = parse["kid"] as String
+                val fetchKey = parse.toKey()
+                cache.put(fetchKid, fetchKey)
+            }
+
+        return cache.getIfPresent(kid)
+    }
+}
