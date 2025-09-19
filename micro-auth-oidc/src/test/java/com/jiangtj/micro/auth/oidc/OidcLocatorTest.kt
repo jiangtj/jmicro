@@ -75,12 +75,14 @@ class OidcLocatorTest {
     fun `test handle with cached key`() {
         val cache = mock<Cache<String, Key>>()
         val cachedKey = mock<Key>()
+        val header: Header = mock()
+        whenever(header.getKid()).thenReturn("test-kid")
         
         whenever(cache.getIfPresent("test-kid")).thenReturn(cachedKey)
         
         ReflectionTestUtils.setField(oidcLocator, "cache", cache)
         
-        val result = oidcLocator.handle("https://example.com/.well-known/openid-configuration", "test-kid")
+        val result = oidcLocator.locate(header)
         
         assertEquals(cachedKey, result)
         verify(cache, times(1)).getIfPresent("test-kid")

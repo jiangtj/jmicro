@@ -21,8 +21,6 @@ val log = KotlinLogging.logger {}
 @Order(10000)
 class OidcLocator(private val jwtProperties: JwtProperties) : Locator<Key> {
 
-    private val matcher = AntPathMatcher()
-
     data class OICF(
         val issuer: String,
         val jwks_uri: String
@@ -40,6 +38,12 @@ class OidcLocator(private val jwtProperties: JwtProperties) : Locator<Key> {
 
     override fun locate(header: Header): Key? {
         val kid = header.getKid() ?: return null
+
+        val key = cache.getIfPresent(kid)
+        if (key != null) {
+            return key
+        }
+
         jwtProperties.oidc.forEach {
             if (match(it, kid)) {
                 log.debug { "matched oidc configuration: $it" }
@@ -70,11 +74,6 @@ class OidcLocator(private val jwtProperties: JwtProperties) : Locator<Key> {
     }
 
     fun handle(openidConfiguration: String, kid: String): Key? {
-        val key = cache.getIfPresent(kid)
-        if (key != null) {
-            return key
-        }
-
         val oicf = rest.get().uri(openidConfiguration)
             .retrieve()
             .body<OICF>()
