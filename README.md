@@ -77,7 +77,7 @@ class ExampleService {
 }
 ```
 
-`micro-auth-casdoor` 是这个鉴权模块的扩展，用于支持 casdoor 的 token 认证，你可以参考他创建自己的鉴权模块
+`micro-auth-oidc` 是这个鉴权模块的扩展，用于支持 oidc 的轻量认证（API 鉴权 + SPA OIDC 认证），你可以参考他创建自己的鉴权模块
 
 ## Web 模块
 [![doc](https://img.shields.io/badge/document-grey.svg?logo=readme)](./micro-web)
