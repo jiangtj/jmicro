@@ -19,7 +19,7 @@
     <dependencies>
         <dependency>
             <groupId>com.jiangtj.micro</groupId>
-            <artifactId>micro-auth-casdoor</artifactId>
+            <artifactId>micro-auth-oidc</artifactId>
         </dependency>
         <dependency>
             <groupId>com.jiangtj.micro</groupId>
