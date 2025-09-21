@@ -14,9 +14,12 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@logto/vue": "^3.0.9",
     "@vueuse/core": "^12.0.0",
     "async-validator": "^4.2.5",
     "axios": "^1.7.9",
+    "casdoor-js-sdk": "^0.16.0",
+    "casdoor-vue-sdk": "^1.6.0",
     "element-plus": "^2.9.1",
     "exceljs": "^4.4.0",
     "file-saver": "^2.0.5",

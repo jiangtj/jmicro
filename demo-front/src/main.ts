@@ -1,12 +1,14 @@
 import './assets/main.css'
 
-import { createApp, watchEffect } from 'vue'
+import {createApp, watchEffect} from 'vue'
 import App from './App.vue'
-import core, { defineBaseUrlOptions, definePageSizes } from './core'
-import { mock } from './core/http-client'
+import core, {defineBaseUrlOptions, definePageSizes} from './core'
 import './style'
-import { useRegisterSW } from 'virtual:pwa-register/vue'
+import {useRegisterSW} from 'virtual:pwa-register/vue'
 import token from './core/token'
+import Casdoor from 'casdoor-vue-sdk'
+import {createLogto, type LogtoConfig} from '@logto/vue';
+
 
 defineBaseUrlOptions({
   name: '17001',
@@ -16,6 +18,21 @@ defineBaseUrlOptions({
 const app = createApp(App)
 
 app.use(core).use(token)
+
+const config = {
+    serverUrl: "http://192.168.31.10:8000",
+    clientId: "a1f9883530433d009fb1",
+    organizationName: "built-in",
+    appName: "application_he3oml",
+    redirectPath: "/callback",
+};
+app.use(Casdoor, config)
+
+const config2: LogtoConfig = {
+    endpoint: 'http://192.168.31.10:8000',
+    appId: 'a1f9883530433d009fb1',
+};
+app.use(createLogto, config2);
 
 definePageSizes(10, 20, 50, 100)
 

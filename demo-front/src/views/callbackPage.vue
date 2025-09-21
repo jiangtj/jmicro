@@ -17,23 +17,32 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
-import { useRoute } from 'vue-router'
-import { request } from '@/core/http-client'
-import { token } from '@/core/token'
-import { login, User, pushDefaultPage } from '@/core'
+import {onMounted} from 'vue'
+import {useRoute} from 'vue-router'
+import {token} from '@/core/token'
+import {login, pushDefaultPage, User} from '@/core'
+import {useCasdoor} from 'casdoor-vue-sdk';
+import {casdoorSdk} from "@/utils/casdoor.ts";
+
+const { signin } = useCasdoor();
 
 const route = useRoute()
 async function loginAction() {
   const code = route.query.code
   const state = route.query.state
-  const res = await request<any>('post', `/login?code=${code}&state=${state}`)
+  const res = await casdoorSdk.exchangeForAccessToken()
+  // const res = await signin('http://192.168.31.10:8000')
   console.log(token)
-  token.value = res.data
-  request<any>('get', '/user').then((res: any) => {
+  console.log(res)
+  token.value = await res.access_token
+  const userInfo = await casdoorSdk.getUserInfo(token.value)
+  console.log(userInfo)
+  login(new User(userInfo as any))
+  pushDefaultPage()
+  /*request<any>('get', '/user').then((res: any) => {
     login(new User(res.data))
     pushDefaultPage()
-  })
+  })*/
 }
 
 onMounted(() => {

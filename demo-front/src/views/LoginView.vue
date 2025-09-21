@@ -1,19 +1,20 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import {useCasdoor} from 'casdoor-vue-sdk';
+import {useLogto} from '@logto/vue';
+import {casdoorSdk} from "@/utils/casdoor.ts";
+
+const { getSigninUrl, getSignupUrl } = useCasdoor();
+const { signIn, signOut, isAuthenticated } = useLogto();
 
 async function login() {
-  const r = await fetch(
-    `http://localhost:17001/toLogin?redirectUrl=${encodeURIComponent('http://localhost:5173/callback')}`,
-    {
-      method: 'GET'
-    }
-  )
-  window.location.href = await r.text()
+  // window.location.href = getSigninUrl()
+  // signIn('http://localhost:3000/callback')
+  casdoorSdk.signin_redirect()
 }
 
-onMounted(() => {
-  login()
-})
+// onMounted(() => {
+//   login()
+// })
 </script>
 
 <template>
