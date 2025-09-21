@@ -1,6 +1,5 @@
 package com.jiangtj.micro.auth.oidc
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.jiangtj.micro.common.JsonUtils
@@ -16,9 +15,11 @@ import org.springframework.web.client.body
 import java.security.Key
 import java.util.concurrent.TimeUnit
 
-val log = KotlinLogging.logger {}
+private val log = KotlinLogging.logger {}
 
-@Order(10000)
+const val ORDER: Int = 10000
+
+@Order(ORDER)
 class OidcLocator(private val jwtProperties: JwtProperties) : Locator<Key> {
 
     data class OICF(
@@ -27,7 +28,7 @@ class OidcLocator(private val jwtProperties: JwtProperties) : Locator<Key> {
     )
 
     data class JwksSet(
-        val keys: List<JsonNode>
+        val keys: List<*>
     )
 
     val rest = RestClient.create()
@@ -49,7 +50,8 @@ class OidcLocator(private val jwtProperties: JwtProperties) : Locator<Key> {
                 log.debug { "matched oidc configuration: $it" }
                 val key = handle(
                     it.openidConfiguration ?: throw MicroException("no openid-configuration"),
-                    kid)
+                    kid
+                )
                 if (key != null) {
                     return key
                 }
