@@ -40,11 +40,6 @@
             </dependency>
             <dependency>
                 <groupId>com.jiangtj.micro</groupId>
-                <artifactId>micro-auth-casdoor</artifactId>
-                <version>0.1.1</version>
-            </dependency>
-            <dependency>
-                <groupId>com.jiangtj.micro</groupId>
                 <artifactId>micro-auth-wechat</artifactId>
                 <version>0.1.1</version>
             </dependency>

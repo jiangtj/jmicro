@@ -99,7 +99,6 @@
                 <module>micro-common</module>
                 <module>micro-web</module>
                 <module>micro-auth</module>
-                <module>micro-auth-casdoor</module>
                 <module>micro-auth-wechat</module>
                 <module>micro-auth-oidc</module>
                 <module>micro-spring-boot-starter</module>
