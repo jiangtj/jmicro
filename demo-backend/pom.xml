@@ -5,10 +5,10 @@
     <parent>
         <groupId>com.jiangtj.micro</groupId>
         <artifactId>jmicro-aggregator</artifactId>
-        <version>0.1.1</version>
+        <version>0.1.2</version>
     </parent>
     <artifactId>demo-backend</artifactId>
-    <version>0.1.1</version>
+    <version>0.1.2</version>
     <name>demo-backend</name>
     <description>demo-backend</description>
 
