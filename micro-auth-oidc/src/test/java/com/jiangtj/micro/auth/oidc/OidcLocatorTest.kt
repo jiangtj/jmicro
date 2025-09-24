@@ -27,7 +27,7 @@ class OidcLocatorTest {
     @BeforeEach
     fun setup() {
         jwtProperties = JwtProperties()
-        oidcLocator = OidcLocator(jwtProperties)
+        oidcLocator = OidcLocator(jwtProperties, null)
         
         // Mock RestClient
         mockRestClient = mock()
@@ -48,7 +48,7 @@ class OidcLocatorTest {
         jwtProperties = JwtProperties(oidc = listOf(
             OidcProperties(pattern = "*", openidConfiguration = null)
         ))
-        oidcLocator = OidcLocator(jwtProperties)
+        oidcLocator = OidcLocator(jwtProperties, null)
         
         assertThrows(MicroException::class.java) {
             oidcLocator.locate(header)

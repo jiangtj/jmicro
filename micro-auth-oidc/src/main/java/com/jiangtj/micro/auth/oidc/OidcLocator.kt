@@ -20,7 +20,7 @@ private val log = KotlinLogging.logger {}
 const val ORDER: Int = 10000
 
 @Order(ORDER)
-class OidcLocator(private val jwtProperties: JwtProperties) : Locator<Key> {
+class OidcLocator(private val jwtProperties: JwtProperties, private val oidcKeyService: OidcKeyService?) : Locator<Key> {
 
     data class OICF(
         val issuer: String,
@@ -39,6 +39,12 @@ class OidcLocator(private val jwtProperties: JwtProperties) : Locator<Key> {
 
     override fun locate(header: Header): Key? {
         val kid = header.getKid() ?: return null
+
+        if (oidcKeyService != null) {
+            if (kid == oidcKeyService.getKid()) {
+                return oidcKeyService.getVerifyKey()
+            }
+        }
 
         val key = cache.getIfPresent(kid)
         if (key != null) {

@@ -19,8 +19,8 @@ class OpenIDConnectAutoConfiguration {
     }
 
     @Bean
-    fun oidcLocator(jwtProperties: JwtProperties): OidcLocator {
-        return OidcLocator(jwtProperties)
+    fun oidcLocator(jwtProperties: JwtProperties, oidcKeyService: OidcKeyService?): OidcLocator {
+        return OidcLocator(jwtProperties, oidcKeyService)
     }
 
 }

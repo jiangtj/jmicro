@@ -1,0 +1,36 @@
+package com.jiangtj.micro.auth.oidc
+
+import com.jiangtj.micro.common.utils.UUIDUtils
+import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.security.EcPrivateJwk
+import io.jsonwebtoken.security.EcPublicJwk
+import io.jsonwebtoken.security.Jwks
+import org.springframework.scheduling.annotation.Scheduled
+import java.security.KeyPair
+import java.util.concurrent.TimeUnit
+
+class OidcKeyService(private val oidcServerProperties: OidcServerProperties) {
+
+    var pair: KeyPair? = null
+    var jwk: EcPrivateJwk? = null
+
+    fun getKid() = jwk!!.id
+
+    fun getSignKey() = pair!!.private
+
+    fun getVerifyKey() = pair!!.public
+
+    fun getPublicJwk(): EcPublicJwk {
+        return jwk!!.toPublicJwk()
+    }
+
+    @Scheduled(fixedDelay = 14, timeUnit = TimeUnit.DAYS)
+    fun refreshKeys() {
+        pair = Jwts.SIG.ES384.keyPair().build()
+        jwk = Jwks.builder()
+            .id((oidcServerProperties.kidPrefix?.let { "$it/" } ?: "")
+                    + UUIDUtils.generateBase64Compressed())
+            .ecKeyPair(pair)
+            .build()
+    }
+}

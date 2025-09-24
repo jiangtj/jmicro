@@ -1,1 +1,2 @@
 com.jiangtj.micro.auth.oidc.OpenIDConnectAutoConfiguration
+com.jiangtj.micro.auth.oidc.OidcServerAutoConfiguration
