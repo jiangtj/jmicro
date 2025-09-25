@@ -13,7 +13,9 @@ class OidcServerAutoConfiguration {
 
     @Bean
     fun oidcKeyService(oidcServerProperties: OidcServerProperties): OidcKeyService {
-        return OidcKeyService(oidcServerProperties)
+        return OidcKeyService(oidcServerProperties).apply {
+            refreshKeys()
+        }
     }
 
 }

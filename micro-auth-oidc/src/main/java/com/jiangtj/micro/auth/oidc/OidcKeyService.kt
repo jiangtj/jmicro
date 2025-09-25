@@ -5,11 +5,9 @@ import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.EcPrivateJwk
 import io.jsonwebtoken.security.EcPublicJwk
 import io.jsonwebtoken.security.Jwks
-import org.springframework.scheduling.annotation.Scheduled
 import java.security.KeyPair
 import java.security.PrivateKey
 import java.security.PublicKey
-import java.util.concurrent.TimeUnit
 
 class OidcKeyService(private val oidcServerProperties: OidcServerProperties) {
 
@@ -24,7 +22,6 @@ class OidcKeyService(private val oidcServerProperties: OidcServerProperties) {
 
     fun getPublicJwk(): EcPublicJwk = jwk!!.toPublicJwk()
 
-    @Scheduled(fixedDelay = 14, timeUnit = TimeUnit.DAYS)
     fun refreshKeys() {
         pair = Jwts.SIG.ES384.keyPair().build()
         jwk = Jwks.builder()
