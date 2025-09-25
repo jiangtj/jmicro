@@ -1,4 +1,4 @@
-package com.jiangtj.micro.auth.oidc
+package com.jiangtj.micro.auth.oidc.cas
 
 import com.jiangtj.micro.common.utils.UUIDUtils
 import io.jsonwebtoken.Jwts

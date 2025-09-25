@@ -1,4 +1,4 @@
-package com.jiangtj.micro.auth.oidc
+package com.jiangtj.micro.auth.oidc.cas
 
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
@@ -82,6 +82,15 @@ class OidcEndpointService(
             if (redirectUri.isEmpty() || codeChallenge.isEmpty()) {
                 return@GET ServerResponse.badRequest()
                     .body("Missing required parameters: redirect_uri, or code_challenge")
+            }
+
+            // 验证回调地址
+            val callbackUri = oidcServerProperties.callbackUri
+            if (callbackUri.isNotEmpty()) {
+                if (!callbackUri.contains(redirectUri)) {
+                    return@GET ServerResponse.badRequest()
+                        .body("Callback uri not match: $redirectUri")
+                }
             }
 
             val user = oidcRedirectAuth.userInfo()

@@ -1,4 +1,4 @@
-package com.jiangtj.micro.auth.oidc
+package com.jiangtj.micro.auth.oidc.cas
 
 import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty

@@ -1,7 +1,10 @@
-package com.jiangtj.micro.auth.oidc;
+package com.jiangtj.micro.auth.oidc.cas;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * OpenID Connect 服务器配置属性
@@ -49,5 +52,10 @@ public class OidcServerProperties {
      * 默认值: /oidc/token
      */
     private String tokenEndpoint = "/oidc/token";
+
+    /**
+     * 回调地址
+     */
+    private List<String> callbackUri = new ArrayList<>();
 
 }
