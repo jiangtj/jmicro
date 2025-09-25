@@ -189,8 +189,8 @@ class OidcEndpointService(
 
     data class UserInfo(
         val id: String,
-        val name: String,
-        val email: String,
-        val preferredUsername: String,
+        val name: String? = null,
+        val email: String? = null,
+        val preferredUsername: String? = null,
     )
 }

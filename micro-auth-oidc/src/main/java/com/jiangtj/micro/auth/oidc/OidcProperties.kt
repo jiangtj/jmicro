@@ -4,7 +4,7 @@ data class OidcProperties(
     /**
      * 匹配参数，在非 ALWAYS 模式下生效，ANT 模式下为路径，PREFIX 模式下为前缀，REGEX 模式下为正则表达式
      */
-    val pattern: String = "*",
+    var pattern: String = "*",
 
     /**
      * 匹配样式，默认 ALWAYS 模式

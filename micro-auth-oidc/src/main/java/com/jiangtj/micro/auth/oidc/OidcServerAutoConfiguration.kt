@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean
 
 @AutoConfiguration
 @EnableConfigurationProperties(OidcServerProperties::class)
-@ConditionalOnBooleanProperty(prefix = "micro.oidc.server", name = ["enabled"], havingValue = true)
+@ConditionalOnBooleanProperty(prefix = "jmicro.oidc.server", name = ["enabled"], havingValue = true)
 class OidcServerAutoConfiguration {
 
     @Bean

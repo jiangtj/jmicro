@@ -2,7 +2,7 @@ package com.jiangtj.micro.auth.oidc
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 
-@ConfigurationProperties(prefix = "micro.oidc.server")
+@ConfigurationProperties(prefix = "jmicro.oidc.server")
 data class OidcServerProperties(
 
     /**

@@ -11,7 +11,7 @@ import org.springframework.web.servlet.function.ServerResponse
 
 @AutoConfiguration
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-@ConditionalOnBooleanProperty(prefix = "micro.oidc.server", name = ["enabled"], havingValue = true)
+@ConditionalOnBooleanProperty(prefix = "jmicro.oidc.server", name = ["enabled"], havingValue = true)
 class OidcServerServletAutoConfiguration {
 
     @Bean

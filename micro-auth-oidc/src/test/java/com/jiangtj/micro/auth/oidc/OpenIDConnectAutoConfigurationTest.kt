@@ -1,20 +1,18 @@
 package com.jiangtj.micro.auth.oidc
 
 import com.jiangtj.micro.test.JMicroTest
-import io.jsonwebtoken.Locator
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
 import org.springframework.test.context.TestPropertySource
-import org.springframework.boot.context.properties.EnableConfigurationProperties
 
 @JMicroTest
 @SpringBootTest(classes = [OpenIDConnectAutoConfiguration::class])
 @TestPropertySource(properties = [
-    "micro.jwt.oidc[0].pattern=*",
-    "micro.jwt.oidc[0].openid-configuration=https://example.com/.well-known/openid-configuration"
+    "jmicro.jwt.oidc[0].pattern=*",
+    "jmicro.jwt.oidc[0].openid-configuration=https://example.com/.well-known/openid-configuration"
 ])
 class OpenIDConnectAutoConfigurationTest {
 
