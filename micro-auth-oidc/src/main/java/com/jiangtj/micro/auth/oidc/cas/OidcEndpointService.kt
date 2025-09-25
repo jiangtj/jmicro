@@ -10,7 +10,6 @@ import org.springframework.web.servlet.function.RouterFunction
 import org.springframework.web.servlet.function.ServerRequest
 import org.springframework.web.servlet.function.ServerResponse
 import org.springframework.web.servlet.function.router
-import org.springframework.web.util.UriComponentsBuilder
 import java.net.URI
 import java.security.MessageDigest
 import java.util.*
@@ -75,8 +74,8 @@ class OidcEndpointService(
             val params = request.params()
             val redirectUri = params.getFirst("redirect_uri") ?: ""
             val codeChallenge = params["code_challenge"]?.first() ?: ""
-            val state = params.getFirst("state") ?: ""
-            val nonce = params.getFirst("nonce") ?: ""
+            val state = params.getFirst("state")
+            val nonce = params.getFirst("nonce")
 
             // 验证必要参数
             if (redirectUri.isEmpty() || codeChallenge.isEmpty()) {
@@ -104,11 +103,7 @@ class OidcEndpointService(
             authCodes.put(code, authCode)
 
             ServerResponse.temporaryRedirect(
-                UriComponentsBuilder.fromUriString(redirectUri)
-                    .queryParam("code", code)
-                    .queryParam("state", state)
-                    .build()
-                    .toUri()
+                URI.create("$redirectUri?code=$code${state?.let { "&state=$it" } ?: ""}")
             ).build()
 
         }
@@ -140,7 +135,7 @@ class OidcEndpointService(
             }
 
             // 生成ID令牌和访问令牌
-            val idToken = generateIdToken(baseUri.toString(), authCodeData.user)
+            val idToken = generateIdToken(baseUri.toString(), authCodeData.user, authCodeData.nonce)
 
             val tokenResponse = mapOf(
                 "access_token" to "none",
@@ -165,7 +160,7 @@ class OidcEndpointService(
         return "${uri.scheme}://${uri.host}:${uri.port}"
     }
 
-    private fun generateIdToken(issuer: String, user: UserInfo): String {
+    private fun generateIdToken(issuer: String, user: UserInfo, nonce: String?): String {
         // 生成真实的JWT ID令牌
         val now = System.currentTimeMillis()
         val expiration = now + 3600 * 1000 * 24 // 24小时后过期
@@ -183,6 +178,7 @@ class OidcEndpointService(
             .claim("name", user.name)
             .claim("email", user.email)
             .claim("preferred_username", user.preferredUsername)
+            .apply { nonce?.let { claim("nonce", it) } }
             .signWith(oidcKeyService.getSignKey())
             .compact()
     }
