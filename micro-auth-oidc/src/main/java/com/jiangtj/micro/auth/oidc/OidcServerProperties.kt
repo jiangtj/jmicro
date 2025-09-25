@@ -15,4 +15,14 @@ data class OidcServerProperties(
      */
     var kidPrefix: String? =null,
 
+    var issuer: String = "oidc",
+
+    var wellKnown: String = "oidc/.well-known/openid-configuration",
+
+    var jwksUri: String = "oidc/jwks",
+
+    var authorizationEndpoint: String = "oidc/auth",
+
+    var tokenEndpoint: String = "oidc/token",
+
 )
