@@ -25,8 +25,7 @@ class OidcKeyService(private val oidcServerProperties: OidcServerProperties) {
     fun refreshKeys() {
         pair = Jwts.SIG.ES384.keyPair().build()
         jwk = Jwks.builder()
-            .id((oidcServerProperties.kidPrefix?.let { "$it/" } ?: "")
-                    + UUIDUtils.generateBase64Compressed())
+            .id((oidcServerProperties.kidPrefix ?: "") + UUIDUtils.generateBase64Compressed())
             .ecKeyPair(pair)
             .build()
     }
