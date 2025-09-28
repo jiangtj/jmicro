@@ -3,6 +3,7 @@ package com.jiangtj.micro.auth.oidc.cas
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.jiangtj.micro.common.utils.UUIDUtils
+import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.io.Encoders
 import org.springframework.http.MediaType.APPLICATION_JSON
@@ -160,7 +161,7 @@ class OidcEndpointService(
         return "${uri.scheme}://${uri.host}:${uri.port}"
     }
 
-    private fun generateIdToken(issuer: String, user: UserInfo, nonce: String?): String {
+    private fun generateIdToken(issuer: String, user: Claims, nonce: String?): String {
         // 生成真实的JWT ID令牌
         val now = System.currentTimeMillis()
         val expiration = now + 3600 * 1000 * 24 // 24小时后过期
@@ -169,15 +170,11 @@ class OidcEndpointService(
             .header()
             .keyId(oidcKeyService.getKid())
             .and()
+            .claims(user)
             .issuer(issuer)
-            .subject(user.id)
             .expiration(Date(expiration))
             .notBefore(Date(now))
             .issuedAt(Date(now))
-            .claim("auth_time", now / 1000)
-            .claim("name", user.name)
-            .claim("email", user.email)
-            .claim("preferred_username", user.preferredUsername)
             .apply { nonce?.let { claim("nonce", it) } }
             .signWith(oidcKeyService.getSignKey())
             .compact()
@@ -189,13 +186,6 @@ class OidcEndpointService(
         val state: String? = null,
         val nonce: String? = null,
         val timestamp: Long = System.currentTimeMillis(),
-        val user: UserInfo,
-    )
-
-    data class UserInfo(
-        val id: String,
-        val name: String? = null,
-        val email: String? = null,
-        val preferredUsername: String? = null,
+        val user: Claims,
     )
 }
