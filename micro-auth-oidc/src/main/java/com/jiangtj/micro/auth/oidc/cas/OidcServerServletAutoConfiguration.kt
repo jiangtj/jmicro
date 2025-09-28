@@ -1,6 +1,5 @@
 package com.jiangtj.micro.auth.oidc.cas
 
-import io.jsonwebtoken.Claims
 import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
@@ -33,7 +32,7 @@ class OidcServerServletAutoConfiguration {
     @ConditionalOnMissingBean
     fun oidcRedirectAuth(): OidcRedirectAuth {
         return object : OidcRedirectAuth {
-            override fun userInfo(): Claims {
+            override fun userInfo(): Map<String, Any?> {
                 TODO("Not yet implemented")
             }
         }
