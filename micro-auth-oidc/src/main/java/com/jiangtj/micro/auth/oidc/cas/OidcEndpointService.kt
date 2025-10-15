@@ -112,8 +112,8 @@ class OidcEndpointService(
         POST(oidcServerProperties.tokenEndpoint) { request ->
             val baseUri = URI.create(oidcServerProperties.baseUrl ?: getBaseUrl(request))
             val params = request.params()
-            val code = params["code"]?.first() ?: ""
-            val codeVerifier = params["code_verifier"]?.first() ?: ""
+            val code = params["code"]?.firstOrNull() ?: ""
+            val codeVerifier = params["code_verifier"]?.firstOrNull() ?: ""
 
             // 验证必要参数
             if (code.isEmpty() || codeVerifier.isEmpty()) {
