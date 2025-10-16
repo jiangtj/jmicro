@@ -1,4 +1,4 @@
-@NonNullApi
+@NullMarked
 package com.jiangtj.micro.web.aop;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

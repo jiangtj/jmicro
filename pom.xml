@@ -50,6 +50,7 @@
         <kotlin-logging.version>7.0.12</kotlin-logging.version>
         <mockito-kotlin.version>6.0.0</mockito-kotlin.version>
         <dokka.version>2.0.0</dokka.version>
+        <jspecify.version>1.0.0</jspecify.version>
         <!-- <maven.test.skip>true</maven.test.skip> -->
     </properties>
 
@@ -176,6 +177,11 @@
                 <version>0.1.5</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.jspecify</groupId>
+                <artifactId>jspecify</artifactId>
+                <version>${jspecify.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.github.oshai</groupId>
