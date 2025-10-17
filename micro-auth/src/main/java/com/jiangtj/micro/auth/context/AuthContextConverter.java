@@ -1,6 +1,6 @@
 package com.jiangtj.micro.auth.context;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * 授权上下文转换器接口

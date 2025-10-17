@@ -2,6 +2,7 @@ package com.jiangtj.micro.auth.servlet;
 
 import com.jiangtj.micro.auth.context.AuthRequest;
 import jakarta.servlet.http.HttpServletRequest;
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.server.RequestPath;
 
@@ -16,7 +17,9 @@ import static org.springframework.http.server.ServletServerHttpRequest.initURI;
  */
 public final class ServletAuthRequest implements AuthRequest {
     private final HttpServletRequest request;
+    @Nullable
     private URI uri;
+    @Nullable
     private RequestPath path;
 
     public ServletAuthRequest(HttpServletRequest request) {

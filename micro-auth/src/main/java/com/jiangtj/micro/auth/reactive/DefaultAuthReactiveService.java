@@ -6,6 +6,7 @@ import com.jiangtj.micro.auth.core.AuthProperties;
 import com.jiangtj.micro.auth.core.AuthReactiveService;
 import com.jiangtj.micro.auth.core.AuthUtils;
 import jakarta.annotation.Resource;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.AntPathMatcher;
 import reactor.core.publisher.Mono;
 
@@ -13,6 +14,7 @@ public class DefaultAuthReactiveService implements AuthReactiveService {
     @Resource
     private AuthProperties properties;
 
+    @Nullable
     private AntPathMatcher matcher;
 
     @Override

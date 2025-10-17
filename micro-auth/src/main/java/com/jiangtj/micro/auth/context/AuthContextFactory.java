@@ -1,5 +1,6 @@
 package com.jiangtj.micro.auth.context;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.ObjectProvider;
 
 import java.util.List;
@@ -11,7 +12,9 @@ public class AuthContextFactory {
 
     private final ObjectProvider<AuthContextConverter> converters;
     private final ObjectProvider<AuthContextHandler> handlers;
+    @Nullable
     private List<AuthContextConverter> convertersCache;
+    @Nullable
     private List<AuthContextHandler> handlersCache;
 
     public AuthContextFactory(ObjectProvider<AuthContextConverter> converters, ObjectProvider<AuthContextHandler> handlers) {
