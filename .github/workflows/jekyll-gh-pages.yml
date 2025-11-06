@@ -40,7 +40,7 @@ jobs:
           mkdir ./temp_site
           cp -r ./_site/* ./temp_site
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v5
         with:
           java-version: '17'
           distribution: 'temurin'
