@@ -76,7 +76,7 @@ jobs:
           mv ./micro-flyway-starter/target/dokka ./temp_site/micro-flyway-starter
           mv ./micro-payment/target/dokka ./temp_site/micro-payment
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: './temp_site'
 
