@@ -35,21 +35,15 @@ class OidcEndpointService(
                 "token_endpoint" to baseUri.resolve(oidcServerProperties.tokenEndpoint),
                 "jwks_uri" to baseUri.resolve(oidcServerProperties.jwksUri),
                 "response_types_supported" to listOf(
-                    "code",
-                    "token",
-                    "id_token",
-                    "code token",
-                    "code id_token",
-                    "token id_token",
-                    "code token id_token"
+                    "code"
                 ),
                 "subject_types_supported" to listOf("public"),
                 "id_token_signing_alg_values_supported" to listOf("ES384"),
                 "scopes_supported" to listOf("openid", "profile", "email"),
                 "token_endpoint_auth_methods_supported" to listOf("private_key_jwt"),
                 "claims_supported" to listOf("sub", "iss", "auth_time", "name", "email", "preferred_username"),
-                "grant_types_supported" to listOf("authorization_code", "implicit", "refresh_token"),
-                "response_modes_supported" to listOf("query", "fragment"),
+                "grant_types_supported" to listOf("authorization_code"),
+                "response_modes_supported" to listOf("query"),
                 "claim_types_supported" to listOf("normal"),
                 "code_challenge_methods_supported" to listOf("S256"),
                 "authorization_response_iss_parameter_supported" to true
@@ -74,32 +68,51 @@ class OidcEndpointService(
             val params = request.params()
             val clientId = params.getFirst("client_id")
             val redirectUri = params.getFirst("redirect_uri") ?: ""
+            val responseType = params.getFirst("response_type") ?: ""
             val codeChallenge = params.getFirst("code_challenge") ?: ""
+            val codeChallengeMethod = params.getFirst("code_challenge_method") ?: "S256"
+            val scope = params.getFirst("scope") ?: "openid"
             val state = params.getFirst("state")
             val nonce = params.getFirst("nonce")
 
-            // 验证必要参数
-            if (redirectUri.isEmpty() || codeChallenge.isEmpty()) {
-                return@GET ServerResponse.badRequest()
-                    .body("Missing required parameters: redirect_uri, or code_challenge")
+            // 验证响应类型 - 只支持授权码模式
+            if (responseType != "code") {
+                return@GET handleAuthorizationError(redirectUri, "unsupported_response_type", "Only 'code' is supported", state)
             }
 
+            // 验证必要参数
+            if (redirectUri.isEmpty()) {
+                return@GET handleAuthorizationError(redirectUri, "invalid_request", "Missing required parameters: redirect_uri", state)
+            }
+
+            // 验证挑战方法 - 只支持 S256
+            /*if (codeChallengeMethod != "S256") {
+                return@GET handleAuthorizationError(redirectUri, "invalid_request", "Unsupported code_challenge_method: $codeChallengeMethod. Only 'S256' is supported", state)
+            }*/
+
             val clientCf = oidcServerProperties.clients.firstOrNull { it.clientId == clientId }
-                ?: return@GET ServerResponse.badRequest()
-                    .body("Invalid client_id: $clientId")
+                ?: return@GET handleAuthorizationError(redirectUri, "invalid_client", "Invalid client_id: $clientId", state)
 
             // 验证回调地址
-            val callbackUri = clientCf.callbackUri
-            if (callbackUri.isNotEmpty()) {
-                if (!callbackUri.contains(redirectUri)) {
-                    return@GET ServerResponse.badRequest()
-                        .body("Callback uri not match: $redirectUri")
+            val callbackUris = clientCf.callbackUri
+            if (callbackUris.isNotEmpty()) {
+                // 检查 redirectUri 是否在允许的回调地址列表中
+                val isValidRedirectUri = callbackUris.any { allowedUri ->
+                    // 完全匹配或者以允许的前缀开头
+                    redirectUri == allowedUri || redirectUri.startsWith(allowedUri)
+                }
+                if (!isValidRedirectUri) {
+                    return@GET handleAuthorizationError(redirectUri, "invalid_request", "Invalid redirect_uri: $redirectUri", state)
                 }
             }
 
             val user = oidcRedirectAuth.userInfo()
             val authCode = AuthCodeData(
+                clientId = clientId,
+                redirectUri = redirectUri,
+                scope = scope,
                 codeChallenge = codeChallenge,
+                codeChallengeMethod = codeChallengeMethod,
                 state = state,
                 nonce = nonce,
                 user = user
@@ -117,13 +130,23 @@ class OidcEndpointService(
         POST(oidcServerProperties.tokenEndpoint) { request ->
             val baseUri = URI.create(oidcServerProperties.baseUrl ?: getBaseUrl(request))
             val params = request.params()
-            val code = params["code"]?.firstOrNull() ?: ""
-            val codeVerifier = params["code_verifier"]?.firstOrNull() ?: ""
+            val code = params.getFirst("code") ?: ""
+            val clientId = params.getFirst("client_id")
+            val redirectUri = params.getFirst("redirect_uri") ?: ""
+            val codeVerifier = params.getFirst("code_verifier") ?: ""
+            val grantType = params.getFirst("grant_type") ?: "authorization_code"
+            val state = params.getFirst("state")
+
+            // 验证授权类型 - 只支持 authorization_code
+            if (grantType != "authorization_code") {
+                return@POST ServerResponse.badRequest()
+                    .body("Unsupported grant_type: $grantType. Only 'authorization_code' is supported.")
+            }
 
             // 验证必要参数
-            if (code.isEmpty() || codeVerifier.isEmpty()) {
+            if (code.isEmpty()) {
                 return@POST ServerResponse.badRequest()
-                    .body("Missing required parameters: code, or code_verifier")
+                    .body("Missing required parameters: code")
             }
 
             // 验证授权码
@@ -131,24 +154,40 @@ class OidcEndpointService(
                 ?: return@POST ServerResponse.badRequest()
                     .body("Invalid authorization code")
 
-            val digest = MessageDigest.getInstance("SHA-256")
-            val bytes = digest.digest(codeVerifier.toByteArray())
-            val calcCodeChallenge = Encoders.BASE64URL.encode(bytes)
-            if (calcCodeChallenge != authCodeData.codeChallenge) {
+            // 验证重定向URI（如果提供）
+            if (redirectUri.isNotEmpty() && redirectUri != authCodeData.redirectUri) {
                 return@POST ServerResponse.badRequest()
-                    .body("Invalid code verifier")
+                    .body("Invalid redirect_uri")
+            }
+
+            if (authCodeData.codeChallenge.isNotEmpty()) {
+                val digest = MessageDigest.getInstance("SHA-256")
+                val bytes = digest.digest(codeVerifier.toByteArray())
+                val calcCodeChallenge = Encoders.BASE64URL.encode(bytes)
+                if (calcCodeChallenge != authCodeData.codeChallenge) {
+                    return@POST ServerResponse.badRequest()
+                        .body("Invalid code verifier")
+                }
+            } else {
+                val clientCf = oidcServerProperties.clients.firstOrNull { it.clientId == clientId }
+                    ?: return@POST handleAuthorizationError(redirectUri, "invalid_client", "Invalid client_id: $clientId", state)
+                val clientSecret = params.getFirst("client_secret") ?: ""
+                if (clientSecret != clientCf.clientSecret) {
+                    return@POST handleAuthorizationError(redirectUri, "invalid_client", "Invalid client_secret: $clientSecret", state)
+                }
+
             }
 
             // 生成ID令牌和访问令牌
-            val idToken = generateIdToken(baseUri.toString(), authCodeData.user, authCodeData.nonce)
+            val idToken = generateIdToken(baseUri.toString(), authCodeData.user, authCodeData.nonce, clientId)
 
             val tokenResponse = mapOf(
-                "access_token" to "none",
+                "access_token" to idToken,
                 "token_type" to "Bearer",
                 "expires_in" to 7200,
                 "refresh_token" to "none",
                 "id_token" to idToken,
-                "scope" to "openid profile"
+                "scope" to authCodeData.scope
             )
 
             // 移除已使用的授权码
@@ -165,7 +204,24 @@ class OidcEndpointService(
         return "${uri.scheme}://${uri.host}:${uri.port}"
     }
 
-    private fun generateIdToken(issuer: String, user: Map<String, Any?>, nonce: String?): String {
+    private fun handleAuthorizationError(
+        redirectUri: String,
+        error: String,
+        errorDescription: String,
+        state: String?
+    ): ServerResponse {
+        return if (redirectUri.isNotEmpty()) {
+            val errorParams = "error=$error&error_description=$errorDescription"
+            ServerResponse.temporaryRedirect(
+                URI.create("$redirectUri?$errorParams${state?.let { "&state=$it" } ?: ""}")
+            ).build()
+        } else {
+            ServerResponse.badRequest()
+                .body("$error: $errorDescription")
+        }
+    }
+
+    private fun generateIdToken(issuer: String, user: Map<String, Any?>, nonce: String?, clientId: String?): String {
         // 生成真实的JWT ID令牌
         val now = System.currentTimeMillis()
         val expiration = now + 3600 * 1000 * 24 // 24小时后过期
@@ -179,6 +235,7 @@ class OidcEndpointService(
             .expiration(Date(expiration))
             .notBefore(Date(now))
             .issuedAt(Date(now))
+            .apply { clientId?.let { audience().add(it).and() } }
             .apply { nonce?.let { claim("nonce", it) } }
             .signWith(oidcKeyService.getSignKey())
             .compact()
@@ -186,7 +243,11 @@ class OidcEndpointService(
 
     // 授权码数据类
     data class AuthCodeData(
+        val clientId: String? = null,
+        val redirectUri: String,
+        val scope: String,
         val codeChallenge: String,
+        val codeChallengeMethod: String,
         val state: String? = null,
         val nonce: String? = null,
         val timestamp: Long = System.currentTimeMillis(),

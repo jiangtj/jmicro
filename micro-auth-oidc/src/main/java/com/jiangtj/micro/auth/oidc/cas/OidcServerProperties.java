@@ -54,7 +54,7 @@ public class OidcServerProperties {
     private String tokenEndpoint = "/oidc/token";
 
     /**
-     * 应用配置
+     * 客户端配置列表
      */
     private List<OidcServerClientProperties> clients = new ArrayList<>();
 
