@@ -66,7 +66,7 @@ class OidcEndpointService(
         // 授权端点
         GET(oidcServerProperties.authorizationEndpoint) { request ->
             val params = request.params()
-            val clientId = params.getFirst("client_id")
+            val clientId = params.getFirst("client_id") ?: ""
             val redirectUri = params.getFirst("redirect_uri") ?: ""
             val responseType = params.getFirst("response_type") ?: ""
             val codeChallenge = params.getFirst("code_challenge") ?: ""
@@ -77,12 +77,22 @@ class OidcEndpointService(
 
             // 验证响应类型 - 只支持授权码模式
             if (responseType != "code") {
-                return@GET handleAuthorizationError(redirectUri, "unsupported_response_type", "Only 'code' is supported", state)
+                return@GET handleAuthorizationError(
+                    redirectUri,
+                    "unsupported_response_type",
+                    "Only 'code' is supported",
+                    state
+                )
             }
 
             // 验证必要参数
             if (redirectUri.isEmpty()) {
-                return@GET handleAuthorizationError(redirectUri, "invalid_request", "Missing required parameters: redirect_uri", state)
+                return@GET handleAuthorizationError(
+                    redirectUri,
+                    "invalid_request",
+                    "Missing required parameters: redirect_uri",
+                    state
+                )
             }
 
             // 验证挑战方法 - 只支持 S256
@@ -90,11 +100,19 @@ class OidcEndpointService(
                 return@GET handleAuthorizationError(redirectUri, "invalid_request", "Unsupported code_challenge_method: $codeChallengeMethod. Only 'S256' is supported", state)
             }*/
 
-            val clientCf = oidcServerProperties.clients.firstOrNull { it.clientId == clientId }
-                ?: return@GET handleAuthorizationError(redirectUri, "invalid_client", "Invalid client_id: $clientId", state)
+            val clientCf = getClientCf(clientId)
+
+            if (codeChallenge.isEmpty() && clientCf == null) {
+                return@GET handleAuthorizationError(
+                    redirectUri,
+                    "invalid_client",
+                    "Invalid client_id: $clientId",
+                    state
+                )
+            }
 
             // 验证回调地址
-            val callbackUris = clientCf.callbackUri
+            val callbackUris = clientCf?.callbackUri ?: emptyList()
             if (callbackUris.isNotEmpty()) {
                 // 检查 redirectUri 是否在允许的回调地址列表中
                 val isValidRedirectUri = callbackUris.any { allowedUri ->
@@ -102,7 +120,12 @@ class OidcEndpointService(
                     redirectUri == allowedUri || redirectUri.startsWith(allowedUri)
                 }
                 if (!isValidRedirectUri) {
-                    return@GET handleAuthorizationError(redirectUri, "invalid_request", "Invalid redirect_uri: $redirectUri", state)
+                    return@GET handleAuthorizationError(
+                        redirectUri,
+                        "invalid_request",
+                        "Invalid redirect_uri: $redirectUri",
+                        state
+                    )
                 }
             }
 
@@ -131,7 +154,7 @@ class OidcEndpointService(
             val baseUri = URI.create(oidcServerProperties.baseUrl ?: getBaseUrl(request))
             val params = request.params()
             val code = params.getFirst("code") ?: ""
-            val clientId = params.getFirst("client_id")
+            val clientId = params.getFirst("client_id") ?: ""
             val redirectUri = params.getFirst("redirect_uri") ?: ""
             val codeVerifier = params.getFirst("code_verifier") ?: ""
             val grantType = params.getFirst("grant_type") ?: "authorization_code"
@@ -169,11 +192,33 @@ class OidcEndpointService(
                         .body("Invalid code verifier")
                 }
             } else {
-                val clientCf = oidcServerProperties.clients.firstOrNull { it.clientId == clientId }
-                    ?: return@POST handleAuthorizationError(redirectUri, "invalid_client", "Invalid client_id: $clientId", state)
+                if (clientId.isEmpty()) {
+                    return@POST ServerResponse.badRequest()
+                        .body("Missing required parameters: client_id")
+                }
+                val clientCf = getClientCf(clientId)
+                    ?: return@POST handleAuthorizationError(
+                        redirectUri,
+                        "invalid_client",
+                        "Invalid client_id: $clientId",
+                        state
+                    )
                 val clientSecret = params.getFirst("client_secret") ?: ""
+                if (clientSecret.isEmpty()) {
+                    return@POST handleAuthorizationError(
+                        redirectUri,
+                        "invalid_client",
+                        "Missing required parameters: client_secret",
+                        state
+                    )
+                }
                 if (clientSecret != clientCf.clientSecret) {
-                    return@POST handleAuthorizationError(redirectUri, "invalid_client", "Invalid client_secret: $clientSecret", state)
+                    return@POST handleAuthorizationError(
+                        redirectUri,
+                        "invalid_client",
+                        "Invalid client_secret: $clientSecret",
+                        state
+                    )
                 }
 
             }
@@ -197,6 +242,13 @@ class OidcEndpointService(
                 .contentType(APPLICATION_JSON)
                 .body(tokenResponse)
         }
+    }
+
+    private fun getClientCf(clientId: String): OidcServerClientProperties? {
+        if (clientId.isEmpty()) {
+            return oidcServerProperties.clients.firstOrNull()
+        }
+        return oidcServerProperties.clients.firstOrNull { it.clientId == clientId }
     }
 
     private fun getBaseUrl(request: ServerRequest): String {
