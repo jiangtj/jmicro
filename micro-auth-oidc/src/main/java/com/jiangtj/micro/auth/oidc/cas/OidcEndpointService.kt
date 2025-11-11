@@ -72,8 +72,9 @@ class OidcEndpointService(
         // 授权端点
         GET(oidcServerProperties.authorizationEndpoint) { request ->
             val params = request.params()
+            val clientId = params.getFirst("client_id")
             val redirectUri = params.getFirst("redirect_uri") ?: ""
-            val codeChallenge = params["code_challenge"]?.first() ?: ""
+            val codeChallenge = params.getFirst("code_challenge") ?: ""
             val state = params.getFirst("state")
             val nonce = params.getFirst("nonce")
 
@@ -83,8 +84,12 @@ class OidcEndpointService(
                     .body("Missing required parameters: redirect_uri, or code_challenge")
             }
 
+            val clientCf = oidcServerProperties.clients.firstOrNull { it.clientId == clientId }
+                ?: return@GET ServerResponse.badRequest()
+                    .body("Invalid client_id: $clientId")
+
             // 验证回调地址
-            val callbackUri = oidcServerProperties.callbackUri
+            val callbackUri = clientCf.callbackUri
             if (callbackUri.isNotEmpty()) {
                 if (!callbackUri.contains(redirectUri)) {
                     return@GET ServerResponse.badRequest()

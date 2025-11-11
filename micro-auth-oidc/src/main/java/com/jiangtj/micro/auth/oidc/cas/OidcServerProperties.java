@@ -54,8 +54,8 @@ public class OidcServerProperties {
     private String tokenEndpoint = "/oidc/token";
 
     /**
-     * 回调地址
+     * 应用配置
      */
-    private List<String> callbackUri = new ArrayList<>();
+    private List<OidcServerClientProperties> clients = new ArrayList<>();
 
 }
