@@ -9,7 +9,7 @@
     </parent>
     <artifactId>micro-auth-oidc</artifactId>
     <version>0.1.6</version>
-    <name>micro-auth</name>
+    <name>micro-auth-oidc</name>
     <description>micro-auth-oidc</description>
 
     <dependencies>

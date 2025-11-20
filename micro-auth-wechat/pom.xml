@@ -9,7 +9,7 @@
     </parent>
     <artifactId>micro-auth-wechat</artifactId>
     <version>0.1.6</version>
-    <name>micro-auth</name>
+    <name>micro-auth-wechat</name>
     <description>micro-auth-wechat</description>
 
     <dependencies>
