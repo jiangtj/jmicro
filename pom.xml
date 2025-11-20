@@ -45,7 +45,7 @@
         <casdoor.version>1.15.0</casdoor.version>
         <wxJava.version>4.7.0</wxJava.version>
         <jjwt.version>0.13.0</jjwt.version>
-        <jb-annotations.version>26.0.2</jb-annotations.version>
+        <jb-annotations.version>26.0.2-1</jb-annotations.version>
         <kotlin.version>2.2.21</kotlin.version>
         <kotlin-logging.version>7.0.13</kotlin-logging.version>
         <mockito-kotlin.version>6.0.0</mockito-kotlin.version>
