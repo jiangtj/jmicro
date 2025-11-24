@@ -47,7 +47,7 @@
         <jjwt.version>0.13.0</jjwt.version>
         <kotlin.version>2.2.21</kotlin.version>
         <kotlin-logging.version>7.0.13</kotlin-logging.version>
-        <mockito-kotlin.version>6.0.0</mockito-kotlin.version>
+        <mockito-kotlin.version>6.1.0</mockito-kotlin.version>
         <dokka.version>2.1.0</dokka.version>
         <jspecify.version>1.0.0</jspecify.version>
         <!-- <maven.test.skip>true</maven.test.skip> -->
