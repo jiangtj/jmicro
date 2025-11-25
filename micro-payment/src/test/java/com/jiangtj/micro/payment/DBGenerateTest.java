@@ -7,7 +7,7 @@ import org.jooq.codegen.KotlinGenerator;
 import org.jooq.meta.jaxb.*;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @Disabled
