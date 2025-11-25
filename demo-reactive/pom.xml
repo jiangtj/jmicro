@@ -51,6 +51,11 @@
             <artifactId>micro-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-webflux-test</artifactId>
+            <scope>test</scope>
+        </dependency>
 
         <dependency>
             <groupId>io.projectreactor</groupId>

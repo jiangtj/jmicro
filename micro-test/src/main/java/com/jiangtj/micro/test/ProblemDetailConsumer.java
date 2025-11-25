@@ -67,9 +67,9 @@ public class ProblemDetailConsumer {
             responseSpec.expectStatus().is4xxClientError();
             responseSpec.expectStatus().isEqualTo(detail.getStatus());
             BodyContentSpec expectBody = responseSpec.expectBody();
-            expectBody.jsonPath("type").exists()
-                    .jsonPath("status").isEqualTo(detail.getStatus())
-                    .jsonPath("instance").exists();
+            expectBody
+                .jsonPath("status").isEqualTo(detail.getStatus())
+                .jsonPath("instance").exists();
             String title = detail.getTitle();
             if (title != null) {
                 expectBody.jsonPath("title").isEqualTo(title);

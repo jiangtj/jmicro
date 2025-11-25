@@ -1,10 +1,10 @@
 package com.jiangtj.micro.common.form
 
-import com.fasterxml.jackson.module.kotlin.isKotlinClass
 import com.jiangtj.micro.common.validation.MaxLength
 import com.jiangtj.micro.common.validation.MinLength
 import jakarta.validation.Valid
 import jakarta.validation.constraints.*
+import tools.jackson.module.kotlin.isKotlinClass
 import java.lang.reflect.Field
 import java.lang.reflect.ParameterizedType
 import kotlin.reflect.jvm.kotlinProperty
