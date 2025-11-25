@@ -5,14 +5,14 @@ import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.client.RestTestClient;
 
 import java.net.URI;
 
 @JMicroMvcTest
 public class ExceptionStatusTests {
     @Resource
-    WebTestClient webClient;
+    RestTestClient webClient;
 
     @Test
     void testErr2() {

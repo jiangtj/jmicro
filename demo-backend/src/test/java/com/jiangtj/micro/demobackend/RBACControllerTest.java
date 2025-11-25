@@ -1,17 +1,17 @@
 package com.jiangtj.micro.demobackend;
 
 import com.jiangtj.micro.test.JMicroMvcTest;
-import com.jiangtj.micro.test.ProblemDetailConsumer;
+import com.jiangtj.micro.test.ProblemDetailMvcConsumer;
 import com.jiangtj.micro.test.WithMockUser;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.client.RestTestClient;
 
 @JMicroMvcTest
 class RBACControllerTest {
 
     @Resource
-    WebTestClient client;
+    RestTestClient client;
 
     @Test
     @WithMockUser
@@ -25,6 +25,6 @@ class RBACControllerTest {
     void hasLoginWithoutToken() {
         client.get().uri("/anno/hasLogin")
                 .exchange()
-                .expectAll(ProblemDetailConsumer.unLogin().expect());
+                .expectAll(ProblemDetailMvcConsumer.unLogin().expect());
     }
 }

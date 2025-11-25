@@ -1,13 +1,13 @@
 package com.jiangtj.micro.demobackend;
 
 import com.jiangtj.micro.test.JMicroMvcTest;
-import com.jiangtj.micro.test.ProblemDetailConsumer;
+import com.jiangtj.micro.test.ProblemDetailMvcConsumer;
 import com.jiangtj.micro.test.WithMockUser;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.client.RestTestClient;
 
 import java.net.URI;
 
@@ -15,7 +15,7 @@ import java.net.URI;
 class BaseControllerTests {
 
     @Resource
-    WebTestClient webClient;
+    RestTestClient webClient;
 
     @Test
     void testIndex() {
@@ -50,7 +50,7 @@ class BaseControllerTests {
         webClient.get().uri("/needtoken")
             .exchange()
             .expectStatus().is4xxClientError()
-            .expectAll(ProblemDetailConsumer.unLogin().expect());
+            .expectAll(ProblemDetailMvcConsumer.unLogin().expect());
     }
 
 }
