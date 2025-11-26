@@ -5,10 +5,10 @@
     <parent>
         <groupId>com.jiangtj.micro</groupId>
         <artifactId>jmicro-aggregator</artifactId>
-        <version>0.1.6</version>
+        <version>0.2.0</version>
     </parent>
     <artifactId>micro-common</artifactId>
-    <version>0.1.6</version>
+    <version>0.2.0</version>
     <name>micro-common</name>
     <description>micro-common</description>
 
@@ -18,15 +18,11 @@
             <artifactId>libphonenumber</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
+            <groupId>tools.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.module</groupId>
+            <groupId>tools.jackson.module</groupId>
             <artifactId>jackson-module-kotlin</artifactId>
         </dependency>
         <dependency>

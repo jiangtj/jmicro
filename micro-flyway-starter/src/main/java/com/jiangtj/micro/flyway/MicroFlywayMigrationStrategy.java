@@ -2,7 +2,7 @@ package com.jiangtj.micro.flyway;
 
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.exception.FlywayValidateException;
-import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
+import org.springframework.boot.flyway.autoconfigure.FlywayMigrationStrategy;
 
 public class MicroFlywayMigrationStrategy implements FlywayMigrationStrategy {
 

@@ -6,7 +6,7 @@
     <groupId>com.jiangtj.micro</groupId>
     <artifactId>jmicro-aggregator</artifactId>
     <packaging>pom</packaging>
-    <version>0.1.6</version>
+    <version>0.2.0</version>
     <url>https://github.com/jiangtj/jmicro</url>
     <name>JMicro</name>
     <description>An open-source framework based on Spring Boot, helps you create applications more easily</description>
@@ -14,7 +14,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.3</version>
+        <version>4.0.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -72,6 +72,11 @@
             <artifactId>kotlin-test-junit5</artifactId>
             <scope>test</scope>
         </dependency>
+        <!--<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jackson-test</artifactId>
+            <scope>test</scope>
+        </dependency>-->
     </dependencies>
 
     <profiles>
@@ -167,7 +172,7 @@
             <dependency>
                 <groupId>com.jiangtj.micro</groupId>
                 <artifactId>micro-dependencies</artifactId>
-                <version>0.1.6</version>
+                <version>0.2.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

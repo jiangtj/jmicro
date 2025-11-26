@@ -5,10 +5,10 @@
     <parent>
         <groupId>com.jiangtj.micro</groupId>
         <artifactId>jmicro-aggregator</artifactId>
-        <version>0.1.6</version>
+        <version>0.2.0</version>
     </parent>
     <artifactId>demo-reactive</artifactId>
-    <version>0.1.6</version>
+    <version>0.2.0</version>
     <name>demo-reactive</name>
     <description>demo-reactive</description>
 
@@ -49,6 +49,11 @@
         <dependency>
             <groupId>com.jiangtj.micro</groupId>
             <artifactId>micro-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-webflux-test</artifactId>
             <scope>test</scope>
         </dependency>
 

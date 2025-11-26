@@ -106,6 +106,7 @@ class OidcLocatorTest {
         whenever(mockRestClient.get()).thenReturn(mockRequestHeadersUriSpec)
         whenever(mockRequestHeadersUriSpec.uri(anyString())).thenReturn(mockRequestHeadersSpec)
         whenever(mockRequestHeadersSpec.retrieve()).thenReturn(mockResponseSpec)
+        whenever(mockResponseSpec.hint(any(), any())).thenReturn(mockResponseSpec)
         whenever(mockResponseSpec.body<OidcLocator.OICF>()).thenReturn(oicf)
         whenever(mockResponseSpec.body<OidcLocator.JwksSet>()).thenReturn(jwksSet)
         
@@ -122,6 +123,7 @@ class OidcLocatorTest {
         whenever(mockRestClient.get()).thenReturn(mockRequestHeadersUriSpec)
         whenever(mockRequestHeadersUriSpec.uri(anyString())).thenReturn(mockRequestHeadersSpec)
         whenever(mockRequestHeadersSpec.retrieve()).thenReturn(mockResponseSpec)
+        whenever(mockResponseSpec.hint(any(), any())).thenReturn(mockResponseSpec)
         whenever(mockResponseSpec.body<OidcLocator.OICF>()).thenReturn(null)
         
         ReflectionTestUtils.setField(oidcLocator, "rest", mockRestClient)
@@ -141,6 +143,7 @@ class OidcLocatorTest {
         whenever(mockRestClient.get()).thenReturn(mockRequestHeadersUriSpec)
         whenever(mockRequestHeadersUriSpec.uri(anyString())).thenReturn(mockRequestHeadersSpec)
         whenever(mockRequestHeadersSpec.retrieve()).thenReturn(mockResponseSpec)
+        whenever(mockResponseSpec.hint(any(), any())).thenReturn(mockResponseSpec)
         whenever(mockResponseSpec.body<OidcLocator.OICF>()).thenReturn(oicf)
         whenever(mockResponseSpec.body<OidcLocator.JwksSet>()).thenReturn(null)
         

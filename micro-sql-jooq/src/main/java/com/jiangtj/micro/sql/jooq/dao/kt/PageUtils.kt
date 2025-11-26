@@ -106,7 +106,7 @@ class ResultStep<R : Record>(val ctx: PageContext<R>) {
     /**
      * 执行查询并将结果转换为指定类型的列表。
      */
-    inline fun <reified T> fetchInto(): Pair<List<T>, Int> {
+    inline fun <reified T : Any> fetchInto(): Pair<List<T>, Int> {
         val result = fetch()
         return Pair(result.first.into(T::class.java), result.second)
     }
@@ -114,7 +114,7 @@ class ResultStep<R : Record>(val ctx: PageContext<R>) {
     /**
      * 执行查询并将结果转换为分页对象。
      */
-    inline fun <reified T> fetchPage(): Page<T> {
+    inline fun <reified T : Any> fetchPage(): Page<T> {
         val result = fetchInto<T>()
         return PageImpl(result.first, ctx.pageable!!, result.second.toLong())
     }

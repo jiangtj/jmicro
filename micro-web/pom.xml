@@ -5,10 +5,10 @@
     <parent>
         <groupId>com.jiangtj.micro</groupId>
         <artifactId>jmicro-aggregator</artifactId>
-        <version>0.1.6</version>
+        <version>0.2.0</version>
     </parent>
     <artifactId>micro-web</artifactId>
-    <version>0.1.6</version>
+    <version>0.2.0</version>
     <name>micro-web</name>
     <description>micro-web</description>
 
@@ -27,7 +27,15 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-aop</artifactId>
+            <artifactId>spring-boot-starter-json</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-kotlin-serialization</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aspectj</artifactId>
         </dependency>
 
         <!-- servlet -->

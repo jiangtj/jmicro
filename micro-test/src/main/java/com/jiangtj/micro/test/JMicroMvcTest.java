@@ -1,6 +1,6 @@
 package com.jiangtj.micro.test;
 
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
@@ -11,6 +11,6 @@ import java.lang.annotation.*;
 @Inherited
 @JMicroTest
 @AutoConfigureMockMvc
-@Import({JMicroWebTestClientMvcConfiguration.class})
+@Import({JMicroRestTestClientMvcConfiguration.class})
 public @interface JMicroMvcTest {
 }

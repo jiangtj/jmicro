@@ -5,8 +5,8 @@ import lombok.Setter;
 import org.jooq.meta.jaxb.Database;
 import org.jooq.meta.jaxb.Jdbc;
 import org.jooq.meta.jaxb.Target;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.jdbc.DatabaseDriver;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceProperties;
 
 /**
  * JOOQ 代码生成器的辅助工具类。

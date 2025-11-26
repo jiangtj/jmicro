@@ -5,10 +5,10 @@
     <parent>
         <groupId>com.jiangtj.micro</groupId>
         <artifactId>jmicro-aggregator</artifactId>
-        <version>0.1.6</version>
+        <version>0.2.0</version>
     </parent>
     <artifactId>demo-backend</artifactId>
-    <version>0.1.6</version>
+    <version>0.2.0</version>
     <name>demo-backend</name>
     <description>demo-backend</description>
 
@@ -67,13 +67,13 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webflux</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-webmvc-test</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.projectreactor</groupId>
-            <artifactId>reactor-test</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-restclient-test</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

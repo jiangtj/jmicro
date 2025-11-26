@@ -1,27 +1,23 @@
 package com.jiangtj.micro.common
 
-import com.fasterxml.jackson.core.JsonProcessingException
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.KotlinModule
-import com.fasterxml.jackson.module.kotlin.readValue
-import com.jiangtj.micro.common.JsonUtils.objectMapper
+import com.jiangtj.micro.common.JsonUtils.jsonMapper
 import io.github.oshai.kotlinlogging.KotlinLogging
 import lombok.extern.slf4j.Slf4j
+import tools.jackson.core.JacksonException
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.KotlinModule
+import tools.jackson.module.kotlin.readValue
 import java.io.IOException
 
 @Slf4j
 object JsonUtils {
     val log = KotlinLogging.logger {}
-    var objectMapper: ObjectMapper
+    var jsonMapper: JsonMapper
 
     init {
-        objectMapper = ObjectMapper()
-        objectMapper.registerModule(JavaTimeModule()) //处理 java8 time api
-        objectMapper.registerModule(KotlinModule.Builder().build()) // 添加 kotlin 支持
-        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-        objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
+        jsonMapper = JsonMapper.builder()
+            .addModule(KotlinModule.Builder().build())
+            .build()
     }
 
     /**
@@ -32,8 +28,8 @@ object JsonUtils {
      * @param om 用于初始化的 ObjectMapper 实例。
      */
     @JvmStatic
-    fun init(om: ObjectMapper) {
-        objectMapper = om.copy()
+    fun init(mapper: JsonMapper) {
+        jsonMapper = mapper
     }
 
     /**
@@ -51,8 +47,8 @@ object JsonUtils {
         }
 
         try {
-            return objectMapper.writeValueAsString(obj)
-        } catch (e: JsonProcessingException) {
+            return jsonMapper.writeValueAsString(obj)
+        } catch (e: JacksonException) {
             log.error(e) { "JsonUtils error" }
         }
         return null
@@ -75,8 +71,8 @@ object JsonUtils {
         }
 
         try {
-            return objectMapper.readValue<T>(json, classType)
-        } catch (e: IOException) {
+            return jsonMapper.readValue<T>(json, classType)
+        } catch (e: JacksonException) {
             log.error(e) { "JsonUtils error" }
         }
 
@@ -100,8 +96,8 @@ object JsonUtils {
         }
 
         try {
-            val javaType = objectMapper.typeFactory.constructCollectionType(ArrayList::class.java, classType)
-            return objectMapper.readValue<MutableList<T>>(json, javaType)
+            val javaType = jsonMapper.typeFactory.constructCollectionType(ArrayList::class.java, classType)
+            return jsonMapper.readValue<MutableList<T>>(json, javaType)
         } catch (e: IOException) {
             log.error(e) { "JsonUtils error" }
         }
@@ -122,7 +118,7 @@ object JsonUtils {
         }
 
         try {
-            return objectMapper.readValue<T>(json)
+            return jsonMapper.readValue<T>(json)
         } catch (e: IOException) {
             log.error(e) { "JsonUtils error" }
         }
@@ -137,7 +133,7 @@ object JsonUtils {
  * @return 序列化后的JSON字符串
  * @throws JsonProcessingException 当序列化过程中发生错误时抛出
  */
-fun <T> T.toJson(): String = objectMapper.writeValueAsString(this)
+fun <T> T.toJson(): String = jsonMapper.writeValueAsString(this)
 
 /**
  * 内联扩展函数：将JSON字符串反序列化为指定类型的对象
@@ -145,4 +141,4 @@ fun <T> T.toJson(): String = objectMapper.writeValueAsString(this)
  * @return 反序列化后的指定类型对象
  * @throws IOException 当反序列化过程中发生错误时抛出
  */
-inline fun <reified T> String.fromJson() = objectMapper.readValue<T>(this)
+inline fun <reified T> String.fromJson() = jsonMapper.readValue<T>(this)
