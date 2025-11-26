@@ -1,6 +1,5 @@
 package com.jiangtj.micro.sql.jooq.jackson
 
-import io.github.oshai.kotlinlogging.KotlinLogging
 import org.jooq.JSON
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
@@ -11,8 +10,6 @@ import tools.jackson.module.kotlin.readValue
 import kotlin.test.Test
 
 class Jackson3Test {
-
-    private val log = KotlinLogging.logger {  }
 
     data class JSONExample(
         val json: JSON
