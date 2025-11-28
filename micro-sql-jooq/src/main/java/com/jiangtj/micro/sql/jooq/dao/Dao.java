@@ -4,8 +4,10 @@ import com.jiangtj.micro.sql.jooq.LogicUtils;
 import com.jiangtj.micro.sql.jooq.PageUtils;
 import lombok.Getter;
 import org.jooq.*;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -21,7 +23,7 @@ public class Dao<R extends UpdatableRecord<R>, T> {
     private final boolean isLogic;
 
     public Dao(TableField<R, T> idField, boolean isLogic) {
-        this.table = idField.getTable();
+        this.table = Objects.requireNonNull(idField.getTable());
         this.ID = idField;
         this.isLogic = isLogic;
     }
@@ -49,6 +51,7 @@ public class Dao<R extends UpdatableRecord<R>, T> {
         return fetch(create).fetchInto(clz);
     }
 
+    @Nullable
     public R fetchById(DSLContext create, T id) {
         return create.selectFrom(table)
             .where(ID.eq(id))

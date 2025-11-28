@@ -7,6 +7,7 @@ import org.jooq.TableField;
 import org.jooq.TableRecord;
 
 import java.util.List;
+import java.util.Objects;
 
 import static com.jiangtj.micro.sql.jooq.LogicUtils.notDeleted;
 import static com.jiangtj.micro.sql.jooq.QueryUtils.predicate;
@@ -14,7 +15,7 @@ import static com.jiangtj.micro.sql.jooq.QueryUtils.predicate;
 public class RNDao<R extends TableRecord<R>, T> extends AbstractRNDao<R, T, R>{
 
     public RNDao(TableField<R, T> tableField, boolean isLogic) {
-        super(tableField, tableField.getTable(), isLogic);
+        super(tableField, Objects.requireNonNull(tableField.getTable()), isLogic);
     }
 
     @Override

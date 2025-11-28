@@ -41,7 +41,7 @@ class WhereStep<R : Record>(ctx: PageContext<R>) : PageableStep<R>(ctx) {
     /**
      * 依据 Example 生成查询条件
      */
-    fun conditionByExample(example: Any?, vararg ignoredFields: Field<*>): ConditionStep<R> {
+    fun conditionByExample(example: Any, vararg ignoredFields: Field<*>): ConditionStep<R> {
         val exampleConditions = QueryUtils.nec(ctx.create, ctx.table, example, *ignoredFields)
         ctx.conditions += exampleConditions
         return ConditionStep(ctx)

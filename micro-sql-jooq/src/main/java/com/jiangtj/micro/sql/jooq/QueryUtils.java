@@ -3,6 +3,7 @@ package com.jiangtj.micro.sql.jooq;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.*;
 import org.jooq.Record;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.StringUtils;
 
 import java.util.Objects;
@@ -95,15 +96,15 @@ public abstract class QueryUtils {
         return predicate ? condition.get() : noCondition();
     }
 
-    public static Condition notEmpty(Function<String, Condition> condition, String fieldValue) {
+    public static Condition notEmpty(Function<@Nullable String, Condition> condition, @Nullable String fieldValue) {
         return predicate(StringUtils.hasLength(fieldValue), () -> condition.apply(fieldValue));
     }
 
-    public static <T> Condition notNull(Function<T, Condition> condition, T fieldValue) {
+    public static <T> Condition notNull(Function<@Nullable T, Condition> condition, @Nullable T fieldValue) {
         return predicate(fieldValue != null, () -> condition.apply(fieldValue));
     }
 
-    public static Condition ne(Function<String, Condition> condition, String fieldValue) {
+    public static Condition ne(Function<String, Condition> condition, @Nullable  String fieldValue) {
         return notEmpty(condition, fieldValue);
     }
 
@@ -111,7 +112,7 @@ public abstract class QueryUtils {
         return notEmptyCondition(create, table, example, ignoredFields);
     }
 
-    public static <T> Condition nn(Function<T, Condition> condition, T fieldValue) {
+    public static <T> Condition nn(Function<T, Condition> condition,  @Nullable T fieldValue) {
         return notNull(condition, fieldValue);
     }
 

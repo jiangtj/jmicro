@@ -8,6 +8,7 @@ import org.jooq.TableRecord;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -24,7 +25,7 @@ public class RNLinkDao<R1 extends TableRecord<R1>, T1, R2 extends TableRecord<R2
     private final TableField<R3, T2> tableField2;
 
     public RNLinkDao(AbstractRNDao<R1, T1, R2> rnDao, TableField<R2, T2> tableField1, TableField<R3, T2> tableField2) {
-        super(rnDao.queryField(), tableField2.getTable(), rnDao.isLogic());
+        super(rnDao.queryField(), Objects.requireNonNull(tableField2.getTable()), rnDao.isLogic());
         this.originalDao = rnDao;
         this.tableField1 = tableField1;
         this.tableField2 = tableField2;
