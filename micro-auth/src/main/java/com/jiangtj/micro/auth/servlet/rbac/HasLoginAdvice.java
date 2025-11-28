@@ -2,10 +2,10 @@ package com.jiangtj.micro.auth.servlet.rbac;
 
 import com.jiangtj.micro.auth.core.AuthService;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.springframework.aop.MethodBeforeAdvice;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 
 import java.lang.reflect.Method;
 import java.util.Objects;

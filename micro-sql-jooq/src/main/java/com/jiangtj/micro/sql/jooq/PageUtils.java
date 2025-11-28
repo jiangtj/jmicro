@@ -2,11 +2,11 @@ package com.jiangtj.micro.sql.jooq;
 
 import org.jooq.*;
 import org.jooq.Record;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.lang.Nullable;
 
 import java.util.List;
 import java.util.function.Function;

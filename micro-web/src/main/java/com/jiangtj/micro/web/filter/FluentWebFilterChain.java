@@ -15,8 +15,7 @@
  */
 package com.jiangtj.micro.web.filter;
 
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
@@ -60,8 +59,7 @@ public class FluentWebFilterChain implements WebFilterChain {
     }
 
     @Override
-    @NonNull
-    public Mono<Void> filter(@NonNull ServerWebExchange exchange) {
+    public Mono<Void> filter(ServerWebExchange exchange) {
         return Mono.defer(() -> this.currentFilter != null && this.chain != null
                 ? invokeFilter(this.currentFilter, this.chain, exchange)
                 : out);

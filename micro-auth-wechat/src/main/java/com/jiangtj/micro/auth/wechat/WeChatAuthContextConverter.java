@@ -7,7 +7,7 @@ import com.jiangtj.micro.auth.context.AuthRequest;
 import com.jiangtj.micro.auth.context.Subject;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 

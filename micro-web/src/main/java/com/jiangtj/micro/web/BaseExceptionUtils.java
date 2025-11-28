@@ -1,8 +1,8 @@
 package com.jiangtj.micro.web;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
-import org.springframework.lang.Nullable;
 
 public class BaseExceptionUtils {
 

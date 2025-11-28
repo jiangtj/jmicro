@@ -2,6 +2,7 @@ package com.jiangtj.micro.web.filter;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.jspecify.annotations.Nullable;
 import org.springframework.web.server.WebFilter;
 
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ public class FluentWebFilter {
 
     private final List<FluentWebFilterPath> paths = new ArrayList<>();
     private WebFilter action;
+    @Nullable
     private List<String> exclude;
 
     public FluentWebFilter(WebFilter action) {

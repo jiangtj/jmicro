@@ -2,7 +2,6 @@ package com.jiangtj.micro.web.filter;
 
 import org.springframework.http.HttpMethod;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.lang.NonNull;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ServerWebExchange;
@@ -23,9 +22,8 @@ public class FluentWebFilterRegister implements WebFilter {
         this.filters = filters;
     }
 
-    @NonNull
     @Override
-    public Mono<Void> filter(@NonNull ServerWebExchange exchange, @NonNull WebFilterChain chain) {
+    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
 
         if (request.getMethod() == HttpMethod.OPTIONS) {

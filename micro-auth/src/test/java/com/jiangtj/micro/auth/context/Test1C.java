@@ -1,8 +1,8 @@
 package com.jiangtj.micro.auth.context;
 
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.springframework.core.Ordered;
-import org.springframework.lang.Nullable;
 
 @Slf4j
 public class Test1C implements AuthContextConverter, Ordered {

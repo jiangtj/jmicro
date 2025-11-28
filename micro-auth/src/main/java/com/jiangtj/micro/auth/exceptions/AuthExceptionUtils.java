@@ -2,8 +2,8 @@ package com.jiangtj.micro.auth.exceptions;
 
 import com.jiangtj.micro.web.BaseException;
 import com.jiangtj.micro.web.BaseExceptionUtils;
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpStatus;
-import org.springframework.lang.Nullable;
 
 import java.util.List;
 

@@ -2,9 +2,8 @@ package com.jiangtj.micro.web.aop;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
-import javax.annotation.Nonnull;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -18,7 +17,7 @@ public abstract class AnnotationMethodInterceptorAdvice<A extends Annotation> im
 
     @Override
     @Nullable
-    public Object invoke(@Nonnull MethodInvocation invocation) throws Throwable {
+    public Object invoke(MethodInvocation invocation) throws Throwable {
         Class<A> annotationType = getAnnotationType();
 
         Method method = invocation.getMethod();

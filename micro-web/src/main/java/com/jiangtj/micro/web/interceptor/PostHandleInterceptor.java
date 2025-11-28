@@ -18,7 +18,7 @@ package com.jiangtj.micro.web.interceptor;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -46,7 +46,7 @@ public interface PostHandleInterceptor {
 	 * (can also be {@code null})
 	 * @throws Exception in case of errors
 	 */
-	void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
+	void postHandle(HttpServletRequest request, HttpServletResponse response, @Nullable Object handler,
 			@Nullable ModelAndView modelAndView) throws Exception;
 
 }

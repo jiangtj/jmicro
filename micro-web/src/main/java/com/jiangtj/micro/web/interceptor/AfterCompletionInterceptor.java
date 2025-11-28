@@ -18,7 +18,7 @@ package com.jiangtj.micro.web.interceptor;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 
@@ -45,7 +45,7 @@ public interface AfterCompletionInterceptor {
 	 * include exceptions that have been handled through an exception resolver
 	 * @throws Exception in case of errors
 	 */
-	void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler,
+	void afterCompletion(HttpServletRequest request, HttpServletResponse response, @Nullable Object handler,
 			@Nullable Exception ex) throws Exception;
 
 }

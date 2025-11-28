@@ -1,6 +1,6 @@
 package com.jiangtj.micro.web.aop;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import reactor.core.publisher.Mono;
 
 import java.lang.annotation.Annotation;

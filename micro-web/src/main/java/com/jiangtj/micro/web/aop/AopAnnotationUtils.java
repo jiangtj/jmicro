@@ -1,6 +1,7 @@
 package com.jiangtj.micro.web.aop;
 
 import com.jiangtj.micro.web.AnnotationUtils;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
@@ -9,8 +10,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import org.springframework.lang.Nullable;
 
 public interface AopAnnotationUtils {
 

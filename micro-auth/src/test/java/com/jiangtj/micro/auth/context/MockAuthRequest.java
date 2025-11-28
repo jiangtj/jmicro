@@ -1,8 +1,8 @@
 package com.jiangtj.micro.auth.context;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpMethod;
 import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 
 import java.net.URI;
 import java.util.*;

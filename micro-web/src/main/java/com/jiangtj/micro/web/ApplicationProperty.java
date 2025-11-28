@@ -1,14 +1,15 @@
 package com.jiangtj.micro.web;
 
 import jakarta.annotation.Resource;
+import org.jspecify.annotations.Nullable;
 import org.springframework.core.env.Environment;
-import org.springframework.lang.Nullable;
 
 public class ApplicationProperty {
 
     @Resource
     private Environment environment;
 
+    @Nullable
     private String applicationName;
 
     @Nullable
