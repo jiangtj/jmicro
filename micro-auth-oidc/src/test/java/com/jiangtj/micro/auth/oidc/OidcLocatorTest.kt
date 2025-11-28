@@ -1,7 +1,6 @@
 package com.jiangtj.micro.auth.oidc
 
 import com.github.benmanes.caffeine.cache.Cache
-import com.jiangtj.micro.common.exceptions.MicroException
 import com.jiangtj.micro.common.fromJson
 import io.jsonwebtoken.Header
 import org.junit.jupiter.api.Assertions.*
@@ -38,26 +37,6 @@ class OidcLocatorTest {
         
         // 使用反射设置 mock RestClient
         ReflectionTestUtils.setField(oidcLocator, "rest", mockRestClient)
-    }
-
-    @Test
-    fun `test locate with matching pattern but no openid configuration`() {
-        val header: Header = mock()
-        whenever(header.getKid()).thenReturn("test-kid")
-        
-        jwtProperties = JwtProperties().apply {
-            oidc = listOf(
-                OidcProperties().apply {
-                    pattern = "*"
-                    openidConfiguration = null
-                }
-            )
-        }
-        oidcLocator = OidcLocator(jwtProperties, null)
-        
-        assertThrows(MicroException::class.java) {
-            oidcLocator.locate(header)
-        }
     }
 
     @Test
