@@ -4,8 +4,8 @@ import com.jiangtj.micro.auth.annotations.HasSubject;
 import com.jiangtj.micro.auth.context.Subject;
 import com.jiangtj.micro.auth.core.AuthService;
 import com.jiangtj.micro.web.aop.AnnotationMethodBeforeAdvice;
-import jakarta.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.ObjectProvider;
 
 import java.lang.reflect.Method;
@@ -27,7 +27,7 @@ public class HasSubjectAdvice extends AnnotationMethodBeforeAdvice<HasSubject> {
     }
 
     @Override
-    public void before(List<HasSubject> annotations, Method method, Object[] args, @Nullable Object target) {
+    public void before(List<HasSubject> annotations, Method method, @Nullable Object[] args, @Nullable Object target) {
         for (HasSubject annotation : annotations) {
             Objects.requireNonNull(authService.getIfAvailable()).hasSubject(Subject.builder()
                 .id(annotation.id())

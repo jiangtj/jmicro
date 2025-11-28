@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.aop.MethodBeforeAdvice;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.lang.NonNull;
 
 import java.lang.reflect.Method;
 import java.util.Objects;
@@ -20,7 +19,7 @@ public class HasLoginAdvice implements MethodBeforeAdvice {
     }
 
     @Override
-    public void before(@NonNull Method method, @NonNull Object[] args, @Nullable Object target) throws Throwable {
+    public void before(Method method, @Nullable Object[] args, @Nullable Object target) throws Throwable {
         Objects.requireNonNull(authService.getIfAvailable()).hasLogin();
     }
 }

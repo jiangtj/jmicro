@@ -1,6 +1,7 @@
 package com.jiangtj.micro.auth.context;
 
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.springframework.core.Ordered;
 
@@ -9,7 +10,7 @@ public class Test1C implements AuthContextConverter, Ordered {
 
     @Nullable
     @Override
-    public AuthContext convert(AuthRequest request) {
+    public AuthContext convert(@NonNull AuthRequest request) {
         log.error("1");
         return null;
     }
