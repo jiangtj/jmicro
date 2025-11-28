@@ -1,6 +1,7 @@
 package com.jiangtj.micro.pic.upload.ali;
 
 import lombok.Data;
+import org.jspecify.annotations.Nullable;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Data
@@ -17,7 +18,8 @@ public class AliOSSProperties {
     // 填写Bucket所在地域。以华东1（杭州）为例，Region填写为cn-hangzhou。
     private String region = "cn-hangzhou";
 
+    @Nullable
     private String accessKeyId;
+    @Nullable
     private String secretAccessKey;
-    private String securityToke;
 }

@@ -1,6 +1,7 @@
 package com.jiangtj.micro.pic.upload;
 
 import lombok.Data;
+import org.jspecify.annotations.Nullable;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.unit.DataSize;
 
@@ -34,8 +35,11 @@ public class PicUploadProperties {
     @Data
     public static class Dir {
         private String path;
+        @Nullable
         private String provider;
+        @Nullable
         private DataSize maxFileSize;
+        @Nullable
         private String[] allowedExtensions;
 
         public String resolve(String fileName) {

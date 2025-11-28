@@ -4,7 +4,6 @@ import com.jiangtj.micro.common.utils.FileNameUtils;
 import com.jiangtj.micro.pic.upload.ex.PicUploadCheckException;
 import com.jiangtj.micro.web.AnnotationUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.lang.NonNull;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,7 +37,7 @@ public class PicUploadService {
             if (dir.getMaxFileSize() == null) {
                 dir.setMaxFileSize(properties.getMaxFileSize());
             }
-            if (dir.getAllowedExtensions() == null) {
+            if (dir.getAllowedExtensions() == null  || dir.getAllowedExtensions().length == 0) {
                 dir.setAllowedExtensions(properties.getAllowedExtensions());
             }
         });
@@ -50,7 +49,7 @@ public class PicUploadService {
      * @param file 上传的文件
      * @return 上传结果，包含文件路径等信息
      */
-    public PicUploadResult upload(@NonNull String target, MultipartFile file) {
+    public PicUploadResult upload(String target, MultipartFile file) {
         PicUploadProperties.Dir dir = getDir(target);
 
         // 检查文件是否为空
@@ -59,7 +58,7 @@ public class PicUploadService {
         }
 
         // 检查文件大小
-        if (file.getSize() > dir.getMaxFileSize().toBytes()) {
+        if (dir.getMaxFileSize() != null && file.getSize() > dir.getMaxFileSize().toBytes()) {
             throw new PicUploadCheckException("文件大小超过限制");
         }
 
@@ -78,7 +77,7 @@ public class PicUploadService {
         }
 
         PicUploadResult result = provider.upload(dir, file);
-        result.setOriginalFileName(originalFilename);
+        result.setOriginalFileName(originalFilename == null ? "未知文件" : originalFilename);
         log.info("图片上传成功: {}", result);
         return result;
     }
@@ -93,7 +92,6 @@ public class PicUploadService {
         return Arrays.asList(dir.getAllowedExtensions()).contains(extension.toLowerCase());
     }
 
-    @NonNull
     public PicUploadProperties.Dir getDir(String target) {
         if (!StringUtils.hasText(target)) {
             throw new PicUploadCheckException("请提供上传目标");

@@ -26,7 +26,7 @@ public class AliOSSService implements PicUploadProvider {
     public AliOSSService(AliOSSProperties properties) {
         this.properties = properties;
         try {
-            if (properties.getAccessKeyId() != null) {
+            if (properties.getAccessKeyId() != null && properties.getSecretAccessKey() != null) {
                 credentialsProvider = CredentialsProviderFactory.newDefaultCredentialProvider(properties.getAccessKeyId(), properties.getSecretAccessKey());
             } else {
                 credentialsProvider = CredentialsProviderFactory.newEnvironmentVariableCredentialsProvider();
