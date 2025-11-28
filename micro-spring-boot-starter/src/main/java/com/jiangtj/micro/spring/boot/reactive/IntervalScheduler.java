@@ -3,6 +3,7 @@ package com.jiangtj.micro.spring.boot.reactive;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -25,8 +26,10 @@ public class IntervalScheduler {
 	@Setter
 	private Duration interval;
 
+    @Nullable
 	private Disposable subscription;
 
+    @Nullable
 	private Scheduler scheduler;
 
 	public IntervalScheduler(String name, Function<Long, Mono<Void>> fn) {
