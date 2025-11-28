@@ -4,7 +4,6 @@ import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.jiangtj.micro.auth.oidc.cas.OidcKeyService
 import com.jiangtj.micro.common.JsonUtils
-import com.jiangtj.micro.common.exceptions.MicroException
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.jsonwebtoken.Header
 import io.jsonwebtoken.Locator
@@ -56,7 +55,7 @@ class OidcLocator(private val jwtProperties: JwtProperties, private val oidcKeyS
             if (match(it, kid)) {
                 log.debug { "matched oidc configuration: $it" }
                 val key = handle(
-                    it.openidConfiguration ?: throw MicroException("no openid-configuration"),
+                    it.openidConfiguration,
                     kid
                 )
                 if (key != null) {

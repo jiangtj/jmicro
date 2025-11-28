@@ -5,7 +5,6 @@ import cn.binarywang.wx.miniapp.bean.WxMaJscode2SessionResult;
 import io.jsonwebtoken.Jwts;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.error.WxErrorException;
-import org.springframework.lang.NonNull;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -20,8 +19,7 @@ public class WeChatLoginService {
         this.wxMaService = wxMaService;
     }
 
-    @NonNull
-    public String login(@NonNull String code) throws WxErrorException {
+    public String login(String code) throws WxErrorException {
         WxMaJscode2SessionResult session = wxMaService.getUserService().getSessionInfo(code);
         log.info(session.getSessionKey());
         String openid = session.getOpenid();
