@@ -76,14 +76,14 @@ class OidcEndpointService(
             val nonce = params.getFirst("nonce")
 
             // 验证响应类型 - 只支持授权码模式
-            if (responseType != "code") {
+            /*if (responseType != "code") {
                 return@GET handleAuthorizationError(
                     redirectUri,
                     "unsupported_response_type",
                     "Only 'code' is supported",
                     state
                 )
-            }
+            }*/
 
             // 验证必要参数
             if (redirectUri.isEmpty()) {
