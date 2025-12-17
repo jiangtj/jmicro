@@ -5,10 +5,9 @@
     <parent>
         <groupId>com.jiangtj.micro</groupId>
         <artifactId>jmicro-aggregator</artifactId>
-        <version>0.2.1</version>
+        <version>0.2.2</version>
     </parent>
     <artifactId>micro-web</artifactId>
-    <version>0.2.1</version>
     <name>micro-web</name>
     <description>micro-web</description>
 

@@ -6,7 +6,7 @@
     <groupId>com.jiangtj.micro</groupId>
     <artifactId>micro-dependencies</artifactId>
     <packaging>pom</packaging>
-    <version>0.2.1</version>
+    <version>0.2.2</version>
     <url>https://github.com/jiangtj/jmicro</url>
     <name>micro-dependencies</name>
     <description>JMicro dependencies pom</description>
@@ -36,57 +36,57 @@
             <dependency>
                 <groupId>com.jiangtj.micro</groupId>
                 <artifactId>micro-auth</artifactId>
-                <version>0.2.1</version>
+                <version>0.2.2</version>
             </dependency>
             <dependency>
                 <groupId>com.jiangtj.micro</groupId>
                 <artifactId>micro-auth-wechat</artifactId>
-                <version>0.2.1</version>
+                <version>0.2.2</version>
             </dependency>
             <dependency>
                 <groupId>com.jiangtj.micro</groupId>
                 <artifactId>micro-auth-oidc</artifactId>
-                <version>0.2.1</version>
+                <version>0.2.2</version>
             </dependency>
             <dependency>
                 <groupId>com.jiangtj.micro</groupId>
                 <artifactId>micro-common</artifactId>
-                <version>0.2.1</version>
+                <version>0.2.2</version>
             </dependency>
             <dependency>
                 <groupId>com.jiangtj.micro</groupId>
                 <artifactId>micro-web</artifactId>
-                <version>0.2.1</version>
+                <version>0.2.2</version>
             </dependency>
             <dependency>
                 <groupId>com.jiangtj.micro</groupId>
                 <artifactId>micro-spring-boot-starter</artifactId>
-                <version>0.2.1</version>
+                <version>0.2.2</version>
             </dependency>
             <dependency>
                 <groupId>com.jiangtj.micro</groupId>
                 <artifactId>micro-sql-jooq</artifactId>
-                <version>0.2.1</version>
+                <version>0.2.2</version>
             </dependency>
             <dependency>
                 <groupId>com.jiangtj.micro</groupId>
                 <artifactId>micro-test</artifactId>
-                <version>0.2.1</version>
+                <version>0.2.2</version>
             </dependency>
             <dependency>
                 <groupId>com.jiangtj.micro</groupId>
                 <artifactId>micro-pic-upload-starter</artifactId>
-                <version>0.2.1</version>
+                <version>0.2.2</version>
             </dependency>
             <dependency>
                 <groupId>com.jiangtj.micro</groupId>
                 <artifactId>micro-flyway-starter</artifactId>
-                <version>0.2.1</version>
+                <version>0.2.2</version>
             </dependency>
             <dependency>
                 <groupId>com.jiangtj.micro</groupId>
                 <artifactId>micro-payment</artifactId>
-                <version>0.2.1</version>
+                <version>0.2.2</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
