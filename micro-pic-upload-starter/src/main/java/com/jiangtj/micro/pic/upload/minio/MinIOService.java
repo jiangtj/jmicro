@@ -18,6 +18,7 @@ import java.security.NoSuchAlgorithmException;
 public class MinIOService implements PicUploadProvider {
     private final MinioClient minioClient;
     private final MinIOProperties properties;
+    private boolean isSetBucketPolicy = true;
 
     public MinIOService(MinioClient minioClient, MinIOProperties properties) {
         this.minioClient = minioClient;
@@ -32,14 +33,17 @@ public class MinIOService implements PicUploadProvider {
             if (!found) {
                 log.info("Bucket '{}' not exists, create it.", bucket);
                 minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());
-                if (properties.getIsAllowGetObject()) {
-                    String policy = """
-                        {"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":"*","Action":"s3:GetObject","Resource":"arn:aws:s3:::%s/*"}]}
-                        """.formatted(bucket);
-                    minioClient.setBucketPolicy(SetBucketPolicyArgs.builder().bucket(bucket).config(policy).build());
-                }
             } else {
                 log.debug("Bucket '{}' already exists.", bucket);
+            }
+
+            // 设置允许策略
+            if (properties.getIsAllowGetObject() && isSetBucketPolicy) {
+                String policy = """
+                        {"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":"*","Action":"s3:GetObject","Resource":"arn:aws:s3:::%s/*"}]}
+                        """.formatted(bucket);
+                minioClient.setBucketPolicy(SetBucketPolicyArgs.builder().bucket(bucket).config(policy).build());
+                isSetBucketPolicy = false;
             }
 
             // 上传对象
