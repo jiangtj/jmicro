@@ -28,6 +28,9 @@ class OidcEndpointService(
     fun endpoints(): RouterFunction<ServerResponse> = router {
         // OIDC 发现文档端点
         GET(oidcServerProperties.wellKnown) { request ->
+            if (!oidcServerProperties.isShowWellKnown) {
+                return@GET ServerResponse.notFound().build()
+            }
             val baseUri = URI.create(oidcServerProperties.baseUrl ?: getBaseUrl(request))
             val discoveryDocument = mapOf(
                 "issuer" to baseUri,

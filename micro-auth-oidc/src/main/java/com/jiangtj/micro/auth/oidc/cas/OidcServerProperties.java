@@ -36,6 +36,12 @@ public class OidcServerProperties {
     private String wellKnown = "/oidc/.well-known/openid-configuration";
 
     /**
+     * 是否展示 Well-known 配置端点
+     * 默认值: true
+     */
+    private boolean showWellKnown = true;
+
+    /**
      * JWKS URI 端点
      * 默认值: /oidc/jwks
      */
