@@ -20,7 +20,8 @@ private val log = KotlinLogging.logger {}
 const val ORDER: Int = 10000
 
 @Order(ORDER)
-class OidcLocator(private val jwtProperties: JwtProperties, private val oidcKeyService: OidcKeyService?) : Locator<Key> {
+class OidcLocator(private val jwtProperties: JwtProperties, private val oidcKeyService: OidcKeyService?) :
+    Locator<Key> {
 
     data class OICF(
         val issuer: String,
@@ -54,10 +55,7 @@ class OidcLocator(private val jwtProperties: JwtProperties, private val oidcKeyS
         jwtProperties.oidc.forEach {
             if (match(it, kid)) {
                 log.debug { "matched oidc configuration: $it" }
-                val key = handle(
-                    it.openidConfiguration,
-                    kid
-                )
+                val key = handle(it, kid)
                 if (key != null) {
                     return key
                 }
@@ -84,14 +82,25 @@ class OidcLocator(private val jwtProperties: JwtProperties, private val oidcKeyS
         return false
     }
 
-    fun handle(openidConfiguration: String, kid: String): Key? {
-        val oicf = rest.get().uri(openidConfiguration)
+    fun handle(oidc: OidcProperties, kid: String): Key? {
+        var jwksUri = oidc.jwksUri
+
+        if (jwksUri == null) {
+            val oicf = rest.get().uri(oidc.openidConfiguration)
+                .retrieve()
+                .body<OICF>()
+            log.debug { "oidc configuration: $oicf" }
+            jwksUri = oicf?.jwks_uri
+        }
+
+        if (jwksUri == null) {
+            log.debug { "no jwks_uri for oidc: $oidc" }
+            return null
+        }
+
+        rest.get().uri(jwksUri)
             .retrieve()
-            .body<OICF>()
-        log.debug { "oidc configuration: $oicf" }
-        oicf?.let { rest.get().uri(it.jwks_uri) }
-            ?.retrieve()
-            ?.body<JwksSet>()
+            .body<JwksSet>()
             ?.keys
             ?.forEach { key ->
                 val parse = Jwks.parser().build().parse(JsonUtils.toJson(key))

@@ -1,6 +1,7 @@
 package com.jiangtj.micro.auth.oidc;
 
 import lombok.Data;
+import org.jspecify.annotations.Nullable;
 
 @Data
 public class OidcProperties {
@@ -20,8 +21,17 @@ public class OidcProperties {
     private String pathSeparator = "/";
 
     /**
+     * 存储 JSON Web Key Set (JWKS) 配置信息的 URL。
+     * 优先级：1. jwksUri > 2. openidConfiguration
+     */
+    @Nullable
+    private String jwksUri;
+
+    /**
      * 存储 OpenID Connect 配置信息的 URL。
      * 该 URL 通常指向 OpenID Provider 的 .well-known/openid-configuration 端点，用于获取 OpenID Connect 的相关配置。
+     * 优先级：1. jwksUri > 2. openidConfiguration
      */
+    @Nullable
     private String openidConfiguration;
 }
