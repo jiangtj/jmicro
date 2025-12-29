@@ -85,8 +85,9 @@ class OidcLocator(private val jwtProperties: JwtProperties, private val oidcKeyS
     fun handle(oidc: OidcProperties, kid: String): Key? {
         var jwksUri = oidc.jwksUri
 
-        if (jwksUri == null) {
-            val oicf = rest.get().uri(oidc.openidConfiguration)
+        val openidConfigUri = oidc.openidConfiguration
+        if (jwksUri == null && openidConfigUri != null) {
+            val oicf = rest.get().uri(openidConfigUri)
                 .retrieve()
                 .body<OICF>()
             log.debug { "oidc configuration: $oicf" }

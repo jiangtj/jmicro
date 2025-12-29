@@ -91,7 +91,9 @@ class OidcLocatorTest {
         
         ReflectionTestUtils.setField(oidcLocator, "rest", mockRestClient)
         
-        val result = oidcLocator.handle("https://example.com/.well-known/openid-configuration", "test-kid")
+        val result = oidcLocator.handle(OidcProperties().apply {
+            openidConfiguration = "https://example.com/.well-known/openid-configuration"
+        }, "test-kid")
         
         // 由于 JWKS 解析可能失败，我们验证调用了正确的方法
         verify(mockRestClient, times(2)).get()
@@ -107,7 +109,9 @@ class OidcLocatorTest {
         
         ReflectionTestUtils.setField(oidcLocator, "rest", mockRestClient)
         
-        val result = oidcLocator.handle("https://example.com/.well-known/openid-configuration", "test-kid")
+        val result = oidcLocator.handle(OidcProperties().apply {
+            openidConfiguration = "https://example.com/.well-known/openid-configuration"
+        }, "test-kid")
         
         assertNull(result)
     }
@@ -128,7 +132,9 @@ class OidcLocatorTest {
         
         ReflectionTestUtils.setField(oidcLocator, "rest", mockRestClient)
         
-        val result = oidcLocator.handle("https://example.com/.well-known/openid-configuration", "test-kid")
+        val result = oidcLocator.handle(OidcProperties().apply {
+            openidConfiguration = "https://example.com/.well-known/openid-configuration"
+        }, "test-kid")
         
         assertNull(result)
     }
