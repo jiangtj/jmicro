@@ -6,7 +6,7 @@
     <groupId>com.jiangtj.micro</groupId>
     <artifactId>jmicro-aggregator</artifactId>
     <packaging>pom</packaging>
-    <version>0.2.2</version>
+    <version>0.2.3</version>
     <url>https://github.com/jiangtj/jmicro</url>
     <name>JMicro</name>
     <description>An open-source framework based on Spring Boot, helps you create applications more easily</description>
@@ -14,7 +14,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.0.0</version>
+        <version>4.0.1</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -187,7 +187,7 @@
             <dependency>
                 <groupId>com.googlecode.libphonenumber</groupId>
                 <artifactId>libphonenumber</artifactId>
-                <version>9.0.18</version>
+                <version>9.0.21</version>
             </dependency>
             <dependency>
                 <groupId>org.casbin</groupId>

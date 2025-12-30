@@ -2,10 +2,7 @@ package com.jiangtj.micro.pic.upload.minio;
 
 import com.jiangtj.micro.pic.upload.*;
 import com.jiangtj.micro.pic.upload.ex.PicUploadInternalException;
-import io.minio.BucketExistsArgs;
-import io.minio.MakeBucketArgs;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
+import io.minio.*;
 import io.minio.errors.MinioException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,6 +18,7 @@ import java.security.NoSuchAlgorithmException;
 public class MinIOService implements PicUploadProvider {
     private final MinioClient minioClient;
     private final MinIOProperties properties;
+    private boolean isSetBucketPolicy = true;
 
     public MinIOService(MinioClient minioClient, MinIOProperties properties) {
         this.minioClient = minioClient;
@@ -33,9 +31,19 @@ public class MinIOService implements PicUploadProvider {
         try (InputStream inputStream = file.getInputStream()) {
             boolean found = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucket).build());
             if (!found) {
+                log.info("Bucket '{}' not exists, create it.", bucket);
                 minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());
             } else {
-                log.error("Bucket '{}' already exists.", bucket);
+                log.debug("Bucket '{}' already exists.", bucket);
+            }
+
+            // 设置允许策略
+            if (properties.getIsAllowGetObject() && isSetBucketPolicy) {
+                String policy = """
+                        {"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":"*","Action":"s3:GetObject","Resource":"arn:aws:s3:::%s/*"}]}
+                        """.formatted(bucket);
+                minioClient.setBucketPolicy(SetBucketPolicyArgs.builder().bucket(bucket).config(policy).build());
+                isSetBucketPolicy = false;
             }
 
             // 上传对象
