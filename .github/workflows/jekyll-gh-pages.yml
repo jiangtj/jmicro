@@ -46,9 +46,13 @@ jobs:
           distribution: 'temurin'
           cache: maven
       - name: Install Dependencies Local
-        run: mvn install -P lib
+        run: |
+          chmod +x ./mvnw
+          ./mvnw install -P lib
       - name: Build Maven Site
-        run: mvn site
+        run: |
+          chmod +x ./mvnw
+          ./mvnw site
       - name: Move site to pages artifact dir
         run: |
           mv ./micro-common/target/site ./temp_site/micro-common
