@@ -61,4 +61,6 @@ jobs:
           distribution: 'temurin'
           cache: maven
       - name: Package with Maven
-        run: ./mvnw package -Dmaven.test.skip=true
+        run: |
+          chmod +x ./mvnw
+          ./mvnw package -Dmaven.test.skip=true
