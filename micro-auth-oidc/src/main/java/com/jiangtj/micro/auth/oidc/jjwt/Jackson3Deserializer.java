@@ -21,6 +21,7 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonParser;
 import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.JavaType;
+import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.deser.jdk.UntypedObjectDeserializer;
 import tools.jackson.databind.json.JsonMapper;
@@ -154,8 +155,8 @@ public class Jackson3Deserializer<T> extends AbstractDeserializer<T> {
             String name = parser.currentName();
             if (claimTypeMap != null && name != null && claimTypeMap.containsKey(name)) {
                 Class<?> type = claimTypeMap.get(name);
-                //noinspection resource
-                return parser.readValueAsTree().traverse(parser.objectReadContext()).readValueAs(type);
+                JsonNode node = parser.readValueAsTree();
+                return context.readTreeAsValue(node, type);
             }
             // otherwise default to super
             return super.deserialize(parser, context);

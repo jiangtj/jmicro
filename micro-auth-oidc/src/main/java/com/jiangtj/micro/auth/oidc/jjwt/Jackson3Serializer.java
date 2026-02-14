@@ -17,6 +17,7 @@ package com.jiangtj.micro.auth.oidc.jjwt;
 
 import io.jsonwebtoken.io.AbstractSerializer;
 import io.jsonwebtoken.lang.Assert;
+import tools.jackson.core.StreamReadFeature;
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.JacksonModule;
 import tools.jackson.databind.ObjectWriter;
@@ -24,6 +25,8 @@ import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.module.SimpleModule;
 
 import java.io.OutputStream;
+
+import static tools.jackson.core.StreamWriteFeature.AUTO_CLOSE_TARGET;
 
 /**
  * Serializer using a Jackson {@link tools.jackson.databind.json.JsonMapper}.
@@ -58,6 +61,7 @@ public class Jackson3Serializer<T> extends AbstractSerializer<T> {
     static JsonMapper newObjectMapper() {
         return JsonMapper.builder()
             .addModule(MODULE)
+            .configure(StreamReadFeature.STRICT_DUPLICATE_DETECTION, true) // https://github.com/jwtk/jjwt/issues/877
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false) // https://github.com/jwtk/jjwt/issues/893
             .build();
     }
@@ -86,7 +90,7 @@ public class Jackson3Serializer<T> extends AbstractSerializer<T> {
     @Override
     protected void doSerialize(T t, OutputStream out) {
         Assert.notNull(out, "OutputStream cannot be null.");
-        ObjectWriter writer = this.jsonMapper.writer();
+        ObjectWriter writer = this.jsonMapper.writer().without(AUTO_CLOSE_TARGET);
         writer.writeValue(out, t);
     }
 }
