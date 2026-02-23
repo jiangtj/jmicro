@@ -146,9 +146,18 @@ class OidcEndpointService(
             val code = UUIDUtils.generateBase64Compressed()
             authCodes.put(code, authCode)
 
-            ServerResponse.temporaryRedirect(
-                URI.create("$redirectUri?code=$code${state?.let { "&state=$it" } ?: ""}")
-            ).build()
+            var u = redirectUri
+            if (u.contains("?")) {
+                u += "&"
+            } else {
+                u += "?"
+            }
+            u += "code=$code"
+            if (state != null) {
+                u += "&state=$state"
+            }
+
+            ServerResponse.temporaryRedirect(URI.create(u)).build()
 
         }
 

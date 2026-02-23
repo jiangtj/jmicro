@@ -6,7 +6,7 @@
     <groupId>com.jiangtj.micro</groupId>
     <artifactId>jmicro-aggregator</artifactId>
     <packaging>pom</packaging>
-    <version>0.2.3</version>
+    <version>0.2.4</version>
     <url>https://github.com/jiangtj/jmicro</url>
     <name>JMicro</name>
     <description>An open-source framework based on Spring Boot, helps you create applications more easily</description>
@@ -14,7 +14,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.0.1</version>
+        <version>4.0.2</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -43,10 +43,10 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>17</java.version>
         <casdoor.version>1.15.0</casdoor.version>
-        <wxJava.version>4.7.0</wxJava.version>
+        <wxJava.version>4.8.0</wxJava.version>
         <jjwt.version>0.13.0</jjwt.version>
         <kotlin.version>2.2.21</kotlin.version>
-        <kotlin-logging.version>7.0.13</kotlin-logging.version>
+        <kotlin-logging.version>7.0.14</kotlin-logging.version>
         <mockito-kotlin.version>6.1.0</mockito-kotlin.version>
         <dokka.version>2.1.0</dokka.version>
         <jspecify.version>1.0.0</jspecify.version>
@@ -155,7 +155,7 @@
                     <plugin>
                         <groupId>org.sonatype.central</groupId>
                         <artifactId>central-publishing-maven-plugin</artifactId>
-                        <version>0.9.0</version>
+                        <version>0.10.0</version>
                         <extensions>true</extensions>
                         <configuration>
                             <publishingServerId>central</publishingServerId>

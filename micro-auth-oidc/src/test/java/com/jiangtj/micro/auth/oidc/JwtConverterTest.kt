@@ -1,27 +1,24 @@
 package com.jiangtj.micro.auth.oidc
 
-import com.jiangtj.micro.auth.context.AuthContext
 import com.jiangtj.micro.auth.context.AuthRequest
-import io.jsonwebtoken.*
-import io.jsonwebtoken.security.Keys
-import org.junit.jupiter.api.Test
+import io.github.oshai.kotlinlogging.KotlinLogging
+import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.Locator
 import org.junit.jupiter.api.Assertions.*
-import org.mockito.Mockito.*
+import org.junit.jupiter.api.Test
+import org.mockito.Mockito.`when`
 import org.mockito.kotlin.mock
-import org.springframework.test.util.ReflectionTestUtils
 import java.security.Key
 import java.util.*
 import javax.crypto.SecretKey
 
 class JwtConverterTest {
 
-    private val secretKey: SecretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256)
+    private val log = KotlinLogging.logger {}
+
+    private val secretKey: SecretKey = Jwts.SIG.HS256.key().build()
     
-    private val testLocator = object : Locator<Key> {
-        override fun locate(header: Header): Key? {
-            return if (header.getKid() == "test-key") secretKey else null
-        }
-    }
+    private val testLocator = Locator<Key> { header -> if (header.getKid() == "test-key") secretKey else null }
 
     @Test
     fun `test convert with valid JWT token`() {
@@ -30,17 +27,19 @@ class JwtConverterTest {
         val expiry = Date(now.time + 3600000) // 1小时后过期
         
         val jwt = Jwts.builder()
-            .setSubject("user123")
-            .setIssuer("https://auth.example.com")
-            .setIssuedAt(now)
-            .setExpiration(expiry)
+            .subject("user123")
+            .issuer("https://auth.example.com")
+            .issuedAt(now)
+            .expiration(expiry)
             .claim("preferredUsername", "john_doe")
             .claim("name", "John Doe")
             .claim("picture", "https://example.com/avatar.jpg")
             .claim("type", "user")
-            .setHeaderParam("kid", "test-key")
+            .header().add("kid", "test-key").and()
             .signWith(secretKey)
             .compact()
+
+        log.info { "jwt: $jwt" }
 
         val authRequest: AuthRequest = mock()
         `when`(authRequest.getHeaders("Authorization")).thenReturn(listOf("Bearer $jwt"))
@@ -101,11 +100,11 @@ class JwtConverterTest {
         val expiry = Date(now.time + 3600000)
         
         val jwt = Jwts.builder()
-            .setSubject("user123")
-            .setIssuer("https://auth.example.com")
-            .setIssuedAt(now)
-            .setExpiration(expiry)
-            .setHeaderParam("kid", "unknown-key")
+            .subject("user123")
+            .issuer("https://auth.example.com")
+            .issuedAt(now)
+            .expiration(expiry)
+            .header().add("kid", "unknown-key").and()
             .signWith(secretKey)
             .compact()
 
@@ -126,11 +125,11 @@ class JwtConverterTest {
         val expiry = Date(now.time - 3600000) // 1小时前过期
         
         val jwt = Jwts.builder()
-            .setSubject("user123")
-            .setIssuer("https://auth.example.com")
-            .setIssuedAt(now)
-            .setExpiration(expiry)
-            .setHeaderParam("kid", "test-key")
+            .subject("user123")
+            .issuer("https://auth.example.com")
+            .issuedAt(now)
+            .expiration(expiry)
+            .header().add("kid", "test-key").and()
             .signWith(secretKey)
             .compact()
 
