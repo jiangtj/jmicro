@@ -9,6 +9,10 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +43,28 @@ class FormRuleGeneratorTest {
         private String char1;
         @Email
         private String mail;
+        @Positive
+        private int positiveVal;
+        @PositiveOrZero
+        private int positiveOrZeroVal;
+        @Negative
+        private int negativeVal;
+        @NegativeOrZero
+        private int negativeOrZeroVal;
+        @DecimalMin("10.5")
+        private double decimalMinVal;
+        @DecimalMax("99.9")
+        private double decimalMaxVal;
+        @Digits(integer = 5, fraction = 2)
+        private BigDecimal digitsVal;
+        @Past
+        private LocalDate pastDate;
+        @PastOrPresent
+        private LocalDateTime pastOrPresentDate;
+        @Future
+        private LocalDate futureDate;
+        @FutureOrPresent
+        private Instant futureOrPresentDate;
     }
 
     @Data
@@ -62,6 +88,17 @@ class FormRuleGeneratorTest {
         assertTrue(json.contains("\"arr2\":[{\"type\":\"array\",\"max\":2}]"));
         assertTrue(json.contains("\"char1\":[{\"type\":\"string\",\"min\":3,\"max\":4}]"));
         assertTrue(json.contains("\"mail\":[{\"type\":\"email\"}]"));
+        assertTrue(json.contains("\"positiveVal\":[{\"type\":\"number\",\"min\":1}]"));
+        assertTrue(json.contains("\"positiveOrZeroVal\":[{\"type\":\"number\",\"min\":0}]"));
+        assertTrue(json.contains("\"negativeVal\":[{\"type\":\"number\",\"max\":-1}]"));
+        assertTrue(json.contains("\"negativeOrZeroVal\":[{\"type\":\"number\",\"max\":0}]"));
+        assertTrue(json.contains("\"decimalMinVal\":[{\"type\":\"number\",\"min\":10}]"));
+        assertTrue(json.contains("\"decimalMaxVal\":[{\"type\":\"number\",\"max\":99}]"));
+        assertTrue(json.contains("\"digitsVal\":[{\"type\":\"number\"}]"));
+        assertTrue(json.contains("\"pastDate\":[{\"type\":\"date\"}]"));
+        assertTrue(json.contains("\"pastOrPresentDate\":[{\"type\":\"date\"}]"));
+        assertTrue(json.contains("\"futureDate\":[{\"type\":\"date\"}]"));
+        assertTrue(json.contains("\"futureOrPresentDate\":[{\"type\":\"date\"}]"));
     }
 
     @Test
