@@ -11,6 +11,10 @@ import jakarta.validation.constraints.*
 import lombok.Data
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import java.math.BigDecimal
+import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 private val log = KotlinLogging.logger {}
 
@@ -36,7 +40,29 @@ class FormRuleGeneratorKtTest {
         @field:Size(min = 3, max = 4)
         val char1: String? = null,
         @field:Email
-        val mail: String? = null
+        val mail: String? = null,
+        @field:Positive
+        val positiveVal: Int? = null,
+        @field:PositiveOrZero
+        val positiveOrZeroVal: Int? = null,
+        @field:Negative
+        val negativeVal: Int? = null,
+        @field:NegativeOrZero
+        val negativeOrZeroVal: Int? = null,
+        @field:DecimalMin("10.5")
+        val decimalMinVal: Double? = null,
+        @field:DecimalMax("99.9")
+        val decimalMaxVal: Double? = null,
+        @field:Digits(integer = 5, fraction = 2)
+        val digitsVal: BigDecimal? = null,
+        @field:Past
+        val pastDate: LocalDate? = null,
+        @field:PastOrPresent
+        val pastOrPresentDate: LocalDateTime? = null,
+        @field:Future
+        val futureDate: LocalDate? = null,
+        @field:FutureOrPresent
+        val futureOrPresentDate: Instant? = null
     )
 
     @Data
@@ -60,6 +86,17 @@ class FormRuleGeneratorKtTest {
         Assertions.assertTrue(json.contains("\"arr2\":[{\"type\":\"array\",\"max\":2}]"))
         Assertions.assertTrue(json.contains("\"char1\":[{\"type\":\"string\",\"min\":3,\"max\":4}]"))
         Assertions.assertTrue(json.contains("\"mail\":[{\"type\":\"email\"}]"))
+        Assertions.assertTrue(json.contains("\"positiveVal\":[{\"type\":\"number\",\"min\":1}]"))
+        Assertions.assertTrue(json.contains("\"positiveOrZeroVal\":[{\"type\":\"number\",\"min\":0}]"))
+        Assertions.assertTrue(json.contains("\"negativeVal\":[{\"type\":\"number\",\"max\":-1}]"))
+        Assertions.assertTrue(json.contains("\"negativeOrZeroVal\":[{\"type\":\"number\",\"max\":0}]"))
+        Assertions.assertTrue(json.contains("\"decimalMinVal\":[{\"type\":\"number\",\"min\":10}]"))
+        Assertions.assertTrue(json.contains("\"decimalMaxVal\":[{\"type\":\"number\",\"max\":99}]"))
+        Assertions.assertTrue(json.contains("\"digitsVal\":[{\"type\":\"number\"}]"))
+        Assertions.assertTrue(json.contains("\"pastDate\":[{\"type\":\"date\"}]"))
+        Assertions.assertTrue(json.contains("\"pastOrPresentDate\":[{\"type\":\"date\"}]"))
+        Assertions.assertTrue(json.contains("\"futureDate\":[{\"type\":\"date\"}]"))
+        Assertions.assertTrue(json.contains("\"futureOrPresentDate\":[{\"type\":\"date\"}]"))
     }
 
     @Test

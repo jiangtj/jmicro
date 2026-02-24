@@ -132,6 +132,67 @@ object FormRuleGenerator {
                 setField = true
             }
 
+            field.getAnnotation(Positive::class.java)?.let {
+                rule.type = "number"
+                rule.min = 1
+                setField = true
+            }
+
+            field.getAnnotation(PositiveOrZero::class.java)?.let {
+                rule.type = "number"
+                rule.min = 0
+                setField = true
+            }
+
+            field.getAnnotation(Negative::class.java)?.let {
+                rule.type = "number"
+                rule.max = -1
+                setField = true
+            }
+
+            field.getAnnotation(NegativeOrZero::class.java)?.let {
+                rule.type = "number"
+                rule.max = 0
+                setField = true
+            }
+
+            field.getAnnotation(DecimalMin::class.java)?.let {
+                rule.type = "number"
+                rule.min = it.value.toDouble().toInt()
+                setField = true
+            }
+
+            field.getAnnotation(DecimalMax::class.java)?.let {
+                rule.type = "number"
+                rule.max = it.value.toDouble().toInt()
+                setField = true
+            }
+
+            field.getAnnotation(Digits::class.java)?.let {
+                rule.type = "number"
+                setField = true
+            }
+
+            field.getAnnotation(Past::class.java)?.let {
+                rule.type = "date"
+                setField = true
+            }
+
+            field.getAnnotation(PastOrPresent::class.java)?.let {
+                rule.type = "date"
+                setField = true
+            }
+
+            field.getAnnotation(Future::class.java)?.let {
+                rule.type = "date"
+                setField = true
+            }
+
+            field.getAnnotation(FutureOrPresent::class.java)?.let {
+                rule.type = "date"
+                setField = true
+            }
+
             field.getAnnotation(MinLength::class.java)?.let {
                 rule.type = "string"
                 rule.min = it.value
