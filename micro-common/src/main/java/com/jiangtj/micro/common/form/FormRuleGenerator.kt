@@ -1,12 +1,11 @@
 package com.jiangtj.micro.common.form
 
-import com.jiangtj.micro.common.form.handler.MobilePhoneHandler
-import com.jiangtj.micro.common.form.handler.PatternHandler
+import com.jiangtj.micro.common.form.handler.*
 import com.jiangtj.micro.common.utils.ListUtils.isList
-import com.jiangtj.micro.common.validation.MaxLength
-import com.jiangtj.micro.common.validation.MinLength
 import jakarta.validation.Valid
-import jakarta.validation.constraints.*
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotEmpty
+import jakarta.validation.constraints.NotNull
 import tools.jackson.module.kotlin.isKotlinClass
 import java.lang.reflect.Field
 import java.lang.reflect.ParameterizedType
@@ -28,6 +27,23 @@ object FormRuleGenerator {
     init {
         addHandler(PatternHandler())
         addHandler(MobilePhoneHandler())
+        addHandler(MinHandler())
+        addHandler(MaxHandler())
+        addHandler(SizeHandler())
+        addHandler(EmailHandler())
+        addHandler(PositiveHandler())
+        addHandler(PositiveOrZeroHandler())
+        addHandler(NegativeHandler())
+        addHandler(NegativeOrZeroHandler())
+        addHandler(DecimalMinHandler())
+        addHandler(DecimalMaxHandler())
+        addHandler(DigitsHandler())
+        addHandler(PastHandler())
+        addHandler(PastOrPresentHandler())
+        addHandler(FutureHandler())
+        addHandler(FutureOrPresentHandler())
+        addHandler(MinLengthHandler())
+        addHandler(MaxLengthHandler())
     }
 
     /**
@@ -62,7 +78,6 @@ object FormRuleGenerator {
         val fields = clazz.getDeclaredFields()
         val isKt = clazz.isKotlinClass()
         for (field in fields) {
-            val rules: MutableList<FormRule> = mutableListOf()
             var setField = false
             val rule = FormRule()
 
@@ -102,112 +117,6 @@ object FormRuleGenerator {
                 setField = true
             }
 
-            field.getAnnotation(Min::class.java)?.let {
-                rule.type = "number"
-                rule.min = it.value.toInt()
-                setField = true
-            }
-
-            field.getAnnotation(Max::class.java)?.let {
-                rule.type = "number"
-                rule.max = it.value.toInt()
-                setField = true
-            }
-
-            field.getAnnotation(Size::class.java)?.let {
-                if (type.isAssignableFrom(CharSequence::class.java)) {
-                    rule.type = "string"
-                }
-                if (isList(type)) {
-                    rule.type = "array"
-                }
-                if (it.min != 0) {
-                    rule.min = it.min
-                }
-                if (it.max != Int.MAX_VALUE) {
-                    rule.max = it.max
-                }
-                setField = true
-            }
-
-            field.getAnnotation(Email::class.java)?.let {
-                rule.type = "email"
-                setField = true
-            }
-
-            field.getAnnotation(Positive::class.java)?.let {
-                rule.type = "number"
-                rule.min = 1
-                setField = true
-            }
-
-            field.getAnnotation(PositiveOrZero::class.java)?.let {
-                rule.type = "number"
-                rule.min = 0
-                setField = true
-            }
-
-            field.getAnnotation(Negative::class.java)?.let {
-                rule.type = "number"
-                rule.max = -1
-                setField = true
-            }
-
-            field.getAnnotation(NegativeOrZero::class.java)?.let {
-                rule.type = "number"
-                rule.max = 0
-                setField = true
-            }
-
-            field.getAnnotation(DecimalMin::class.java)?.let {
-                rule.type = "number"
-                rule.min = it.value.toDouble().toInt()
-                setField = true
-            }
-
-            field.getAnnotation(DecimalMax::class.java)?.let {
-                rule.type = "number"
-                rule.max = it.value.toDouble().toInt()
-                setField = true
-            }
-
-            field.getAnnotation(Digits::class.java)?.let {
-                rule.type = "number"
-                setField = true
-            }
-
-            field.getAnnotation(Past::class.java)?.let {
-                rule.type = "date"
-                setField = true
-            }
-
-            field.getAnnotation(PastOrPresent::class.java)?.let {
-                rule.type = "date"
-                setField = true
-            }
-
-            field.getAnnotation(Future::class.java)?.let {
-                rule.type = "date"
-                setField = true
-            }
-
-            field.getAnnotation(FutureOrPresent::class.java)?.let {
-                rule.type = "date"
-                setField = true
-            }
-
-            field.getAnnotation(MinLength::class.java)?.let {
-                rule.type = "string"
-                rule.min = it.value
-                setField = true
-            }
-
-            field.getAnnotation(MaxLength::class.java)?.let {
-                rule.type = "string"
-                rule.max = it.value
-                setField = true
-            }
-
             if (isKt) {
                 val kProperty = field.kotlinProperty
                 if (kProperty != null) {
@@ -218,14 +127,22 @@ object FormRuleGenerator {
                 }
             }
 
+            val rules: MutableList<FormRule> = mutableListOf()
+
             if (setField) {
                 if (rule.type == null && type.isAssignableFrom(String::class.java)) {
                     rule.type = "string"
                 }
-                rules.add(rule)
+                if (rule.required != null) {
+                    rules.add(rule)
+                }
             }
 
             handle(field, rules)
+
+            if (setField && rules.isEmpty()) {
+                rules.add(rule)
+            }
 
             field.getAnnotation(Valid::class.java)?.let {
                 val validRule = FormRule()
