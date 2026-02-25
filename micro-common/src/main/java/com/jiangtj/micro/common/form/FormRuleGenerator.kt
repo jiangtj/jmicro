@@ -1,5 +1,8 @@
 package com.jiangtj.micro.common.form
 
+import com.jiangtj.micro.common.form.handler.MobilePhoneHandler
+import com.jiangtj.micro.common.form.handler.PatternHandler
+import com.jiangtj.micro.common.utils.ListUtils.isList
 import com.jiangtj.micro.common.validation.MaxLength
 import com.jiangtj.micro.common.validation.MinLength
 import jakarta.validation.Valid
@@ -247,10 +250,6 @@ object FormRuleGenerator {
 
         cache[clazz.getName()] = map
         return map
-    }
-
-    private fun isList(type: Class<*>): Boolean {
-        return type.isArray || MutableCollection::class.java.isAssignableFrom(type)
     }
 
     private fun handle(field: Field, rules: MutableList<FormRule>) {

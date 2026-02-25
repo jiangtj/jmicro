@@ -1,5 +1,7 @@
-package com.jiangtj.micro.common.form
+package com.jiangtj.micro.common.form.handler
 
+import com.jiangtj.micro.common.form.FormRule
+import com.jiangtj.micro.common.form.FormRuleHandler
 import jakarta.validation.constraints.Pattern
 import java.lang.reflect.Field
 
@@ -22,4 +24,3 @@ class PatternHandler : FormRuleHandler<Pattern> {
         return rule
     }
 }
-
