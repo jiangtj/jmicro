@@ -54,7 +54,6 @@ private val locker = Any()
  * RandomStringUtils.get(0)  // 返回空字符串 ""
  * ```
  */
-@JvmStatic
 fun get(size: Int): String {
     val src = SRC_NUMBER + SRC_UPPER
     return buildString(size) {
@@ -79,7 +78,6 @@ fun get(size: Int): String {
  * RandomStringUtils.get("")              // 返回空字符串 ""
  * ```
  */
-@JvmStatic
 fun get(format: String): String {
     return get(format, ESC_CHAR)
 }
@@ -96,7 +94,6 @@ fun get(format: String): String {
  * RandomStringUtils.get("test-###-test", '#') // 返回类似 "test-A3B-test" 的字符串
  * ```
  */
-@JvmStatic
 fun get(format: String, esc: Char): String {
     return get(SRC_NUMBER + SRC_UPPER, format, esc)
 }
@@ -114,7 +111,6 @@ fun get(format: String, esc: Char): String {
  * RandomStringUtils.get("abc", "a?b?c", '?') // 返回类似 "aXbYc" 的字符串，X和Y从"abc"中选取
  * ```
  */
-@JvmStatic
 fun get(source: String, format: String, esc: Char): String {
     return buildString(format.length) {
         for (char in format) {
@@ -139,7 +135,6 @@ fun get(source: String, format: String, esc: Char): String {
  * RandomStringUtils.getNum(0) // 返回空字符串 ""
  * ```
  */
-@JvmStatic
 fun getNum(size: Int): String {
     return buildString(size) {
         repeat(size) {
@@ -159,7 +154,6 @@ fun getNum(size: Int): String {
  * RandomStringUtils.getNum("SN-??-??") // 返回类似 "SN-38-47" 的字符串
  * ```
  */
-@JvmStatic
 fun getNum(format: String): String {
     return getNum(format, ESC_CHAR)
 }
@@ -176,7 +170,6 @@ fun getNum(format: String): String {
  * RandomStringUtils.getNum("SN-##-##", '#') // 返回类似 "SN-38-47" 的字符串
  * ```
  */
-@JvmStatic
 fun getNum(format: String, esc: Char): String {
     return get(SRC_NUMBER, format, esc)
 }
@@ -193,7 +186,6 @@ fun getNum(format: String, esc: Char): String {
  * RandomStringUtils.getHex(0) // 返回空字符串 ""
  * ```
  */
-@JvmStatic
 fun getHex(size: Int): String {
     return buildString(size) {
         repeat(size) {
@@ -213,7 +205,6 @@ fun getHex(size: Int): String {
  * RandomStringUtils.getHex("0x????") // 返回类似 "0xA3F7" 的字符串
  * ```
  */
-@JvmStatic
 fun getHex(format: String): String {
     return getHex(format, ESC_CHAR)
 }
@@ -230,7 +221,6 @@ fun getHex(format: String): String {
  * RandomStringUtils.getHex("0x####", '#') // 返回类似 "0xA3F7" 的字符串
  * ```
  */
-@JvmStatic
 fun getHex(format: String, esc: Char): String {
     return get(SRC_HEX_UPPER, format, esc)
 }
@@ -261,7 +251,6 @@ private fun getRandomChar(src: String): String {
  * RandomStringUtils.getNextVal() // 返回类似 "20240115123045123123456789" 的字符串
  * ```
  */
-@JvmStatic
 fun getNextVal(): String {
     synchronized(locker) {
         val formatDate = SimpleDateFormat("yyyyMMddHHmmssSSS")
@@ -286,7 +275,6 @@ fun getNextVal(): String {
  * RandomStringUtils.subStringByLength("", 3)           // 返回 []
  * ```
  */
-@JvmStatic
 fun subStringByLength(inputString: String, length: Int): List<String> {
     if (inputString.isEmpty()) {
         return emptyList()
@@ -295,7 +283,7 @@ fun subStringByLength(inputString: String, length: Int): List<String> {
     if (inputString.length % length != 0) {
         size++
     }
-    return subStringByLengthAndSize(inputString, length, size)
+    return subStringByLengthAndSize(inputString, length, size).filterNotNull()
 }
 
 /**
@@ -314,7 +302,6 @@ fun subStringByLength(inputString: String, length: Int): List<String> {
  * RandomStringUtils.subStringByLengthAndSize("123456", 3, 3)    // 返回 ["123", "456", null]
  * ```
  */
-@JvmStatic
 fun subStringByLengthAndSize(inputString: String, length: Int, size: Int): List<String?> {
     return List(size) { index ->
         substring(inputString, index * length, (index + 1) * length)
@@ -338,7 +325,6 @@ fun subStringByLengthAndSize(inputString: String, length: Int, size: Int): List<
  * RandomStringUtils.substring("12345", 3, 8)  // 返回 "45"
  * ```
  */
-@JvmStatic
 fun substring(str: String, f: Int, t: Int): String? {
     if (f >= str.length) {
         return null
