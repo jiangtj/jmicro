@@ -12,7 +12,7 @@ class SizeHandler : FormRuleHandler<Size> {
     override fun handle(field: Field, element: Size): FormRule {
         val rule = FormRule()
         val type = field.type
-        if (type.isAssignableFrom(CharSequence::class.java)) {
+        if (CharSequence::class.java.isAssignableFrom(type)) {
             rule.type = "string"
         }
         if (isList(type)) {

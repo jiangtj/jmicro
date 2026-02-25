@@ -78,7 +78,6 @@ object FormRuleGenerator {
         val fields = clazz.getDeclaredFields()
         val isKt = clazz.isKotlinClass()
         for (field in fields) {
-            val rules: MutableList<FormRule> = mutableListOf()
             var setField = false
             val rule = FormRule()
 
@@ -128,14 +127,22 @@ object FormRuleGenerator {
                 }
             }
 
+            val rules: MutableList<FormRule> = mutableListOf()
+
             if (setField) {
                 if (rule.type == null && type.isAssignableFrom(String::class.java)) {
                     rule.type = "string"
                 }
-                rules.add(rule)
+                if (rule.required != null) {
+                    rules.add(rule)
+                }
             }
 
             handle(field, rules)
+
+            if (setField && rules.isEmpty()) {
+                rules.add(rule)
+            }
 
             field.getAnnotation(Valid::class.java)?.let {
                 val validRule = FormRule()
