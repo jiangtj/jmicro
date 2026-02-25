@@ -21,26 +21,13 @@ import java.util.Date
  * @since 1.0.0
  */
 
-/** 数字字符集 */
-private const val SRC_NUMBER = "0123456789"
-
-/** 小写字母字符集 */
-private const val SRC_LOWER = "abcdefghijklmnopqrstuvwxyz"
-
-/** 大写字母字符集 */
-private val SRC_UPPER = SRC_LOWER.uppercase()
-
-/** 小写十六进制字符集 */
-private const val SRC_HEX_LOWER = "0123456789abcdef"
-
-/** 大写十六进制字符集 */
-private val SRC_HEX_UPPER = SRC_HEX_LOWER.uppercase()
-
-/** 默认占位符字符 */
-private const val ESC_CHAR = '?'
-
-/** 用于 getNextVal() 方法的同步锁对象 */
-private val locker = Any()
+private const val NUMERIC_CHARS = "0123456789"
+private const val LOWERCASE_LETTERS = "abcdefghijklmnopqrstuvwxyz"
+private val UPPERCASE_LETTERS = LOWERCASE_LETTERS.uppercase()
+private const val HEX_LOWERCASE_CHARS = "0123456789abcdef"
+private val HEX_UPPERCASE_CHARS = HEX_LOWERCASE_CHARS.uppercase()
+private const val PLACEHOLDER_CHAR = '?'
+private val LOCK = Any()
 
 /**
  * 生成指定长度的随机字符串（包含数字和大写字母）
@@ -55,7 +42,7 @@ private val locker = Any()
  * ```
  */
 fun get(size: Int): String {
-    val src = SRC_NUMBER + SRC_UPPER
+    val src = NUMERIC_CHARS + UPPERCASE_LETTERS
     return buildString(size) {
         repeat(size) {
             append(getRandomChar(src))
@@ -79,7 +66,7 @@ fun get(size: Int): String {
  * ```
  */
 fun get(format: String): String {
-    return get(format, ESC_CHAR)
+    return get(format, PLACEHOLDER_CHAR)
 }
 
 /**
@@ -95,7 +82,7 @@ fun get(format: String): String {
  * ```
  */
 fun get(format: String, esc: Char): String {
-    return get(SRC_NUMBER + SRC_UPPER, format, esc)
+    return get(NUMERIC_CHARS + UPPERCASE_LETTERS, format, esc)
 }
 
 /**
@@ -138,7 +125,7 @@ fun get(source: String, format: String, esc: Char): String {
 fun getNum(size: Int): String {
     return buildString(size) {
         repeat(size) {
-            append(getRandomChar(SRC_NUMBER))
+            append(getRandomChar(NUMERIC_CHARS))
         }
     }
 }
@@ -155,7 +142,7 @@ fun getNum(size: Int): String {
  * ```
  */
 fun getNum(format: String): String {
-    return getNum(format, ESC_CHAR)
+    return getNum(format, PLACEHOLDER_CHAR)
 }
 
 /**
@@ -171,7 +158,7 @@ fun getNum(format: String): String {
  * ```
  */
 fun getNum(format: String, esc: Char): String {
-    return get(SRC_NUMBER, format, esc)
+    return get(NUMERIC_CHARS, format, esc)
 }
 
 /**
@@ -189,7 +176,7 @@ fun getNum(format: String, esc: Char): String {
 fun getHex(size: Int): String {
     return buildString(size) {
         repeat(size) {
-            append(getRandomChar(SRC_HEX_UPPER))
+            append(getRandomChar(HEX_UPPERCASE_CHARS))
         }
     }
 }
@@ -206,7 +193,7 @@ fun getHex(size: Int): String {
  * ```
  */
 fun getHex(format: String): String {
-    return getHex(format, ESC_CHAR)
+    return getHex(format, PLACEHOLDER_CHAR)
 }
 
 /**
@@ -222,7 +209,7 @@ fun getHex(format: String): String {
  * ```
  */
 fun getHex(format: String, esc: Char): String {
-    return get(SRC_HEX_UPPER, format, esc)
+    return get(HEX_UPPERCASE_CHARS, format, esc)
 }
 
 /**
@@ -252,7 +239,7 @@ private fun getRandomChar(src: String): String {
  * ```
  */
 fun getNextVal(): String {
-    synchronized(locker) {
+    synchronized(LOCK) {
         val formatDate = SimpleDateFormat("yyyyMMddHHmmssSSS")
         return formatDate.format(Date()) +
                 Math.round(Math.random() * 899999999 + 100000000)
