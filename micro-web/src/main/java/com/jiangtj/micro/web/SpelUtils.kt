@@ -12,8 +12,10 @@ object SpelUtils {
         val parameters = method.parameters
         for (i in parameters.indices) {
             val parameter = parameters[i]
-            val arg = args[i]
+            val arg = args.getOrNull(i)
             context.setVariable(parameter.name, arg)
+            context.setVariable("p$i", arg)
+            context.setVariable("a$i", arg)
         }
         return context
     }
