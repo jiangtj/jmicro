@@ -1,134 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.1.0 http://maven.apache.org/xsd/maven-4.1.0.xsd">
+    <modelVersion>4.1.0</modelVersion>
 
-    <groupId>com.jiangtj.micro</groupId>
+    <parent/>
     <artifactId>micro-dependencies</artifactId>
-    <packaging>pom</packaging>
-    <version>0.2.4</version>
-    <url>https://github.com/jiangtj/jmicro</url>
+    <packaging>bom</packaging>
     <name>micro-dependencies</name>
     <description>JMicro dependencies pom</description>
-
-    <licenses>
-        <license>
-            <name>GNU Lesser General Public License v2.1</name>
-            <url>https://raw.githubusercontent.com/jiangtj/jmicro/master/LICENSE</url>
-        </license>
-    </licenses>
-
-    <developers>
-        <developer>
-            <name>Mr.J</name>
-            <email>116749895@qq.com</email>
-        </developer>
-    </developers>
-
-    <scm>
-        <connection>scm:git:git://github.com/jiangtj/jmicro.git</connection>
-        <developerConnection>scm:git:ssh://github.com:jiangtj/jmicro.git</developerConnection>
-        <url>https://github.com/jiangtj/jmicro/tree/master</url>
-    </scm>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>com.jiangtj.micro</groupId>
                 <artifactId>micro-auth</artifactId>
-                <version>0.2.4</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.jiangtj.micro</groupId>
                 <artifactId>micro-auth-wechat</artifactId>
-                <version>0.2.4</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.jiangtj.micro</groupId>
                 <artifactId>micro-auth-oidc</artifactId>
-                <version>0.2.4</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.jiangtj.micro</groupId>
                 <artifactId>micro-common</artifactId>
-                <version>0.2.4</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.jiangtj.micro</groupId>
                 <artifactId>micro-web</artifactId>
-                <version>0.2.4</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.jiangtj.micro</groupId>
                 <artifactId>micro-spring-boot-starter</artifactId>
-                <version>0.2.4</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.jiangtj.micro</groupId>
                 <artifactId>micro-sql-jooq</artifactId>
-                <version>0.2.4</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.jiangtj.micro</groupId>
                 <artifactId>micro-test</artifactId>
-                <version>0.2.4</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.jiangtj.micro</groupId>
                 <artifactId>micro-pic-upload-starter</artifactId>
-                <version>0.2.4</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.jiangtj.micro</groupId>
                 <artifactId>micro-flyway-starter</artifactId>
-                <version>0.2.4</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.jiangtj.micro</groupId>
                 <artifactId>micro-payment</artifactId>
-                <version>0.2.4</version>
+                <version>${project.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-    <profiles>
-        <profile>
-            <id>central</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>3.2.8</version>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <!-- Prevent gpg from using pinentry programs -->
-                            <gpgArguments>
-                                <arg>--pinentry-mode</arg>
-                                <arg>loopback</arg>
-                            </gpgArguments>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.sonatype.central</groupId>
-                        <artifactId>central-publishing-maven-plugin</artifactId>
-                        <version>0.10.0</version>
-                        <extensions>true</extensions>
-                        <configuration>
-                            <publishingServerId>central</publishingServerId>
-                            <autoPublish>true</autoPublish>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>
