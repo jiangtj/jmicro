@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.1.0 http://maven.apache.org/xsd/maven-4.1.0.xsd">
+    <modelVersion>4.1.0</modelVersion>
 
     <groupId>com.jiangtj.micro</groupId>
     <artifactId>jmicro-aggregator</artifactId>
@@ -169,13 +169,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>com.jiangtj.micro</groupId>
-                <artifactId>micro-dependencies</artifactId>
-                <version>0.2.4</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
             <dependency>
                 <groupId>org.jspecify</groupId>
                 <artifactId>jspecify</artifactId>

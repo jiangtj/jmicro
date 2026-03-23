@@ -33,7 +33,9 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Test with Maven
-      run: mvn test
+      run: |
+        chmod +x ./mvnw
+        ./mvnw test
     - name: Publish Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2
       if: always()
@@ -59,4 +61,6 @@ jobs:
           distribution: 'temurin'
           cache: maven
       - name: Package with Maven
-        run: mvn package -Dmaven.test.skip=true
+        run: |
+          chmod +x ./mvnw
+          ./mvnw package -Dmaven.test.skip=true
