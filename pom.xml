@@ -14,7 +14,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.0.4</version>
+        <version>4.0.5</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -45,10 +45,10 @@
         <casdoor.version>1.15.0</casdoor.version>
         <wxJava.version>4.8.0</wxJava.version>
         <jjwt.version>0.13.0</jjwt.version>
-        <kotlin.version>2.2.21</kotlin.version>
+        <kotlin.version>2.3.20</kotlin.version>
         <kotlin-logging.version>8.0.01</kotlin-logging.version>
-        <mockito-kotlin.version>6.2.3</mockito-kotlin.version>
-        <dokka.version>2.1.0</dokka.version>
+        <mockito-kotlin.version>6.3.0</mockito-kotlin.version>
+        <dokka.version>2.2.0</dokka.version>
         <jspecify.version>1.0.0</jspecify.version>
         <!-- <maven.test.skip>true</maven.test.skip> -->
     </properties>
