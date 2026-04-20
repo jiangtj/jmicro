@@ -3,6 +3,7 @@ package com.jiangtj.micro.sql.jooq.dao.kt
 import com.jiangtj.micro.sql.jooq.PageUtils
 import com.jiangtj.micro.sql.jooq.QueryUtils
 import org.jooq.*
+import org.jooq.impl.DAOImpl
 import org.jooq.impl.DSL
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
@@ -119,3 +120,8 @@ class ResultStep<R : Record>(val ctx: PageContext<R>) {
         return PageImpl(result.first, ctx.pageable!!, result.second.toLong())
     }
 }
+
+/**
+ * 为 DAOImpl 添加 fetchPage 方法，简化分页查询的使用。
+ */
+fun <T : UpdatableRecord<T>, PO, PK> DAOImpl<T, PO, PK>.fetchPage() = this.ctx().selectPage(this.table)
