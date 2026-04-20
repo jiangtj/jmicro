@@ -55,7 +55,6 @@ jobs:
           mv ./micro-web/target/site ./temp_site/micro-web
           mv ./micro-auth/target/site ./temp_site/micro-auth
           mv ./micro-auth-oidc/target/site ./temp_site/micro-auth-oidc
-          mv ./micro-auth-wechat/target/site ./temp_site/micro-auth-wechat
           mv ./micro-spring-boot-starter/target/site ./temp_site/micro-spring-boot-starter
           mv ./micro-sql-jooq/target/site ./temp_site/micro-sql-jooq
           mv ./micro-test/target/site ./temp_site/micro-test
@@ -68,7 +67,6 @@ jobs:
           mv ./micro-web/target/dokka ./temp_site/micro-web
           mv ./micro-auth/target/dokka ./temp_site/micro-auth
           mv ./micro-auth-oidc/target/dokka ./temp_site/micro-auth-oidc
-          mv ./micro-auth-wechat/target/dokka ./temp_site/micro-auth-wechat
           mv ./micro-spring-boot-starter/target/dokka ./temp_site/micro-spring-boot-starter
           mv ./micro-sql-jooq/target/dokka ./temp_site/micro-sql-jooq
           mv ./micro-test/target/dokka ./temp_site/micro-test

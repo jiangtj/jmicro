@@ -43,7 +43,6 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>17</java.version>
         <casdoor.version>1.15.0</casdoor.version>
-        <wxJava.version>4.8.0</wxJava.version>
         <jjwt.version>0.13.0</jjwt.version>
         <kotlin.version>2.3.20</kotlin.version>
         <kotlin-logging.version>8.0.01</kotlin-logging.version>
@@ -98,7 +97,6 @@
                 <module>micro-common</module>
                 <module>micro-web</module>
                 <module>micro-auth</module>
-                <module>micro-auth-wechat</module>
                 <module>micro-auth-oidc</module>
                 <module>micro-spring-boot-starter</module>
                 <module>micro-sql-jooq</module>
@@ -200,31 +198,6 @@
                 <groupId>org.casbin</groupId>
                 <artifactId>casdoor-spring-boot-starter</artifactId>
                 <version>${casdoor.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.binarywang</groupId>
-                <artifactId>weixin-java-miniapp</artifactId>
-                <version>${wxJava.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.binarywang</groupId>
-                <artifactId>weixin-java-open</artifactId>
-                <version>${wxJava.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.binarywang</groupId>
-                <artifactId>weixin-java-pay</artifactId>
-                <version>${wxJava.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.binarywang</groupId>
-                <artifactId>weixin-java-mp</artifactId>
-                <version>${wxJava.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.binarywang</groupId>
-                <artifactId>weixin-java-cp</artifactId>
-                <version>${wxJava.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.jsonwebtoken</groupId>

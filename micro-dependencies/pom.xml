@@ -40,11 +40,6 @@
             </dependency>
             <dependency>
                 <groupId>com.jiangtj.micro</groupId>
-                <artifactId>micro-auth-wechat</artifactId>
-                <version>0.2.5</version>
-            </dependency>
-            <dependency>
-                <groupId>com.jiangtj.micro</groupId>
                 <artifactId>micro-auth-oidc</artifactId>
                 <version>0.2.5</version>
             </dependency>
