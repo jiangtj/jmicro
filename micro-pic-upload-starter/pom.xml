@@ -30,6 +30,12 @@
             <version>8.5.17</version>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3</artifactId>
+            <version>2.25.27</version>
+            <optional>true</optional>
+        </dependency>
 
         <dependency>
             <groupId>com.jiangtj.micro</groupId>
