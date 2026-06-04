@@ -18,7 +18,7 @@ import java.util.List;
 import static com.jiangtj.micro.sql.jooq.jooq.tables.SystemUser.SYSTEM_USER;
 import static org.jooq.impl.DSL.condition;
 import static org.jooq.impl.DSL.field;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 class PageUtilsTest {
@@ -91,5 +91,31 @@ class PageUtilsTest {
             .pageable(pageable)
             .subscribe(Flux::from, Mono::from)
             .map(PageReactiveUtils.toPage(SystemUser.class));*/
+    }
+
+    @Test
+    void convertSortProperty() {
+        String source = "userName-id.version";
+        assertAll(
+                () -> assertEquals("userName-id.version", PageUtils.convertSortProperty(source, SortPropertyStyle.ORIGINAL)),
+                () -> assertEquals("userNameIdVersion", PageUtils.convertSortProperty(source, SortPropertyStyle.CAMEL)),
+                () -> assertEquals("UserNameIdVersion", PageUtils.convertSortProperty(source, SortPropertyStyle.PASCAL)),
+                () -> assertEquals("user_name_id_version", PageUtils.convertSortProperty(source, SortPropertyStyle.SNAKE_LOWER)),
+                () -> assertEquals("USER_NAME_ID_VERSION", PageUtils.convertSortProperty(source, SortPropertyStyle.SNAKE_UPPER)),
+                () -> assertEquals("user-name-id-version", PageUtils.convertSortProperty(source, SortPropertyStyle.KEBAB_LOWER)),
+                () -> assertEquals("USER-NAME-ID-VERSION", PageUtils.convertSortProperty(source, SortPropertyStyle.KEBAB_UPPER)),
+                () -> assertEquals("usernameidversion", PageUtils.convertSortProperty(source, SortPropertyStyle.LOWER)),
+                () -> assertEquals("USERNAMEIDVERSION", PageUtils.convertSortProperty(source, SortPropertyStyle.UPPER))
+        );
+    }
+
+    @Test
+    void limitStepWithSortPropertyStyle() {
+        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "userName"));
+        PageUtils.LimitStep<Record1<SystemUserRecord>> step = PageUtils.selectFrom(create, SYSTEM_USER)
+                .conditions(condition("1 = 1"))
+                .pageable(pageable, SortPropertyStyle.SNAKE_LOWER);
+
+        assertTrue(step.listStep().getSQL().toLowerCase().contains("user_name"));
     }
 }
