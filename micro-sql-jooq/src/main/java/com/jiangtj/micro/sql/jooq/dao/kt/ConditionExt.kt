@@ -1,11 +1,7 @@
 package com.jiangtj.micro.sql.jooq.dao.kt
 
 import com.jiangtj.micro.common.exceptions.MicroProblemDetailException
-import org.jooq.Condition
-import org.jooq.Field
-import org.jooq.SelectConditionStep
-import org.jooq.TableField
-import org.jooq.TableRecord
+import org.jooq.*
 import org.jooq.impl.DSL
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -69,7 +65,7 @@ private fun <T : ChronoLocalDate> validateDateRange(dates: List<T>): Pair<T, T> 
  * @throws MicroProblemDetailException 当日期列表为空或长度不为 2 时抛出该异常。
  */
 @JvmName("betweenLocalDate")
-fun Field<LocalDateTime>.between(dates: List<LocalDate>?): Condition {
+fun TableField<out Record, LocalDateTime?>.between(dates: List<LocalDate>?): Condition {
     if (dates.isNullOrEmpty()) {
         return DSL.noCondition()
     }
@@ -85,7 +81,7 @@ fun Field<LocalDateTime>.between(dates: List<LocalDate>?): Condition {
  * @throws MicroProblemDetailException 当日期列表为空或长度不为 2 时抛出该异常。
  */
 @JvmName("betweenLocalDateTime")
-fun Field<LocalDateTime>.between(dates: List<LocalDateTime>?): Condition {
+fun TableField<out Record, LocalDateTime?>.between(dates: List<LocalDateTime>?): Condition {
     if (dates.isNullOrEmpty()) {
         return DSL.noCondition()
     }
@@ -107,7 +103,7 @@ fun Field<LocalDateTime>.between(dates: List<LocalDateTime>?): Condition {
  * @throws MicroProblemDetailException 当日期列表为空或长度不为 2 时抛出该异常。
  */
 @JvmName("between")
-fun Field<LocalDate>.between(dates: List<LocalDate>?): Condition {
+fun TableField<out Record, LocalDate?>.between(dates: List<LocalDate>?): Condition {
     if (dates.isNullOrEmpty()) {
         return DSL.noCondition()
     }
