@@ -2,6 +2,7 @@ package com.jiangtj.micro.sql.jooq.dao.kt
 
 import com.jiangtj.micro.sql.jooq.PageUtils
 import com.jiangtj.micro.sql.jooq.QueryUtils
+import com.jiangtj.micro.sql.jooq.SortPropertyStyle
 import org.jooq.*
 import org.jooq.impl.DSL
 import org.springframework.data.domain.Page
@@ -16,6 +17,7 @@ data class PageContext<R : Record>(
     var table: Table<R>,
     var conditions: MutableList<Condition?> = mutableListOf(),
     var pageable: Pageable? = null,
+    var sortPropertyStyle: SortPropertyStyle = SortPropertyStyle.ORIGINAL,
     var orderField: MutableList<OrderField<*>> = mutableListOf(),
 )
 
@@ -93,7 +95,19 @@ open class PageableStep<R : Record>(val ctx: PageContext<R>) {
      * 添加分页参数
      */
     fun pageable(pageable: Pageable, vararg orderFields: OrderField<*>): ResultStep<R> {
+        return pageable(pageable, SortPropertyStyle.ORIGINAL, *orderFields)
+    }
+
+    /**
+     * 添加分页参数，并支持排序字段名风格转换
+     */
+    fun pageable(
+        pageable: Pageable,
+        sortPropertyStyle: SortPropertyStyle,
+        vararg orderFields: OrderField<*>,
+    ): ResultStep<R> {
         ctx.pageable = pageable
+        ctx.sortPropertyStyle = sortPropertyStyle
         ctx.orderField = orderFields.toMutableList()
         return ResultStep(ctx)
     }
@@ -114,7 +128,12 @@ class ResultStep<R : Record>(val ctx: PageContext<R>) {
             else
                 notNullConditions.reduce { acc, condition -> acc.and(condition) }
         val listC = ctx.create.selectFrom(ctx.table).where(conditions)
-        val pageC = PageUtils.handlePageable(listC, ctx.pageable!!, *ctx.orderField.toTypedArray())
+        val pageC = PageUtils.handlePageable(
+            listC,
+            ctx.pageable!!,
+            ctx.sortPropertyStyle,
+            *ctx.orderField.toTypedArray(),
+        )
         val result = pageC.fetch()
         val count = ctx.create.selectCount().from(ctx.table).where(conditions).fetchSingle().value1()
         return Pair(result, count)

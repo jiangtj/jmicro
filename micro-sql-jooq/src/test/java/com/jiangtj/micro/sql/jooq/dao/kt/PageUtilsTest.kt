@@ -1,5 +1,6 @@
 package com.jiangtj.micro.sql.jooq.dao.kt
 
+import com.jiangtj.micro.sql.jooq.SortPropertyStyle
 import com.jiangtj.micro.sql.jooq.jooq.Tables.SYSTEM_USER
 import com.jiangtj.micro.sql.jooq.jooq.tables.pojos.SystemUser
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -11,6 +12,7 @@ import org.jooq.tools.jdbc.MockExecuteContext
 import org.jooq.tools.jdbc.MockResult
 import org.junit.jupiter.api.Test
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import kotlin.test.assertEquals
 
 private val log = KotlinLogging.logger {}
@@ -195,6 +197,23 @@ class PageUtilsTest {
         val result = create.selectPage(SYSTEM_USER)
             .conditionByExample(user, SYSTEM_USER.USERNAME)
             .pageable(PageRequest.of(0, 10))
+            .fetchPage<SystemUser>()
+        log.info { "result: $result" }
+    }
+
+    @Test
+    fun testWithSortPropertyStyle() {
+        val create = createDSL {
+            log.info { "sql: $it" }
+            if (isCount(it)) {
+                assertEquals("select count(*) from `system_user`", it)
+            } else {
+                assertEquals("select `system_user`.`id`, `system_user`.`username`, `system_user`.`password`, `system_user`.`is_deleted` from `system_user` order by user_name asc limit ? offset ?", it)
+            }
+        }
+        val pageable = PageRequest.of(0, 10, Sort.by(Sort.Order.asc("userName")))
+        val result = create.selectPage(SYSTEM_USER)
+            .pageable(pageable, SortPropertyStyle.SNAKE_LOWER)
             .fetchPage<SystemUser>()
         log.info { "result: $result" }
     }
