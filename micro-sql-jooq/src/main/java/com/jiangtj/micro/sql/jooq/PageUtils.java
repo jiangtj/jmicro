@@ -1,5 +1,6 @@
 package com.jiangtj.micro.sql.jooq;
 
+import com.jiangtj.micro.common.exceptions.MicroException;
 import org.jooq.*;
 import org.jooq.Record;
 import org.springframework.data.domain.Page;
@@ -8,7 +9,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.Nullable;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Function;
 
 import static com.jiangtj.micro.sql.jooq.QueryUtils.nec;
@@ -74,13 +77,30 @@ public interface PageUtils {
      */
     static <R extends Record> SelectLimitPercentAfterOffsetStep<R> handlePageable(SelectOrderByStep<R> where,
                                                                                   Pageable pageable, OrderField<?>... orderFields) {
+        return handlePageable(where, pageable, SortPropertyStyle.ORIGINAL, orderFields);
+    }
+
+    /**
+     * 处理分页参数，并支持排序字段名风格转换。
+     *
+     * @param where             查询条件步骤
+     * @param pageable          分页参数
+     * @param sortPropertyStyle 排序字段名转换策略
+     * @param <R>               记录类型
+     * @param orderFields       排序字段
+     * @return 应用了分页参数的查询步骤
+     */
+    static <R extends Record> SelectLimitPercentAfterOffsetStep<R> handlePageable(SelectOrderByStep<R> where,
+                                                                                   Pageable pageable,
+                                                                                   SortPropertyStyle sortPropertyStyle,
+                                                                                   OrderField<?>... orderFields) {
         Sort sort = pageable.getSort();
         SelectLimitStep<R> rs;
         if (orderFields.length > 0) {
             rs = where.orderBy(orderFields);
         } else if (!sort.isEmpty()) {
             List<SortField<Object>> list = sort.stream().map(order -> {
-                String property = order.getProperty();
+                String property = convertSortProperty(order.getProperty(), sortPropertyStyle);
                 if (order.isAscending()) {
                     return field(property).asc();
                 }
@@ -94,6 +114,50 @@ public interface PageUtils {
             rs = where;
         }
         return rs.offset(pageable.getOffset()).limit(pageable.getPageSize());
+    }
+
+    /**
+     * 将Spring Data排序字段名转换为指定风格。
+     */
+    static String convertSortProperty(String property, SortPropertyStyle style) {
+        if (style == null || style == SortPropertyStyle.ORIGINAL) {
+            return property;
+        }
+        List<String> words = splitSortPropertyWords(property);
+        if (words.isEmpty()) {
+            return property;
+        }
+        return switch (style) {
+            case CAMEL -> words.get(0) + words.stream().skip(1).map(PageUtils::capitalizeWord).reduce("", String::concat);
+            case PASCAL -> words.stream().map(PageUtils::capitalizeWord).reduce("", String::concat);
+            case SNAKE_LOWER -> String.join("_", words);
+            case SNAKE_UPPER -> String.join("_", words).toUpperCase(Locale.ROOT);
+            case KEBAB_LOWER -> String.join("-", words);
+            case KEBAB_UPPER -> String.join("-", words).toUpperCase(Locale.ROOT);
+            case LOWER -> String.join("", words);
+            case UPPER -> String.join("", words).toUpperCase(Locale.ROOT);
+            default -> throw new MicroException("Unexpected value: " + style);
+        };
+    }
+
+    private static List<String> splitSortPropertyWords(String property) {
+        String normalized = property.trim()
+                .replace('-', ' ')
+                .replace('_', ' ')
+                .replace('.', ' ')
+                .replaceAll("([a-z0-9])([A-Z])", "$1 $2")
+                .replaceAll("([A-Z]+)([A-Z][a-z])", "$1 $2");
+        return Arrays.stream(normalized.split("\\s+"))
+                .filter(s -> !s.isEmpty())
+                .map(s -> s.toLowerCase(Locale.ROOT))
+                .toList();
+    }
+
+    private static String capitalizeWord(String word) {
+        if (word.isEmpty()) {
+            return word;
+        }
+        return Character.toUpperCase(word.charAt(0)) + word.substring(1);
     }
 
     /**
@@ -210,6 +274,10 @@ public interface PageUtils {
             return new LimitStep<>(handlePageable(listStep, pageable, orderFields), countStep, pageable);
         }
 
+        public LimitStep<R> pageable(Pageable pageable, SortPropertyStyle style, OrderField<?>... orderFields) {
+            return new LimitStep<>(handlePageable(listStep, pageable, style, orderFields), countStep, pageable);
+        }
+
         public SelectJoinStep<R> listStep() {
             return this.listStep;
         }
@@ -236,6 +304,10 @@ public interface PageUtils {
 
         public LimitStep<R> pageable(Pageable pageable, OrderField<?>... orderFields) {
             return new LimitStep<>(handlePageable(listStep, pageable, orderFields), countStep, pageable);
+        }
+
+        public LimitStep<R> pageable(Pageable pageable, SortPropertyStyle style, OrderField<?>... orderFields) {
+            return new LimitStep<>(handlePageable(listStep, pageable, style, orderFields), countStep, pageable);
         }
     }
 
