@@ -121,6 +121,47 @@ class PageUtilsTest {
     }
 
     @Test
+    fun testWithWhereAndFirst() {
+        val create = createDSL {
+            log.info { "sql: $it" }
+            if (isCount(it)) {
+                assertEquals("select count(*) from `system_user` " +
+                        "where (`system_user`.`username` = ? and `system_user`.`id` = ?)", it)
+            } else {
+                assertEquals("select `system_user`.`id`, `system_user`.`username`, `system_user`.`password`, `system_user`.`is_deleted` from `system_user` " +
+                        "where (`system_user`.`username` = ? and `system_user`.`id` = ?) limit ? offset ?", it)
+            }
+        }
+        val result = create.selectPage(SYSTEM_USER)
+            .where(SYSTEM_USER.ID.eq(1))
+            .andFirst(SYSTEM_USER.USERNAME.eq("name"))
+            .pageable(PageRequest.of(0, 10))
+            .fetchPage<SystemUser>()
+        log.info { "result: $result" }
+    }
+
+    @Test
+    fun testWithWhereAndByExample() {
+        val create = createDSL {
+            log.info { "sql: $it" }
+            if (isCount(it)) {
+                assertEquals("select count(*) from `system_user` " +
+                        "where (`system_user`.`id` = ? and `system_user`.`username` = ?)", it)
+            } else {
+                assertEquals("select `system_user`.`id`, `system_user`.`username`, `system_user`.`password`, `system_user`.`is_deleted` from `system_user` " +
+                        "where (`system_user`.`id` = ? and `system_user`.`username` = ?) limit ? offset ?", it)
+            }
+        }
+        val user = SystemUser(null, "name", null, null)
+        val result = create.selectPage(SYSTEM_USER)
+            .where(SYSTEM_USER.ID.eq(1))
+            .andByExample(user)
+            .pageable(PageRequest.of(0, 10))
+            .fetchPage<SystemUser>()
+        log.info { "result: $result" }
+    }
+
+    @Test
     fun testWithConditionByExample() {
         val create = createDSL {
             log.info { "sql: $it" }

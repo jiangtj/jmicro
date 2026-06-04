@@ -66,6 +66,23 @@ class ConditionStep<R : Record>(ctx: PageContext<R>) : PageableStep<R>(ctx) {
         ctx.conditions += conditions
         return this
     }
+
+    /**
+     * 添加查询条件至开头
+     */
+    fun andFirst(conditions: Condition?): ConditionStep<R> {
+        ctx.conditions.add(0, conditions)
+        return this
+    }
+
+    /**
+     * 添加 Example 查询条件
+     */
+    fun andByExample(example: Any, vararg ignoredFields: Field<*>): ConditionStep<R> {
+        val exampleConditions = QueryUtils.nec(ctx.create, ctx.table, example, *ignoredFields)
+        ctx.conditions += exampleConditions
+        return this
+    }
 }
 
 /**
