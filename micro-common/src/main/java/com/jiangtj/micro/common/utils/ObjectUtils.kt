@@ -14,9 +14,13 @@ fun Any.trimAllStringProperties() {
             if (currentValue != null) {
                 val trim = currentValue.trim()
                 property.setter.call(this, trim)
-                if (property.returnType.isMarkedNullable && trim.isEmpty()){
+                if (property.returnType.isMarkedNullable && trim.isEmpty()) {
                     property.setter.call(this, null)
                 }
             }
         }
 }
+
+fun String?.ifNullOrEmpty(defaultValue: () -> String) = if (this.isNullOrEmpty()) defaultValue() else this
+
+fun String?.ifNullOrBlank(defaultValue: () -> String) = if (this.isNullOrBlank()) defaultValue() else this

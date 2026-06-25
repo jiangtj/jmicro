@@ -70,5 +70,42 @@ class ObjectUtilsTest {
         assertEquals("  readOnly  ", payload.readOnlyText)
         assertFalse(payload.readOnlyText == payload.readOnlyText.trim())
     }
+
+    @Test
+    fun ifNullOrEmpty_shouldReturnDefaultForNullOrEmpty() {
+        assertEquals("default", (null as String?).ifNullOrEmpty { "default" })
+        assertEquals("default", "".ifNullOrEmpty { "default" })
+    }
+
+    @Test
+    fun ifNullOrEmpty_shouldReturnOriginalForNonEmpty() {
+        var invoked = false
+        val result = "value".ifNullOrEmpty {
+            invoked = true
+            "default"
+        }
+
+        assertEquals("value", result)
+        assertFalse(invoked)
+    }
+
+    @Test
+    fun ifNullOrBlank_shouldReturnDefaultForNullOrBlank() {
+        assertEquals("default", (null as String?).ifNullOrBlank { "default" })
+        assertEquals("default", "".ifNullOrBlank { "default" })
+        assertEquals("default", "   ".ifNullOrBlank { "default" })
+    }
+
+    @Test
+    fun ifNullOrBlank_shouldReturnOriginalForNonBlank() {
+        var invoked = false
+        val result = "value".ifNullOrBlank {
+            invoked = true
+            "default"
+        }
+
+        assertEquals("value", result)
+        assertFalse(invoked)
+    }
 }
 
