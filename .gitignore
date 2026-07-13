@@ -30,3 +30,13 @@ nbdist/
 polaris/
 
 *.pdf
+
+### Gradle ###
+HELP.md
+.gradle
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### Kotlin ###
+.kotlin
