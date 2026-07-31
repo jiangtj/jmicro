@@ -10,7 +10,7 @@ J Micro 是一个基于 Spring Boot 的轻量框架，方便开发者更轻松�
 
 ## 使用
 
-在开发阶段，建议使用本地安装。即 `clone` 后，`mvn install -P lib` 安装到本地，当然也可直接引用 Maven Central 上已发布的 lib
+在开发阶段，建议使用本地安装。即 `clone` 后，`./gradlew build` 安装到本地，当然也可直接引用 Maven Central 上已发布的 lib
 
 ```xml
 <!-- 添加依赖管理，可以在添加模块的时候省略版本号 -->
