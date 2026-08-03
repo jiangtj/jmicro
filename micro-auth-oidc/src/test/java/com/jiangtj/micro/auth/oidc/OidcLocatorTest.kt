@@ -26,7 +26,7 @@ class OidcLocatorTest {
     @BeforeEach
     fun setup() {
         jwtProperties = JwtProperties()
-        oidcLocator = OidcLocator(jwtProperties, null)
+        oidcLocator = OidcLocator(jwtProperties.oidc, null)
         
         // Mock RestClient
         mockRestClient = mock()
@@ -142,73 +142,73 @@ class OidcLocatorTest {
     @Test
     fun `test match with ANT style pattern`() {
         // 测试 ANT 模式匹配
-        val oidcProperties = OidcProperties().apply {
+        val oidcClient = OidcProperties().apply {
             pattern = "/api/**"
             matcherStyle = MatcherStyle.ANT
             pathSeparator = "/"
         }
         
         // 应该匹配的模式
-        assertTrue(oidcLocator.match(oidcProperties, "/api/users/123"))
-        assertTrue(oidcLocator.match(oidcProperties, "/api/admin/settings"))
-        assertTrue(oidcLocator.match(oidcProperties, "/api/"))
+        assertTrue(oidcLocator.match(oidcClient, "/api/users/123"))
+        assertTrue(oidcLocator.match(oidcClient, "/api/admin/settings"))
+        assertTrue(oidcLocator.match(oidcClient, "/api/"))
         
         // 不应该匹配的模式
-        assertFalse(oidcLocator.match(oidcProperties, "/users/api/123"))
-        assertFalse(oidcLocator.match(oidcProperties, "api/users/123"))
-        assertFalse(oidcLocator.match(oidcProperties, "/other/path"))
+        assertFalse(oidcLocator.match(oidcClient, "/users/api/123"))
+        assertFalse(oidcLocator.match(oidcClient, "api/users/123"))
+        assertFalse(oidcLocator.match(oidcClient, "/other/path"))
     }
 
     @Test
     fun `test match with REGEX style pattern`() {
         // 测试正则表达式模式匹配
-        val oidcProperties = OidcProperties().apply {
+        val oidcClient = OidcProperties().apply {
             pattern = "^user_.*$"
             matcherStyle = MatcherStyle.REGEX
         }
         
         // 应该匹配的模式
-        assertTrue(oidcLocator.match(oidcProperties, "user_123"))
-        assertTrue(oidcLocator.match(oidcProperties, "user_admin"))
-        assertTrue(oidcLocator.match(oidcProperties, "user_"))
+        assertTrue(oidcLocator.match(oidcClient, "user_123"))
+        assertTrue(oidcLocator.match(oidcClient, "user_admin"))
+        assertTrue(oidcLocator.match(oidcClient, "user_"))
         
         // 不应该匹配的模式
-        assertFalse(oidcLocator.match(oidcProperties, "admin_user_123"))
-        assertFalse(oidcLocator.match(oidcProperties, "123_user"))
-        assertFalse(oidcLocator.match(oidcProperties, "user"))
+        assertFalse(oidcLocator.match(oidcClient, "admin_user_123"))
+        assertFalse(oidcLocator.match(oidcClient, "123_user"))
+        assertFalse(oidcLocator.match(oidcClient, "user"))
     }
 
     @Test
     fun `test match with PREFIX style pattern`() {
         // 测试前缀模式匹配
-        val oidcProperties = OidcProperties().apply {
+        val oidcClient = OidcProperties().apply {
             pattern = "app-"
             matcherStyle = MatcherStyle.PREFIX
         }
         
         // 应该匹配的模式
-        assertTrue(oidcLocator.match(oidcProperties, "app-123"))
-        assertTrue(oidcLocator.match(oidcProperties, "app-user-admin"))
-        assertTrue(oidcLocator.match(oidcProperties, "app-"))
+        assertTrue(oidcLocator.match(oidcClient, "app-123"))
+        assertTrue(oidcLocator.match(oidcClient, "app-user-admin"))
+        assertTrue(oidcLocator.match(oidcClient, "app-"))
         
         // 不应该匹配的模式
-        assertFalse(oidcLocator.match(oidcProperties, "my-app-123"))
-        assertFalse(oidcLocator.match(oidcProperties, "123-app-"))
-        assertFalse(oidcLocator.match(oidcProperties, "app"))
+        assertFalse(oidcLocator.match(oidcClient, "my-app-123"))
+        assertFalse(oidcLocator.match(oidcClient, "123-app-"))
+        assertFalse(oidcLocator.match(oidcClient, "app"))
     }
 
     @Test
     fun `test match with default ANT pattern`() {
         // 测试默认的 ANT 模式（通配符 *）
-        val oidcProperties = OidcProperties().apply {
+        val oidcClient = OidcProperties().apply {
             pattern = "*"
             matcherStyle = MatcherStyle.ANT
         }
         
         // 应该匹配所有内容
-        assertTrue(oidcLocator.match(oidcProperties, "anything"))
-        assertTrue(oidcLocator.match(oidcProperties, "123"))
-        assertTrue(oidcLocator.match(oidcProperties, "user_123"))
+        assertTrue(oidcLocator.match(oidcClient, "anything"))
+        assertTrue(oidcLocator.match(oidcClient, "123"))
+        assertTrue(oidcLocator.match(oidcClient, "user_123"))
         // todo fix?
         // assertTrue(oidcLocator.match(oidcProperties, ""))
     }
@@ -216,36 +216,36 @@ class OidcLocatorTest {
     @Test
     fun `test match with complex ANT pattern`() {
         // 测试复杂的 ANT 模式
-        val oidcProperties = OidcProperties().apply {
+        val oidcClient = OidcProperties().apply {
             pattern = "**/admin/*.json"
             matcherStyle = MatcherStyle.ANT
             pathSeparator = "/"
         }
         
         // 应该匹配的模式
-        assertTrue(oidcLocator.match(oidcProperties, "api/admin/config.json"))
-        assertTrue(oidcLocator.match(oidcProperties, "v1/api/admin/settings.json"))
-        assertTrue(oidcLocator.match(oidcProperties, "admin/data.json"))
+        assertTrue(oidcLocator.match(oidcClient, "api/admin/config.json"))
+        assertTrue(oidcLocator.match(oidcClient, "v1/api/admin/settings.json"))
+        assertTrue(oidcLocator.match(oidcClient, "admin/data.json"))
         
         // 不应该匹配的模式
-        assertFalse(oidcLocator.match(oidcProperties, "/api/user/config.json"))
-        assertFalse(oidcLocator.match(oidcProperties, "/api/admin/config.xml"))
-        assertFalse(oidcLocator.match(oidcProperties, "admin/config"))
+        assertFalse(oidcLocator.match(oidcClient, "/api/user/config.json"))
+        assertFalse(oidcLocator.match(oidcClient, "/api/admin/config.xml"))
+        assertFalse(oidcLocator.match(oidcClient, "admin/config"))
     }
 
     @Test
     fun `test match with ALWAYS style`() {
         // 测试 ALWAYS 模式 - 应该总是返回 true
-        val oidcProperties = OidcProperties().apply {
+        val oidcClient = OidcProperties().apply {
             pattern = "any-pattern"
             matcherStyle = MatcherStyle.ALWAYS
         }
         
         // 应该匹配所有内容，不管 kid 是什么
-        assertTrue(oidcLocator.match(oidcProperties, "any-kid"))
-        assertTrue(oidcLocator.match(oidcProperties, ""))
-        assertTrue(oidcLocator.match(oidcProperties, "123"))
-        assertTrue(oidcLocator.match(oidcProperties, "special@chars#"))
+        assertTrue(oidcLocator.match(oidcClient, "any-kid"))
+        assertTrue(oidcLocator.match(oidcClient, ""))
+        assertTrue(oidcLocator.match(oidcClient, "123"))
+        assertTrue(oidcLocator.match(oidcClient, "special@chars#"))
     }
 
     @Test

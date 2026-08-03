@@ -4,7 +4,7 @@ import lombok.Data;
 import org.jspecify.annotations.Nullable;
 
 @Data
-public class OidcProperties {
+public class OidcProperties implements OidcClient {
     /**
      * 匹配参数，在非 ALWAYS 模式下生效，ANT 模式下为路径，PREFIX 模式下为前缀，REGEX 模式下为正则表达式
      */
@@ -34,4 +34,13 @@ public class OidcProperties {
      */
     @Nullable
     private String openidConfiguration;
+
+
+    @Nullable
+    private Integer order;
+
+    @Override
+    public int getOrder() {
+        return order != null ? order : 0;
+    }
 }
