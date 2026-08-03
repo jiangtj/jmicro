@@ -4,7 +4,6 @@ import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.jiangtj.micro.auth.oidc.cas.OidcKeyService
 import com.jiangtj.micro.common.JsonUtils
-import com.jiangtj.micro.common.exceptions.MicroException
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.jsonwebtoken.Header
 import io.jsonwebtoken.Locator
@@ -21,7 +20,10 @@ private val log = KotlinLogging.logger {}
 const val ORDER: Int = 10000
 
 @Order(ORDER)
-class OidcLocator(private val jwtProperties: JwtProperties, private val oidcKeyService: OidcKeyService?) : Locator<Key> {
+class OidcLocator(
+    private val oidcProvider: List<OidcClient>,
+    private val oidcKeyService: OidcKeyService?,
+) : Locator<Key> {
 
     data class OICF(
         val issuer: String,
@@ -52,13 +54,10 @@ class OidcLocator(private val jwtProperties: JwtProperties, private val oidcKeyS
             return key
         }
 
-        jwtProperties.oidc.forEach {
+        oidcProvider.forEach {
             if (match(it, kid)) {
                 log.debug { "matched oidc configuration: $it" }
-                val key = handle(
-                    it.openidConfiguration ?: throw MicroException("no openid-configuration"),
-                    kid
-                )
+                val key = handle(it, kid)
                 if (key != null) {
                     return key
                 }
@@ -69,7 +68,7 @@ class OidcLocator(private val jwtProperties: JwtProperties, private val oidcKeyS
         return null
     }
 
-    fun match(oidc: OidcProperties, kid: String): Boolean {
+    fun match(oidc: OidcClient, kid: String): Boolean {
         if (oidc.matcherStyle == MatcherStyle.ALWAYS) {
             return true
         }
@@ -85,14 +84,26 @@ class OidcLocator(private val jwtProperties: JwtProperties, private val oidcKeyS
         return false
     }
 
-    fun handle(openidConfiguration: String, kid: String): Key? {
-        val oicf = rest.get().uri(openidConfiguration)
+    fun handle(oidc: OidcClient, kid: String): Key? {
+        var jwksUri = oidc.jwksUri
+
+        val openidConfigUri = oidc.openidConfiguration
+        if (jwksUri == null && openidConfigUri != null) {
+            val oicf = rest.get().uri(openidConfigUri)
+                .retrieve()
+                .body<OICF>()
+            log.debug { "oidc configuration: $oicf" }
+            jwksUri = oicf?.jwks_uri
+        }
+
+        if (jwksUri == null) {
+            log.debug { "no jwks_uri for oidc: $oidc" }
+            return null
+        }
+
+        rest.get().uri(jwksUri)
             .retrieve()
-            .body<OICF>()
-        log.debug { "oidc configuration: $oicf" }
-        oicf?.let { rest.get().uri(it.jwks_uri) }
-            ?.retrieve()
-            ?.body<JwksSet>()
+            .body<JwksSet>()
             ?.keys
             ?.forEach { key ->
                 val parse = Jwks.parser().build().parse(JsonUtils.toJson(key))
