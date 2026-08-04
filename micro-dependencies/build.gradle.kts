@@ -2,6 +2,7 @@
 // micro-dependencies pom that consumers import to align internal module versions.
 plugins {
     `java-platform`
+    alias(libs.plugins.maven.publish)
 }
 
 dependencies {

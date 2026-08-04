@@ -25,6 +25,7 @@ plugins {
     alias(libs.plugins.kotlin.jvm) apply false
     alias(libs.plugins.kotlin.spring) apply false
     alias(libs.plugins.kotlin.lombok) apply false
+    alias(libs.plugins.maven.publish) apply false
 }
 
 group = "com.jiangtj.micro"

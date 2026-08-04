@@ -6,6 +6,7 @@ java = "17"
 kotlin = "2.2.20"
 kotlinLogging = "8.0.01"
 dokka = "2.2.0"
+mavenPublish = "0.37.0"
 
 # Libraries
 jspecify = "1.0.0"
@@ -79,3 +80,4 @@ spring-dependency-management = { id = "io.spring.dependency-management", version
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }
 kotlin-lombok = { id = "org.jetbrains.kotlin.plugin.lombok", version.ref = "kotlin" }
+maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }
