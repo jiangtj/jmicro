@@ -28,7 +28,7 @@ plugins {
 }
 
 group = "com.jiangtj.micro"
-version = "0.2.9"
+version = "0.3.0"
 
 // Project-wide metadata shared by all published artifacts
 extra["projectUrl"] = "https://github.com/jiangtj/jmicro"
