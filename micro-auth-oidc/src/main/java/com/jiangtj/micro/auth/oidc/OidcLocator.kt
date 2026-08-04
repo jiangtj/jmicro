@@ -20,8 +20,10 @@ private val log = KotlinLogging.logger {}
 const val ORDER: Int = 10000
 
 @Order(ORDER)
-class OidcLocator(private val jwtProperties: JwtProperties, private val oidcKeyService: OidcKeyService?) :
-    Locator<Key> {
+class OidcLocator(
+    private val oidcProvider: List<OidcClient>,
+    private val oidcKeyService: OidcKeyService?,
+) : Locator<Key> {
 
     data class OICF(
         val issuer: String,
@@ -52,7 +54,7 @@ class OidcLocator(private val jwtProperties: JwtProperties, private val oidcKeyS
             return key
         }
 
-        jwtProperties.oidc.forEach {
+        oidcProvider.forEach {
             if (match(it, kid)) {
                 log.debug { "matched oidc configuration: $it" }
                 val key = handle(it, kid)
@@ -66,7 +68,7 @@ class OidcLocator(private val jwtProperties: JwtProperties, private val oidcKeyS
         return null
     }
 
-    fun match(oidc: OidcProperties, kid: String): Boolean {
+    fun match(oidc: OidcClient, kid: String): Boolean {
         if (oidc.matcherStyle == MatcherStyle.ALWAYS) {
             return true
         }
@@ -82,7 +84,7 @@ class OidcLocator(private val jwtProperties: JwtProperties, private val oidcKeyS
         return false
     }
 
-    fun handle(oidc: OidcProperties, kid: String): Key? {
+    fun handle(oidc: OidcClient, kid: String): Key? {
         var jwksUri = oidc.jwksUri
 
         val openidConfigUri = oidc.openidConfiguration
