@@ -107,4 +107,39 @@ subprojects {
             }
         }
     }
+
+    // Maven Central publishing (vanniktech/gradle-maven-publish-plugin).
+    // Applied only to modules that registered the plugin (all lib modules, including
+    // the micro-dependencies BOM); demo apps intentionally do not apply the plugin.
+    plugins.withId("com.vanniktech.maven.publish") {
+        extensions.configure<com.vanniktech.maven.publish.MavenPublishBaseExtension> {
+            // publishToMavenCentral()/signAllPublications() are enabled via gradle.properties
+            // (mavenCentralPublishing / signAllPublications) to avoid final-property conflicts.
+            pom {
+                name.set(project.name)
+                description.set("jmicro ${project.name} module")
+                inceptionYear.set("2024")
+                url.set(rootProject.extra["projectUrl"] as String)
+                licenses {
+                    license {
+                        name.set(rootProject.extra["licenseName"] as String)
+                        url.set(rootProject.extra["licenseUrl"] as String)
+                        distribution.set("repo")
+                    }
+                }
+                developers {
+                    developer {
+                        id.set("jiangtj")
+                        name.set("JiangTJ")
+                        url.set("https://github.com/jiangtj/")
+                    }
+                }
+                scm {
+                    url.set(rootProject.extra["scmUrl"] as String)
+                    connection.set("scm:git:git://github.com/jiangtj/jmicro.git")
+                    developerConnection.set("scm:git:ssh://git@github.com/jiangtj/jmicro.git")
+                }
+            }
+        }
+    }
 }
