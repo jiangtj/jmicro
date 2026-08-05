@@ -1,4 +1,4 @@
-name: Gradle Central Deploy Test
+name: Maven Central Deploy Test
 
 on:
   workflow_dispatch:
