@@ -2,6 +2,7 @@ package com.jiangtj.micro.business.config
 
 import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.annotation.Bean
@@ -10,6 +11,12 @@ import org.springframework.context.annotation.Bean
 @EnableConfigurationProperties(SystemConfigProperties::class)
 @ConditionalOnBooleanProperty(prefix = "system.config", name = ["enabled"], havingValue = true)
 class SystemConfigAutoConfiguration {
+
+    @Bean
+    @ConditionalOnMissingBean
+    fun systemConfigSaver(): SystemConfigSaver {
+        return InMemorySystemConfigSaver()
+    }
 
     @Bean
     fun systemConfigService(
