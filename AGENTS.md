@@ -16,8 +16,7 @@
 ## Config and Integration Hotspots
 - Property namespaces are module-specific and important: `jmicro.auth.*`, `jmicro.jwt.*`, `micro.flyway.*`, `micro.pic.upload.*`, plus provider namespaces (`minio.*`, `ali.oss.*`, `hw.obs.*`, `easyimages.api.*`).
 - OIDC/JWT support is in `micro-auth` (package `com.jiangtj.micro.auth.oidc`); the optional OIDC server (Cas) support is in `micro-business` (package `com.jiangtj.micro.business.oidc.cas`) and is opt-in.
-- Demo auth integration depends on Casdoor (`docker-compose.yml`, root `README.md` Casdoor setup, and `demo-front/src/main.ts`).
-- Frontend talks directly to backend base URL `http://localhost:17001` (`demo-front/src/main.ts`) and attaches bearer tokens in `demo-front/src/core/token.ts`.
+- Demo auth integration depends on Casdoor (`docker-compose.yml` and root `README.md` Casdoor setup).
 
 ## Developer Workflows (Project-Specific)
 - Local library install (recommended by maintainers, publishes to Maven Local):
@@ -27,7 +26,6 @@
 - Run one demo backend at a time (both default to same port):
   - `./gradlew :demo-backend:bootRun`
   - `./gradlew :demo-reactive:bootRun`
-- Frontend workflow (inside `demo-front`): use scripts in `demo-front/package.json` (`dev`, `build`, `test:unit`, `lint`).
 
 ## Testing and Coding Conventions Seen in Repo
 - Integration tests commonly use `@JMicroTest` from `micro-test` (`micro-test/src/main/java/com/jiangtj/micro/test/JMicroTest.java`) and auth helpers like `@WithMockUser` (see `micro-auth/README.md`).

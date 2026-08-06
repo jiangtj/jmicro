@@ -230,7 +230,6 @@ Flyway 支持已合并到 `micro-business` 模块，且为可选依赖——使�
 
 - [demo-backend](demo-backend): Servlet 后端服务
 - [demo-reactive](demo-reactive): Webflux 后端服务
-- [demo-front](demo-front): Vue 前端服务
 
 demo-backend 与 demo-reactive 是提供一样的功能，部署在同一端口上，所以，在你运行 demo 时，你需选择其中一个运行
 
