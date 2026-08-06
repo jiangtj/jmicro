@@ -27,7 +27,7 @@ jobs:
         distribution: 'temurin'
         cache: gradle
     - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v4
+      uses: gradle/actions/setup-gradle@v6
     - name: Test with Gradle
       run: ./gradlew test
     - name: Publish Test Results
@@ -49,6 +49,6 @@ jobs:
           distribution: 'temurin'
           cache: gradle
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
       - name: Package with Gradle
         run: ./gradlew assemble
