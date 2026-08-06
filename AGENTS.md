@@ -19,8 +19,8 @@
 - Frontend talks directly to backend base URL `http://localhost:17001` (`demo-front/src/main.ts`) and attaches bearer tokens in `demo-front/src/core/token.ts`.
 
 ## Developer Workflows (Project-Specific)
-- Local library bootstrap (recommended by maintainers):
-  - `./gradlew build`
+- Local library install (recommended by maintainers, publishes to Maven Local):
+  - `./gradlew publishToMavenLocal`
 - Build/test all modules from root:
   - `./gradlew test`
 - Run one demo backend at a time (both default to same port):
