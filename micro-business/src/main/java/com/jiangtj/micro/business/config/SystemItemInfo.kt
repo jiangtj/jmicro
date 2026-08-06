@@ -11,7 +11,7 @@ data class SystemItemInfo(
     var secret: Boolean = false,
     var needRefresh: Boolean = false,
     var group: SystemGroup = SystemGroup("default"),
-    var type: SystemItemType = SystemItemType.TEXT,
+    var type: String = SystemItemType.TEXT.name,
     var provider: List<Pair<String, String>> = listOf(),
     var order: Int = 999,
     var formatter: Function<String, String>? = null,
