@@ -15,38 +15,38 @@ J Micro 是一个基于 Spring Boot 的轻量级基础工具集，帮助开发�
 
 - [模块总览](#模块总览)
 - [快速开始](#快速开始)
-  - [本地安装](#本地安装)
-  - [引入依赖管理](#引入依赖管理)
+    - [本地安装](#本地安装)
+    - [引入依赖管理](#引入依赖管理)
 - [核心模块](#核心模块)
-  - [micro-auth 认证与鉴权](#micro-auth-认证与鉴权)
-  - [micro-web Web 工具](#micro-web-web-工具)
-  - [micro-common 通用工具](#micro-common-通用工具)
-  - [micro-pic-upload-starter 图片上传](#micro-pic-upload-starter-图片上传)
-  - [micro-sql-jooq 数据库扩展](#micro-sql-jooq-数据库扩展)
-  - [micro-business 业务聚合](#micro-business-业务聚合)
-  - [micro-spring-boot-starter 应用默认配置](#micro-spring-boot-starter-应用默认配置)
-  - [micro-test 测试支持](#micro-test-测试支持)
-  - [micro-dependencies 依赖对齐（BOM）](#micro-dependencies-依赖对齐bom)
+    - [micro-auth 认证与鉴权](#micro-auth-认证与鉴权)
+    - [micro-web Web 工具](#micro-web-web-工具)
+    - [micro-common 通用工具](#micro-common-通用工具)
+    - [micro-pic-upload-starter 图片上传](#micro-pic-upload-starter-图片上传)
+    - [micro-sql-jooq 数据库扩展](#micro-sql-jooq-数据库扩展)
+    - [micro-business 业务聚合](#micro-business-业务聚合)
+    - [micro-spring-boot-starter 应用默认配置](#micro-spring-boot-starter-应用默认配置)
+    - [micro-test 测试支持](#micro-test-测试支持)
+    - [micro-dependencies 依赖对齐（BOM）](#micro-dependencies-依赖对齐bom)
 - [Demo 应用](#demo-应用)
-  - [运行 Demo](#运行-demo)
-  - [配置 Casdoor](#配置-casdoor)
+    - [运行 Demo](#运行-demo)
+    - [配置 Casdoor](#配置-casdoor)
 - [构建与发布](#构建与发布)
 
 ## 模块总览
 
-| 模块 | 类型 | 说明 |
-| --- | --- | --- |
-| `micro-common` | library | JSON、日期、表单校验规则、基础校验注解与常用工具类 |
-| `micro-web` | library | 过滤器/拦截器扩展、`FluentWebFilter`、异常基础能力 |
-| `micro-auth` | library | 轻量认证与鉴权（filter + 注解 + OIDC 基础能力） |
-| `micro-spring-boot-starter` | starter | 应用默认配置（异常处理 + Web 过滤器自动装配） |
-| `micro-sql-jooq` | library | JOOQ 业务封装（分页、代码生成扩展） |
-| `micro-pic-upload-starter` | starter | 图片上传（本地 / OSS / OBS / MinIO / EasyImages） |
-| `micro-business` | library | 业务聚合（Flyway 扩展、可选 OIDC Server） |
-| `micro-test` | library | 集成测试支持（`@JMicroTest`、`@WithMockUser` 等） |
-| `micro-dependencies` | bom (platform) | 内部模块版本对齐表，供使用方 `import` |
-| `demo-backend` | demo | Servlet 后端示例（端口 17001） |
-| `demo-reactive` | demo | WebFlux 后端示例（端口 17001） |
+| 模块 | 类型 | 说明 | 文档 | API |
+| --- | --- | --- | --- | --- |
+| `micro-common` | library | JSON、日期、表单校验规则、基础校验注解与常用工具类 | [README](./micro-common/README.md) | [api](https://jiangtj.com/jmicro/micro-common/api) |
+| `micro-web` | library | 过滤器/拦截器扩展、`FluentWebFilter`、异常基础能力 | [README](./micro-web/README.md) | [api](https://jiangtj.com/jmicro/micro-web/api) |
+| `micro-auth` | library | 轻量认证与鉴权（filter + 注解 + OIDC 基础能力） | [README](./micro-auth/README.md) | [api](https://jiangtj.com/jmicro/micro-auth/api) |
+| `micro-spring-boot-starter` | starter | 应用默认配置（异常处理 + Web 过滤器自动装配） | [README](./micro-spring-boot-starter/README.md) | [api](https://jiangtj.com/jmicro/micro-spring-boot-starter/api) |
+| `micro-sql-jooq` | library | JOOQ 业务封装（分页、代码生成扩展） | [README](./micro-sql-jooq/README.md) | [api](https://jiangtj.com/jmicro/micro-sql-jooq/api) |
+| `micro-pic-upload-starter` | starter | 图片上传（本地 / OSS / OBS / MinIO / EasyImages） | [README](./micro-pic-upload-starter/README.md) | [api](https://jiangtj.com/jmicro/micro-pic-upload-starter/api) |
+| `micro-business` | library | 业务聚合（Flyway 扩展、可选 OIDC Server） | [README](./micro-business/README.md) | [api](https://jiangtj.com/jmicro/micro-business/api) |
+| `micro-test` | library | 集成测试支持（`@JMicroTest`、`@WithMockUser` 等） | [README](./micro-test/README.md) | [api](https://jiangtj.com/jmicro/micro-test/api) |
+| `micro-dependencies` | bom (platform) | 内部模块版本对齐表，供使用方 `import` | [README](./micro-dependencies/README.md) | - |
+| `demo-backend` | demo | Servlet 后端示例（端口 17001） | - | - |
+| `demo-reactive` | demo | WebFlux 后端示例（端口 17001） | - | - |
 
 > 所有 `micro-*` 库模块均已发布至 Maven Central；`demo-*` 仅为示例应用，不在发布范围内。
 
@@ -90,9 +90,6 @@ J Micro 是一个基于 Spring Boot 的轻量级基础工具集，帮助开发�
 ## 核心模块
 
 ### micro-auth 认证与鉴权
-
-[![doc](https://img.shields.io/badge/document-grey.svg?logo=readme)](./micro-auth)
-[![dokka](https://img.shields.io/badge/dokka-grey.svg?logo=kotlin)](https://jiangtj.com/jmicro/micro-auth/api)
 
 ```xml
 <dependency>
@@ -146,9 +143,6 @@ class ExampleService {
 
 ### micro-web Web 工具
 
-[![doc](https://img.shields.io/badge/document-grey.svg?logo=readme)](./micro-web)
-[![dokka](https://img.shields.io/badge/dokka-grey.svg?logo=kotlin)](https://jiangtj.com/jmicro/micro-web/api)
-
 ```xml
 <dependency>
     <groupId>com.jiangtj.micro</groupId>
@@ -182,9 +176,6 @@ public class MyConfiguration {
 
 ### micro-common 通用工具
 
-[![doc](https://img.shields.io/badge/document-grey.svg?logo=readme)](./micro-common)
-[![dokka](https://img.shields.io/badge/dokka-grey.svg?logo=kotlin)](https://jiangtj.com/jmicro/micro-common/api)
-
 ```xml
 <dependency>
     <groupId>com.jiangtj.micro</groupId>
@@ -206,9 +197,6 @@ Map<String, List<FormRule>> generate = FormRuleGenerator.generate(Example.class)
 
 ### micro-pic-upload-starter 图片上传
 
-[![doc](https://img.shields.io/badge/document-grey.svg?logo=readme)](./micro-pic-upload-starter)
-[![dokka](https://img.shields.io/badge/dokka-grey.svg?logo=kotlin)](https://jiangtj.com/jmicro/micro-pic-upload-starter/api)
-
 ```xml
 <dependency>
     <groupId>com.jiangtj.micro</groupId>
@@ -227,9 +215,6 @@ Map<String, List<FormRule>> generate = FormRuleGenerator.generate(Example.class)
 > 配置方式与代码示例见 [micro-pic-upload-starter/README.md](./micro-pic-upload-starter/README.md)。
 
 ### micro-sql-jooq 数据库扩展
-
-[![doc](https://img.shields.io/badge/document-grey.svg?logo=readme)](./micro-sql-jooq)
-[![dokka](https://img.shields.io/badge/dokka-grey.svg?logo=kotlin)](https://jiangtj.com/jmicro/micro-sql-jooq/api)
 
 ```xml
 <dependency>
@@ -270,9 +255,6 @@ public Mono<Page<AdminUser>> fetchPage() {
 
 ### micro-business 业务聚合
 
-[![doc](https://img.shields.io/badge/document-grey.svg?logo=readme)](./micro-business)
-[![dokka](https://img.shields.io/badge/dokka-grey.svg?logo=kotlin)](https://jiangtj.com/jmicro/micro-business/api)
-
 ```xml
 <dependency>
     <groupId>com.jiangtj.micro</groupId>
@@ -303,9 +285,6 @@ Flyway 为可选能力，需自行引入依赖：
 
 ### micro-spring-boot-starter 应用默认配置
 
-[![doc](https://img.shields.io/badge/document-grey.svg?logo=readme)](./micro-spring-boot-starter)
-[![dokka](https://img.shields.io/badge/dokka-grey.svg?logo=kotlin)](https://jiangtj.com/jmicro/micro-spring-boot-starter/api)
-
 ```xml
 <dependency>
     <groupId>com.jiangtj.micro</groupId>
@@ -318,9 +297,6 @@ Flyway 为可选能力，需自行引入依赖：
 > 详见 [micro-spring-boot-starter/README.md](./micro-spring-boot-starter/README.md)。
 
 ### micro-test 测试支持
-
-[![doc](https://img.shields.io/badge/document-grey.svg?logo=readme)](./micro-test)
-[![dokka](https://img.shields.io/badge/dokka-grey.svg?logo=kotlin)](https://jiangtj.com/jmicro/micro-test/api)
 
 ```xml
 <dependency>
@@ -383,7 +359,7 @@ Demo 的认证与鉴权由 [Casdoor](https://casdoor.org/) 提供，需先准备
     docker run -p 28000:8000 -d casbin/casdoor-all-in-one
     ```
 
-    > 开发环境 `demo-backend` 使用端口 `28000`（而非 `8000`），以避免端口冲突。
+   > 开发环境 `demo-backend` 使用端口 `28000`（而非 `8000`），以避免端口冲突。
 
 2. 在「身份认证 → 应用」中添加应用：
     - 应用名：`application_he3oml`
