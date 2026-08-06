@@ -4,7 +4,7 @@
 - This repo is a Spring Boot 4 multi-module monorepo built with Gradle (Kotlin DSL: `settings.gradle.kts`, `build.gradle.kts`, `gradle/libs.versions.toml`). `micro-dependencies` is a `java-platform` project (Gradle BOM equivalent).
 - Core library modules live under `micro-*`; runnable demos are `demo-backend` (Servlet) and `demo-reactive` (WebFlux), both configured for port `17001` (`demo-*/src/main/resources/application.properties`).
 - Dependency version alignment is centralized in the `micro-dependencies` java-platform project and consumed by other modules; the Spring Boot BOM is imported via the `io.spring.dependency-management` plugin configured in the root `build.gradle.kts`.
-- `micro-spring-boot-starter` is the opinionated entry point for app defaults (exception handling + web filter wiring), while specialized features stay in dedicated starters (`micro-auth`, `micro-auth-oidc`, `micro-pic-upload-starter`, `micro-flyway-starter`).
+- `micro-spring-boot-starter` is the opinionated entry point for app defaults (exception handling + web filter wiring), while specialized features stay in dedicated starters (`micro-auth`, `micro-auth-oidc`, `micro-pic-upload-starter`, `micro-business`). Flyway support now lives in `micro-business` as an optional dependency.
 
 ## Architecture Patterns You Should Follow
 - Prefer Spring Boot auto-configuration extension points over direct wiring: each starter registers via `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports`.

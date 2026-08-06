@@ -1,1 +1,1 @@
-com.jiangtj.micro.business.MicroBusinessAutoConfiguration
+com.jiangtj.micro.business.flyway.MicroFlywayAutoConfiguration

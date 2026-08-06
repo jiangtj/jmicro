@@ -12,4 +12,12 @@ dependencies {
     api("org.springframework.boot:spring-boot-starter")
     api(libs.jspecify)
     api(project(":micro-common"))
+
+    // Flyway support is optional: consumers must opt-in by adding the Flyway
+    // dependencies themselves. compileOnly + runtimeOnly keeps them visible for
+    // compilation and runtime but non-transitive (not forced onto consumers).
+    compileOnly("org.springframework.boot:spring-boot-starter-flyway")
+    compileOnly("org.flywaydb:flyway-core")
+    runtimeOnly("org.springframework.boot:spring-boot-starter-flyway")
+    runtimeOnly("org.flywaydb:flyway-core")
 }

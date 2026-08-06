@@ -1,4 +1,4 @@
-package com.jiangtj.micro.flyway;
+package com.jiangtj.micro.business.flyway;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

@@ -15,7 +15,6 @@ dependencies {
         api(project(":micro-sql-jooq"))
         api(project(":micro-test"))
         api(project(":micro-pic-upload-starter"))
-        api(project(":micro-flyway-starter"))
         api(project(":micro-business"))
     }
 }

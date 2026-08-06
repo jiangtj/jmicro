@@ -1,4 +1,4 @@
-package com.jiangtj.micro.flyway;
+package com.jiangtj.micro.business.flyway;
 
 import org.flywaydb.core.Flyway;
 import org.springframework.boot.autoconfigure.AutoConfiguration;

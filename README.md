@@ -188,13 +188,24 @@ public Mono<Page<AdminUser>> fetchPage() {
 ```
 
 ## Flyway 扩展
-[![doc](https://img.shields.io/badge/document-grey.svg?logo=readme)](./micro-flyway-starter)
-[![dokka](https://img.shields.io/badge/dokka-grey.svg?logo=kotlin)](https://jiangtj.com/jmicro/micro-flyway-starter/api)
+Flyway 支持已合并到 `micro-business` 模块，且为可选依赖——使用时需自行引入 Flyway 依赖。
+
+[![doc](https://img.shields.io/badge/document-grey.svg?logo=readme)](./micro-business)
+[![dokka](https://img.shields.io/badge/dokka-grey.svg?logo=kotlin)](https://jiangtj.com/jmicro/micro-business/api)
 
 ```xml
 <dependency>
     <groupId>com.jiangtj.micro</groupId>
-    <artifactId>micro-flyway-starter</artifactId>
+    <artifactId>micro-business</artifactId>
+</dependency>
+<!-- Flyway 为可选能力，需自行引入 -->
+<dependency>
+    <groupId>org.flywaydb</groupId>
+    <artifactId>flyway-core</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-flyway</artifactId>
 </dependency>
 ```
 
