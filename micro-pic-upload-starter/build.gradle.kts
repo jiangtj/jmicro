@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kotlin.lombok)
     alias(libs.plugins.spring.dependency.management)
     alias(libs.plugins.maven.publish)
+    alias(libs.plugins.dokka)
 }
 
 dependencies {

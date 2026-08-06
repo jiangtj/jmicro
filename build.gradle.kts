@@ -26,6 +26,7 @@ plugins {
     alias(libs.plugins.kotlin.spring) apply false
     alias(libs.plugins.kotlin.lombok) apply false
     alias(libs.plugins.maven.publish) apply false
+    alias(libs.plugins.dokka) apply false
 }
 
 group = "com.jiangtj.micro"
@@ -138,6 +139,27 @@ subprojects {
                     url.set(rootProject.extra["scmUrl"] as String)
                     connection.set("scm:git:git://github.com/jiangtj/jmicro.git")
                     developerConnection.set("scm:git:ssh://git@github.com/jiangtj/jmicro.git")
+                }
+            }
+        }
+    }
+
+    // Dokka API documentation generation (HTML).
+    // Only modules that apply the Dokka plugin (the publishable library modules)
+    // participate; demo apps and the java-platform BOM are intentionally excluded.
+    plugins.withId("org.jetbrains.dokka") {
+        extensions.configure<org.jetbrains.dokka.gradle.DokkaExtension> {
+            moduleName.set(project.name)
+            moduleVersion.set(project.version.toString())
+            dokkaSourceSets.configureEach {
+                skipEmptyPackages.set(true)
+                skipDeprecated.set(true)
+                reportUndocumented.set(false)
+                jdkVersion.set(libs.versions.java.get().toInt())
+                sourceLink {
+                    localDirectory.set(file("src/main"))
+                    remoteUrl.set(java.net.URI("${rootProject.extra["scmUrl"] as String}/src/main"))
+                    remoteLineSuffix.set("#L")
                 }
             }
         }

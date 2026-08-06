@@ -42,7 +42,7 @@ jobs:
       - name: Set up temp site dir
         run: mkdir -p ./temp_site && cp -r ./_site/* ./temp_site
 
-      # Build API docs with Gradle (Javadoc for Java + KDoc via Dokka if available)
+      # Build API docs with Gradle (Dokka HTML for Java + Kotlin)
       - name: Set up JDK 17
         uses: actions/setup-java@v5
         with:
@@ -52,16 +52,16 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Generate aggregated Javadoc (per module)
-        run: ./gradlew javadoc --no-daemon
+      - name: Generate Dokka HTML (per module)
+        run: ./gradlew dokkaGenerate --no-daemon
         continue-on-error: true
 
-      - name: Move javadoc into site
+      - name: Move dokka into site
         run: |
-          for m in micro-common micro-web micro-auth micro-auth-oidc micro-spring-boot-starter micro-sql-jooq micro-test micro-pic-upload-starter micro-flyway-starter micro-payment micro-dependencies; do
-            if [ -d "./$m/build/docs/javadoc" ]; then
-              mkdir -p "./temp_site/$m/javadoc"
-              cp -r "./$m/build/docs/javadoc/." "./temp_site/$m/javadoc"
+          for m in micro-common micro-web micro-auth micro-auth-oidc micro-spring-boot-starter micro-sql-jooq micro-test micro-pic-upload-starter micro-flyway-starter; do
+            if [ -d "./$m/build/dokka/html" ]; then
+              mkdir -p "./temp_site/$m/api"
+              cp -r "./$m/build/dokka/html/." "./temp_site/$m/api"
             fi
           done
 

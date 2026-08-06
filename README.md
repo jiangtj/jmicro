@@ -29,7 +29,7 @@ J Micro 是一个基于 Spring Boot 的轻量框架，方便开发者更轻松�
 
 ## 认证与鉴权模块
 [![doc](https://img.shields.io/badge/document-grey.svg?logo=readme)](./micro-auth)
-[![dokka](https://img.shields.io/badge/dokka-grey.svg?logo=kotlin)](https://jiangtj.com/jmicro/micro-auth/dokka)
+[![dokka](https://img.shields.io/badge/dokka-grey.svg?logo=kotlin)](https://jiangtj.com/jmicro/micro-auth/api)
 
 ```xml
 <dependency>
@@ -81,7 +81,7 @@ class ExampleService {
 
 ## Web 模块
 [![doc](https://img.shields.io/badge/document-grey.svg?logo=readme)](./micro-web)
-[![dokka](https://img.shields.io/badge/dokka-grey.svg?logo=kotlin)](https://jiangtj.com/jmicro/micro-web/dokka)
+[![dokka](https://img.shields.io/badge/dokka-grey.svg?logo=kotlin)](https://jiangtj.com/jmicro/micro-web/api)
 
 ```xml
 <dependency>
@@ -115,7 +115,7 @@ public class MyConfiguration {
 
 ## 通用模块
 [![doc](https://img.shields.io/badge/document-grey.svg?logo=readme)](./micro-common)
-[![dokka](https://img.shields.io/badge/dokka-grey.svg?logo=kotlin)](https://jiangtj.com/jmicro/micro-common/dokka)
+[![dokka](https://img.shields.io/badge/dokka-grey.svg?logo=kotlin)](https://jiangtj.com/jmicro/micro-common/api)
 
 #### FormRule 规则生成
 
@@ -128,7 +128,7 @@ Map<String, List<FormRule>> generate = FormRuleGenerator.generate(Example.class)
 
 ## 图片上传模块
 [![doc](https://img.shields.io/badge/document-grey.svg?logo=readme)](./micro-pic-upload-starter)
-[![dokka](https://img.shields.io/badge/dokka-grey.svg?logo=kotlin)](https://jiangtj.com/jmicro/micro-pic-upload-starter/dokka)
+[![dokka](https://img.shields.io/badge/dokka-grey.svg?logo=kotlin)](https://jiangtj.com/jmicro/micro-pic-upload-starter/api)
 
 ```xml
 
@@ -148,7 +148,7 @@ Map<String, List<FormRule>> generate = FormRuleGenerator.generate(Example.class)
 
 ## JOOQ 扩展
 [![doc](https://img.shields.io/badge/document-grey.svg?logo=readme)](./micro-sql-jooq)
-[![dokka](https://img.shields.io/badge/dokka-grey.svg?logo=kotlin)](https://jiangtj.com/jmicro/micro-sql-jooq/dokka)
+[![dokka](https://img.shields.io/badge/dokka-grey.svg?logo=kotlin)](https://jiangtj.com/jmicro/micro-sql-jooq/api)
 
 ```xml
 <dependency>
@@ -189,7 +189,7 @@ public Mono<Page<AdminUser>> fetchPage() {
 
 ## Flyway 扩展
 [![doc](https://img.shields.io/badge/document-grey.svg?logo=readme)](./micro-flyway-starter)
-[![dokka](https://img.shields.io/badge/dokka-grey.svg?logo=kotlin)](https://jiangtj.com/jmicro/micro-flyway-starter/dokka)
+[![dokka](https://img.shields.io/badge/dokka-grey.svg?logo=kotlin)](https://jiangtj.com/jmicro/micro-flyway-starter/api)
 
 ```xml
 <dependency>
@@ -202,7 +202,7 @@ public Mono<Page<AdminUser>> fetchPage() {
 
 ## Starter 模块
 [![doc](https://img.shields.io/badge/document-grey.svg?logo=readme)](./micro-spring-boot-starter)
-[![dokka](https://img.shields.io/badge/dokka-grey.svg?logo=kotlin)](https://jiangtj.com/jmicro/micro-spring-boot-starter/dokka)
+[![dokka](https://img.shields.io/badge/dokka-grey.svg?logo=kotlin)](https://jiangtj.com/jmicro/micro-spring-boot-starter/api)
 
 ```xml
 <dependency>
