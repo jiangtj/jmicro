@@ -1,9 +1,9 @@
 # AGENTS Guide for `jmicro`
 
 ## Big Picture (Monorepo + Module Boundaries)
-- This repo is a Spring Boot 4 multi-module monorepo (`pom.xml`) with two active profiles by default: `server` (demo apps) and `lib` (reusable starters/libs).
+- This repo is a Spring Boot 4 multi-module monorepo built with Gradle (Kotlin DSL: `settings.gradle.kts`, `build.gradle.kts`, `gradle/libs.versions.toml`). `micro-dependencies` is a `java-platform` project (Gradle BOM equivalent).
 - Core library modules live under `micro-*`; runnable demos are `demo-backend` (Servlet) and `demo-reactive` (WebFlux), both configured for port `17001` (`demo-*/src/main/resources/application.properties`).
-- Dependency version alignment is centralized in `micro-dependencies/pom.xml` and imported by consumers as BOM.
+- Dependency version alignment is centralized in the `micro-dependencies` java-platform project and consumed by other modules; the Spring Boot BOM is imported via the `io.spring.dependency-management` plugin configured in the root `build.gradle.kts`.
 - `micro-spring-boot-starter` is the opinionated entry point for app defaults (exception handling + web filter wiring), while specialized features stay in dedicated starters (`micro-auth`, `micro-auth-oidc`, `micro-pic-upload-starter`, `micro-flyway-starter`).
 
 ## Architecture Patterns You Should Follow
@@ -19,13 +19,13 @@
 - Frontend talks directly to backend base URL `http://localhost:17001` (`demo-front/src/main.ts`) and attaches bearer tokens in `demo-front/src/core/token.ts`.
 
 ## Developer Workflows (Project-Specific)
-- Local library bootstrap (recommended by maintainers):
-  - `mvn install -P lib`
-- Build/test all modules from root (profiles are active by default in parent POM):
-  - `mvn test`
+- Local library install (recommended by maintainers, publishes to Maven Local):
+  - `./gradlew publishToMavenLocal`
+- Build/test all modules from root:
+  - `./gradlew test`
 - Run one demo backend at a time (both default to same port):
-  - `mvn -pl demo-backend spring-boot:run`
-  - `mvn -pl demo-reactive spring-boot:run`
+  - `./gradlew :demo-backend:bootRun`
+  - `./gradlew :demo-reactive:bootRun`
 - Frontend workflow (inside `demo-front`): use scripts in `demo-front/package.json` (`dev`, `build`, `test:unit`, `lint`).
 
 ## Testing and Coding Conventions Seen in Repo
@@ -33,4 +33,5 @@
 - Nullness is explicit via JSpecify `@NullMarked` package-level defaults across modules (search `**/package-info.java`).
 - Java + Kotlin coexist in modules; keep interop-friendly APIs and avoid introducing framework patterns that bypass current starter auto-config design.
 - When adding new starter behavior, mirror existing pattern: properties class + auto-config + `AutoConfiguration.imports` registration + demo/test coverage in either `demo-backend` or `demo-reactive`.
+- When adding a new module, register it in `settings.gradle.kts` (`include(...)`) and add a `build.gradle.kts` mirroring existing starters (apply `java-library`, Kotlin plugins, and `io.spring.dependency-management`; shared config lives in the root `build.gradle.kts` `subprojects` block).
 

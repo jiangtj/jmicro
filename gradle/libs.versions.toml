@@ -1,0 +1,83 @@
+[versions]
+# Platform
+springBoot = "4.0.6"
+springDependencyManagement = "1.1.7"
+java = "17"
+kotlin = "2.2.20"
+kotlinLogging = "8.0.01"
+dokka = "2.2.0"
+mavenPublish = "0.37.0"
+
+# Libraries
+jspecify = "1.0.0"
+jsr305 = "3.0.2"
+libphonenumber = "9.0.29"
+casdoor = "1.15.0"
+jjwt = "0.13.0"
+mockitoKotlin = "6.3.0"
+lombok = "1.18.44"
+
+# Pic upload providers
+aliyunOss = "3.18.5"
+huaweiObs = "3.25.10"
+minio = "8.5.17"
+awssdk = "2.42.41"
+
+# Payment
+wechatpay = "0.2.17"
+
+[libraries]
+# Kotlin
+kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
+kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
+kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5", version.ref = "kotlin" }
+kotlin-logging-jvm = { module = "io.github.oshai:kotlin-logging-jvm", version.ref = "kotlinLogging" }
+
+# Nullness
+jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
+jsr305 = { module = "com.google.code.findbugs:jsr305", version.ref = "jsr305" }
+
+# Tools
+libphonenumber = { module = "com.googlecode.libphonenumber:libphonenumber", version.ref = "libphonenumber" }
+casdoorStarter = { module = "org.casbin:casdoor-spring-boot-starter", version.ref = "casdoor" }
+
+# JWT
+jjwt-api = { module = "io.jsonwebtoken:jjwt-api", version.ref = "jjwt" }
+jjwt-impl = { module = "io.jsonwebtoken:jjwt-impl", version.ref = "jjwt" }
+jjwt-jackson = { module = "io.jsonwebtoken:jjwt-jackson", version.ref = "jjwt" }
+jjwt-gson = { module = "io.jsonwebtoken:jjwt-gson", version.ref = "jjwt" }
+
+# Test
+mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
+
+# Pic upload providers
+aliyun-oss = { module = "com.aliyun.oss:aliyun-sdk-oss", version.ref = "aliyunOss" }
+huawei-obs = { module = "com.huaweicloud:esdk-obs-java-bundle", version.ref = "huaweiObs" }
+minio = { module = "io.minio:minio", version.ref = "minio" }
+awssdk-s3 = { module = "software.amazon.awssdk:s3", version.ref = "awssdk" }
+
+# Payment
+wechatpay-java = { module = "com.github.wechatpay-apiv3:wechatpay-java", version.ref = "wechatpay" }
+
+# Lombok
+lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
+
+# Internal modules (declared for clarity; versions come from the platform project)
+micro-common = { module = "com.jiangtj.micro:micro-common" }
+micro-web = { module = "com.jiangtj.micro:micro-web" }
+micro-auth = { module = "com.jiangtj.micro:micro-auth" }
+micro-auth-oidc = { module = "com.jiangtj.micro:micro-auth-oidc" }
+micro-spring-boot-starter = { module = "com.jiangtj.micro:micro-spring-boot-starter" }
+micro-sql-jooq = { module = "com.jiangtj.micro:micro-sql-jooq" }
+micro-test = { module = "com.jiangtj.micro:micro-test" }
+micro-pic-upload-starter = { module = "com.jiangtj.micro:micro-pic-upload-starter" }
+micro-flyway-starter = { module = "com.jiangtj.micro:micro-flyway-starter" }
+micro-payment = { module = "com.jiangtj.micro:micro-payment" }
+
+[plugins]
+spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
+spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "springDependencyManagement" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }
+kotlin-lombok = { id = "org.jetbrains.kotlin.plugin.lombok", version.ref = "kotlin" }
+maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }

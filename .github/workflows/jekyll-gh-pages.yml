@@ -1,5 +1,5 @@
 # Sample workflow for building and deploying a Jekyll site to GitHub Pages
-name: Deploy Jekyll and Maven Site with GitHub Pages
+name: Deploy Jekyll and Gradle Site with GitHub Pages
 
 on:
   # Runs on pushes targeting the default branch
@@ -30,49 +30,41 @@ jobs:
         uses: actions/checkout@v7
       - name: Setup Pages
         uses: actions/configure-pages@v6
+
+      # Build the Jekyll site
       - name: Build with Jekyll
         uses: actions/jekyll-build-pages@v1
         with:
           source: ./
           destination: ./_site
-      - name: Move site to pages artifact dir
-        run: |
-          mkdir ./temp_site
-          cp -r ./_site/* ./temp_site
+
+      # Prepare the merged static site directory
+      - name: Set up temp site dir
+        run: mkdir -p ./temp_site && cp -r ./_site/* ./temp_site
+
+      # Build API docs with Gradle (Javadoc for Java + KDoc via Dokka if available)
       - name: Set up JDK 17
         uses: actions/setup-java@v5
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: maven
-      - name: Install Dependencies Local
-        run: mvn install -P lib
-      - name: Build Maven Site
-        run: mvn site
-      - name: Move site to pages artifact dir
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Generate aggregated Javadoc (per module)
+        run: ./gradlew javadoc --no-daemon
+        continue-on-error: true
+
+      - name: Move javadoc into site
         run: |
-          mv ./micro-common/target/site ./temp_site/micro-common
-          mv ./micro-web/target/site ./temp_site/micro-web
-          mv ./micro-auth/target/site ./temp_site/micro-auth
-          mv ./micro-auth-oidc/target/site ./temp_site/micro-auth-oidc
-          mv ./micro-spring-boot-starter/target/site ./temp_site/micro-spring-boot-starter
-          mv ./micro-sql-jooq/target/site ./temp_site/micro-sql-jooq
-          mv ./micro-test/target/site ./temp_site/micro-test
-          mv ./micro-pic-upload-starter/target/site ./temp_site/micro-pic-upload-starter
-          mv ./micro-flyway-starter/target/site ./temp_site/micro-flyway-starter
-          mv ./micro-payment/target/site ./temp_site/micro-payment
-      - name: Move dokka to pages artifact dir
-        run: |
-          mv ./micro-common/target/dokka ./temp_site/micro-common
-          mv ./micro-web/target/dokka ./temp_site/micro-web
-          mv ./micro-auth/target/dokka ./temp_site/micro-auth
-          mv ./micro-auth-oidc/target/dokka ./temp_site/micro-auth-oidc
-          mv ./micro-spring-boot-starter/target/dokka ./temp_site/micro-spring-boot-starter
-          mv ./micro-sql-jooq/target/dokka ./temp_site/micro-sql-jooq
-          mv ./micro-test/target/dokka ./temp_site/micro-test
-          mv ./micro-pic-upload-starter/target/dokka ./temp_site/micro-pic-upload-starter
-          mv ./micro-flyway-starter/target/dokka ./temp_site/micro-flyway-starter
-          mv ./micro-payment/target/dokka ./temp_site/micro-payment
+          for m in micro-common micro-web micro-auth micro-auth-oidc micro-spring-boot-starter micro-sql-jooq micro-test micro-pic-upload-starter micro-flyway-starter micro-payment micro-dependencies; do
+            if [ -d "./$m/build/docs/javadoc" ]; then
+              mkdir -p "./temp_site/$m/javadoc"
+              cp -r "./$m/build/docs/javadoc/." "./temp_site/$m/javadoc"
+            fi
+          done
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5
         with:
