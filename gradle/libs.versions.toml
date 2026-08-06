@@ -11,7 +11,7 @@ mavenPublish = "0.37.0"
 # Libraries
 jspecify = "1.0.0"
 jsr305 = "3.0.2"
-libphonenumber = "9.0.29"
+libphonenumber = "9.0.36"
 casdoor = "1.15.0"
 jjwt = "0.13.0"
 mockitoKotlin = "6.3.0"
