@@ -66,6 +66,7 @@ micro-sql-jooq = { module = "com.jiangtj.micro:micro-sql-jooq" }
 micro-test = { module = "com.jiangtj.micro:micro-test" }
 micro-pic-upload-starter = { module = "com.jiangtj.micro:micro-pic-upload-starter" }
 micro-flyway-starter = { module = "com.jiangtj.micro:micro-flyway-starter" }
+micro-business = { module = "com.jiangtj.micro:micro-business" }
 
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }

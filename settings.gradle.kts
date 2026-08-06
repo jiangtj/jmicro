@@ -40,6 +40,7 @@ include(
     "micro-dependencies",
     "micro-pic-upload-starter",
     "micro-flyway-starter",
+    "micro-business",
     // server (demo apps)
     "demo-backend",
     "demo-reactive",
