@@ -16,6 +16,5 @@ dependencies {
         api(project(":micro-test"))
         api(project(":micro-pic-upload-starter"))
         api(project(":micro-flyway-starter"))
-        api(project(":micro-payment"))
     }
 }

@@ -23,9 +23,6 @@ huaweiObs = "3.25.10"
 minio = "8.5.17"
 awssdk = "2.42.41"
 
-# Payment
-wechatpay = "0.2.17"
-
 [libraries]
 # Kotlin
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
@@ -56,9 +53,6 @@ huawei-obs = { module = "com.huaweicloud:esdk-obs-java-bundle", version.ref = "h
 minio = { module = "io.minio:minio", version.ref = "minio" }
 awssdk-s3 = { module = "software.amazon.awssdk:s3", version.ref = "awssdk" }
 
-# Payment
-wechatpay-java = { module = "com.github.wechatpay-apiv3:wechatpay-java", version.ref = "wechatpay" }
-
 # Lombok
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 
@@ -72,7 +66,6 @@ micro-sql-jooq = { module = "com.jiangtj.micro:micro-sql-jooq" }
 micro-test = { module = "com.jiangtj.micro:micro-test" }
 micro-pic-upload-starter = { module = "com.jiangtj.micro:micro-pic-upload-starter" }
 micro-flyway-starter = { module = "com.jiangtj.micro:micro-flyway-starter" }
-micro-payment = { module = "com.jiangtj.micro:micro-payment" }
 
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
