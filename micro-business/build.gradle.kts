@@ -18,6 +18,4 @@ dependencies {
     // compilation and runtime but non-transitive (not forced onto consumers).
     compileOnly("org.springframework.boot:spring-boot-starter-flyway")
     compileOnly("org.flywaydb:flyway-core")
-    runtimeOnly("org.springframework.boot:spring-boot-starter-flyway")
-    runtimeOnly("org.flywaydb:flyway-core")
 }
