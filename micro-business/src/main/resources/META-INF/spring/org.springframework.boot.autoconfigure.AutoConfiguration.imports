@@ -1,3 +1,4 @@
 com.jiangtj.micro.business.flyway.MicroFlywayAutoConfiguration
+com.jiangtj.micro.business.config.SystemConfigAutoConfiguration
 com.jiangtj.micro.business.cas.OidcServerAutoConfiguration
 com.jiangtj.micro.business.cas.OidcServerServletAutoConfiguration

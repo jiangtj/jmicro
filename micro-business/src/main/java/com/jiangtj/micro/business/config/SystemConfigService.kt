@@ -4,9 +4,7 @@ import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.jiangtj.micro.web.copyTo
 import org.springframework.context.ApplicationEventPublisher
-import org.springframework.stereotype.Service
 
-@Service
 class SystemConfigService(
     loaders: List<SystemConfigLoader>,
     private val applicationEventPublisher: ApplicationEventPublisher,
