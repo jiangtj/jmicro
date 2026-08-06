@@ -60,7 +60,6 @@ lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 micro-common = { module = "com.jiangtj.micro:micro-common" }
 micro-web = { module = "com.jiangtj.micro:micro-web" }
 micro-auth = { module = "com.jiangtj.micro:micro-auth" }
-micro-auth-oidc = { module = "com.jiangtj.micro:micro-auth-oidc" }
 micro-spring-boot-starter = { module = "com.jiangtj.micro:micro-spring-boot-starter" }
 micro-sql-jooq = { module = "com.jiangtj.micro:micro-sql-jooq" }
 micro-test = { module = "com.jiangtj.micro:micro-test" }

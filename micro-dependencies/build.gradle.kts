@@ -10,7 +10,6 @@ dependencies {
         api(project(":micro-common"))
         api(project(":micro-web"))
         api(project(":micro-auth"))
-        api(project(":micro-auth-oidc"))
         api(project(":micro-spring-boot-starter"))
         api(project(":micro-sql-jooq"))
         api(project(":micro-test"))

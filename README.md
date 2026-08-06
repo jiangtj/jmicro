@@ -77,7 +77,7 @@ class ExampleService {
 }
 ```
 
-`micro-auth-oidc` 是这个鉴权模块的扩展，用于支持 oidc 的轻量认证（API 鉴权 + SPA OIDC 认证），你可以参考他创建自己的鉴权模块
+`micro-auth` 模块内置了 OIDC 的轻量认证支持（API 鉴权 + SPA OIDC 认证，包 `com.jiangtj.micro.auth.oidc`）；可选的 OIDC Server（Cas）能力位于 `micro-business` 模块（`com.jiangtj.micro.business.oidc.cas`，默认关闭），你可以参考它创建自己的鉴权模块
 
 ## Web 模块
 [![doc](https://img.shields.io/badge/document-grey.svg?logo=readme)](./micro-web)

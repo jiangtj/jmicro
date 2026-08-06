@@ -1,4 +1,4 @@
-package com.jiangtj.micro.auth.oidc.cas
+package com.jiangtj.micro.business.oidc.cas
 
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine

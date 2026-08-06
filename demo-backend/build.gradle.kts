@@ -10,7 +10,8 @@ plugins {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation(project(":micro-spring-boot-starter"))
-    implementation(project(":micro-auth-oidc"))
+    implementation(project(":micro-auth"))
+    implementation(project(":micro-business"))
     implementation(project(":micro-pic-upload-starter"))
     implementation("org.springframework.boot:spring-boot-starter-actuator")
 

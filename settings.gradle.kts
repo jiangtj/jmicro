@@ -33,7 +33,6 @@ include(
     "micro-common",
     "micro-web",
     "micro-auth",
-    "micro-auth-oidc",
     "micro-spring-boot-starter",
     "micro-sql-jooq",
     "micro-test",

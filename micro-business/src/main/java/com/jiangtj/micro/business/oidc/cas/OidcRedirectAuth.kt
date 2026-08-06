@@ -1,4 +1,4 @@
-package com.jiangtj.micro.auth.oidc.cas
+package com.jiangtj.micro.business.oidc.cas
 
 interface OidcRedirectAuth {
 

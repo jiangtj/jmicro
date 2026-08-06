@@ -8,7 +8,8 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":micro-auth-oidc"))
+    implementation(project(":micro-auth"))
+    implementation(project(":micro-business"))
     implementation(project(":micro-spring-boot-starter"))
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
