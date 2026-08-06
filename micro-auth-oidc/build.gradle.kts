@@ -10,8 +10,6 @@ plugins {
 
 dependencies {
     api(libs.jjwt.api)
-    runtimeOnly(libs.jjwt.impl)
-
     api(project(":micro-auth"))
     api("com.github.ben-manes.caffeine:caffeine")
 

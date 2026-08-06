@@ -5,6 +5,7 @@
 - Core library modules live under `micro-*`; runnable demos are `demo-backend` (Servlet) and `demo-reactive` (WebFlux), both configured for port `17001` (`demo-*/src/main/resources/application.properties`).
 - Dependency version alignment is centralized in the `micro-dependencies` java-platform project and consumed by other modules; the Spring Boot BOM is imported via the `io.spring.dependency-management` plugin configured in the root `build.gradle.kts`.
 - `micro-spring-boot-starter` is the opinionated entry point for app defaults (exception handling + web filter wiring), while specialized features stay in dedicated starters (`micro-auth`, `micro-auth-oidc`, `micro-pic-upload-starter`, `micro-business`). Flyway support now lives in `micro-business` as an optional dependency.
+- OIDC/JWT 核心能力（包 `com.jiangtj.micro.auth.oidc`）位于 `micro-auth` 模块；`micro-auth-oidc` 仅保留 Cas 相关实现（OIDC server 能力），并依赖 `micro-auth` 提供的 OIDC 基础能力。
 
 ## Architecture Patterns You Should Follow
 - Prefer Spring Boot auto-configuration extension points over direct wiring: each starter registers via `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports`.
@@ -14,7 +15,7 @@
 
 ## Config and Integration Hotspots
 - Property namespaces are module-specific and important: `jmicro.auth.*`, `jmicro.jwt.*`, `micro.flyway.*`, `micro.pic.upload.*`, plus provider namespaces (`minio.*`, `ali.oss.*`, `hw.obs.*`, `easyimages.api.*`).
-- OIDC/JWT support is in `micro-auth-oidc`; default OIDC server support is opt-in and documented in `micro-auth-oidc/README.md`.
+- OIDC/JWT support is in `micro-auth` (package `com.jiangtj.micro.auth.oidc`); the optional OIDC server (Cas) support is in `micro-auth-oidc` and is opt-in, documented in `micro-auth-oidc/README.md`.
 - Demo auth integration depends on Casdoor (`docker-compose.yml`, root `README.md` Casdoor setup, and `demo-front/src/main.ts`).
 - Frontend talks directly to backend base URL `http://localhost:17001` (`demo-front/src/main.ts`) and attaches bearer tokens in `demo-front/src/core/token.ts`.
 

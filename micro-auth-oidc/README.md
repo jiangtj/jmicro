@@ -1,5 +1,7 @@
 # Micro Auth OIDC
 
+> 注意：OIDC 核心能力（JWT 验证、`OpenIDConnectAutoConfiguration`、`OidcLocator`、jjwt 集成等）已迁移至 `micro-auth` 模块（包路径 `com.jiangtj.micro.auth.oidc` 保持不变）。本模块（`micro-auth-oidc`）现在仅保留 Cas 相关实现，并依赖 `micro-auth` 提供的 OIDC 基础能力。
+
 基于 PKCE 流程的轻量权限控制模块
 
 我们推荐使用第三方开源的 OIDC 认证服务，如 logto, keycloak, casdoor, zitadel 等, 并在 Web 单页应用中认证获取 id_token, 然后在后端验证 token 有效性。

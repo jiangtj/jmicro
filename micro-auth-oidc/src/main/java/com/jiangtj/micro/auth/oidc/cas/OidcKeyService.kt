@@ -1,15 +1,18 @@
 package com.jiangtj.micro.auth.oidc.cas
 
 import com.jiangtj.micro.common.utils.UUIDUtils
+import io.jsonwebtoken.Header
 import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.Locator
 import io.jsonwebtoken.security.EcPrivateJwk
 import io.jsonwebtoken.security.EcPublicJwk
 import io.jsonwebtoken.security.Jwks
+import java.security.Key
 import java.security.KeyPair
 import java.security.PrivateKey
 import java.security.PublicKey
 
-class OidcKeyService(private val oidcServerProperties: OidcServerProperties) {
+class OidcKeyService(private val oidcServerProperties: OidcServerProperties) : Locator<Key> {
 
     var pair: KeyPair? = null
     var jwk: EcPrivateJwk? = null
@@ -28,5 +31,13 @@ class OidcKeyService(private val oidcServerProperties: OidcServerProperties) {
             .id((oidcServerProperties.kidPrefix ?: "") + UUIDUtils.generateBase64Compressed())
             .ecKeyPair(pair)
             .build()
+    }
+
+    override fun locate(header: Header): Key? {
+        val kid = header["kid"] as? String ?: return null
+        if (kid == getKid()) {
+            return getVerifyKey()
+        }
+        return null
     }
 }
