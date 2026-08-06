@@ -1,6 +1,18 @@
-# micro-business
+# J Micro Business
+
+![doc](https://img.shields.io/badge/document-grey.svg?logo=readme)
+[![dokka](https://img.shields.io/badge/dokka-grey.svg?logo=kotlin)](https://jiangtj.com/jmicro/micro-business/api)
 
 jmicro 的业务能力聚合模块，用于承载通用的业务侧自动配置与扩展能力。当前内置了对 Flyway 的轻量级扩展与可选的 OpenID Connect 服务器（Cas）能力。
+
+## 目录
+
+- [模块特性](#模块特性)
+- [使用方法](#使用方法)
+  - [添加依赖](#添加依赖)
+  - [Flyway 扩展（可选）](#flyway-扩展可选)
+  - [OpenID Connect 服务器（可选，默认关闭）](#openid-connect-服务器可选默认关闭)
+- [扩展指南](#扩展指南)
 
 ## 模块特性
 
@@ -19,10 +31,11 @@ jmicro 的业务能力聚合模块，用于承载通用的业务侧自动配置�
 </dependency>
 ```
 
+> 建议配合 `micro-dependencies` BOM 使用，省略版本号（见[根 README](../README.md)）。
+
 ### Flyway 扩展（可选）
 
-Flyway 相关依赖在 `micro-business` 中是**可选（optional）**的，模块本身不会强制传递 Flyway。
-若要启用 Flyway 扩展，需在使用方自行引入 Flyway 依赖：
+Flyway 相关依赖在 `micro-business` 中是**可选（optional）**的，模块本身不会强制传递 Flyway。若要启用 Flyway 扩展，需在使用方自行引入 Flyway 依赖：
 
 ```xml
 <dependency>
@@ -44,8 +57,6 @@ Flyway 相关依赖在 `micro-business` 中是**可选（optional）**的，模�
 
 #### 配置属性
 
-在 `application.properties` 或 `application.yml` 中添加配置：
-
 ```properties
 # 是否在校验失败后自动清理并重新迁移
 micro.flyway.clean-on-validation-error=true
@@ -57,14 +68,14 @@ micro:
     clean-on-validation-error: true
 ```
 
-`clean-on-validation-error` 默认为 `false`。建议仅在开发或测试环境启用该能力，避免误删生产数据。
+`clean-on-validation-error` 默认为 `false`。**建议仅在开发或测试环境启用该能力，避免误删生产数据。**
 
 #### 工作机制
 
 当 Flyway 在执行 `migrate` 时发生 `FlywayValidateException`：
 
-- `clean-on-validation-error=false`：直接抛出异常，行为与 Spring Boot 默认一致
-- `clean-on-validation-error=true`：自动执行 `clean` 后重新 `migrate`
+- `clean-on-validation-error=false`：直接抛出异常，行为与 Spring Boot 默认一致。
+- `clean-on-validation-error=true`：自动执行 `clean` 后重新 `migrate`。
 
 如果你需要完全关闭 Flyway，可继续使用 Spring Boot 的配置：
 

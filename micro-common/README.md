@@ -1,16 +1,32 @@
-# micro-common
+# J Micro Common
+
+![doc](https://img.shields.io/badge/document-grey.svg?logo=readme)
+[![dokka](https://img.shields.io/badge/dokka-grey.svg?logo=kotlin)](https://jiangtj.com/jmicro/micro-common/api)
 
 通用工具模块，提供 JSON 处理、日期格式化、表单校验规则生成、基础校验注解以及常用工具类，支持 Java 与 Kotlin 项目。
 
-## 安装
+## 目录
+
+- [引入依赖](#引入依赖)
+- [功能概览](#功能概览)
+- [使用示例](#使用示例)
+  - [JSON 处理](#json-处理)
+  - [日期格式化](#日期格式化)
+  - [表单规则生成](#表单规则生成)
+  - [校验注解](#校验注解)
+  - [常用工具类](#常用工具类)
+  - [异常基类](#异常基类)
+
+## 引入依赖
 
 ```xml
 <dependency>
     <groupId>com.jiangtj.micro</groupId>
     <artifactId>micro-common</artifactId>
-    <version>${last-version}</version>
 </dependency>
 ```
+
+> 建议配合 `micro-dependencies` BOM 使用，省略版本号（见[根 README](../README.md)）。
 
 ## 功能概览
 
@@ -34,7 +50,7 @@ val json2 = payload.toJson()
 val back2: Map<String, String> = json2.fromJson()
 ```
 
-如果需要替换默认的 `JsonMapper`：
+如果需要替换默认的 `JsonMapper`（应用启动时由 `JMicroCommonAutoConfiguration` 初始化）：
 
 ```kotlin
 val mapper = JsonMapper.builder().build()
@@ -105,4 +121,6 @@ val map = dto.toMap()
 
 - `MicroException`：通用运行时异常基类。
 - `MicroHttpException`：携带 HTTP 状态码的异常。
-- `MicroProblemDetailException`：携带 `title`/`detail` 的问题详情异常。
+- `MicroProblemDetailException`：携带 `title`/`detail` 的问题详情异常（供上层 starter 转换为 RFC 9457 响应）。
+
+> 上层异常处理见 [micro-spring-boot-starter/README.md](../micro-spring-boot-starter/README.md)。
