@@ -12,7 +12,7 @@ class SystemConfigService(
     private val systemConfigSaver: SystemConfigSaver,
 ) {
 
-    private val defaultConfig = mutableMapOf<String, SystemItem>()
+    private val defaultConfig = mutableMapOf<String, SystemItemInfo>()
 
     val cache: Cache<String, String> = Caffeine.newBuilder().build()
 
@@ -55,27 +55,10 @@ class SystemConfigService(
         return getValue(key).lowercase() == "true"
     }
 
-    data class SystemConfigDto(
-        var key: String = "",
-        var name: String = "",
-        var description: String = "",
-        var value: String = "",
-        var formatedValue: String? = null,
-        var secret: Boolean = false,
-        var needRefresh: Boolean = false,
-        var group: SystemGroup = SystemGroup("default"),
-        var type: SystemItemType = SystemItemType.TEXT,
-        var fileDefaultPath: String = "",
-        var provider: List<Pair<String, String>> = listOf(),
-        var order: Int = 999,
-        var isModified: Boolean = false,
-        var tag: List<String> = listOf(),
-    )
-
-    fun getAllConfig(): List<SystemConfigDto> {
-        val map = mutableMapOf<String, SystemConfigDto>()
+    fun getAllConfig(): List<SystemItemInfo> {
+        val map = mutableMapOf<String, SystemItemInfo>()
         defaultConfig.forEach { (k, v) ->
-            map[k] = v.copyTo(SystemConfigDto())
+            map[k] = v.copyTo(SystemItemInfo())
         }
         systemConfigSaver.findAll().forEach {
             val c = map[it.first.trimKey()]
@@ -99,7 +82,7 @@ class SystemConfigService(
                 it
             }
             .sortedWith(
-                compareBy<SystemConfigDto> { it.group.order }
+                compareBy<SystemItemInfo> { it.group.order }
                     .thenBy { it.order }
             )
     }
@@ -143,17 +126,11 @@ class SystemConfigService(
         applicationEventPublisher.publishEvent(SystemConfigRefreshEvent())
     }
 
-    data class SystemConfigForTag(
-        var key: String = "",
-        var name: String = "",
-        var value: String = "",
-    )
-
-    fun getConfigByTag(tag: String): List<SystemConfigForTag> {
+    fun getConfigByTag(tag: String): List<SystemItem> {
         val t = tag.trim().lowercase()
         return getAllConfig()
             .filter { it.tag.any { item -> item.trim().lowercase() == t } }
-            .map { SystemConfigForTag(it.key, it.name, it.value) }
+            .map { SystemItem(it.key, it.name, it.value) }
     }
 
 }

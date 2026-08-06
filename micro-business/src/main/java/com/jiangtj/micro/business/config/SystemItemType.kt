@@ -1,5 +1,5 @@
 package com.jiangtj.micro.business.config
 
 enum class SystemItemType {
-    TEXT, TEXTAREA, SWITCH, SELECT, FILE
+    TEXT, TEXTAREA, SWITCH, SELECT, MULTI_SELECT
 }
