@@ -1,4 +1,4 @@
-package com.jiangtj.micro.business.oidc.cas
+package com.jiangtj.micro.business.cas
 
 import com.jiangtj.micro.common.utils.UUIDUtils
 import io.jsonwebtoken.Header

@@ -10,12 +10,8 @@ plugins {
 
 dependencies {
     api("org.springframework.boot:spring-boot-starter")
-    api(libs.jspecify)
     api(project(":micro-common"))
     api(project(":micro-auth"))
-    api(libs.jjwt.api)
-    runtimeOnly(libs.jjwt.impl)
-    api("com.github.ben-manes.caffeine:caffeine")
 
     // optional web stacks (OIDC server endpoints use servlet functional endpoints)
     compileOnly("org.springframework.boot:spring-boot-starter-web")
