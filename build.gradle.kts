@@ -29,9 +29,6 @@ plugins {
     alias(libs.plugins.dokka) apply false
 }
 
-group = "com.jiangtj.micro"
-version = "0.3.0"
-
 // Project-wide metadata shared by all published artifacts
 extra["projectUrl"] = "https://github.com/jiangtj/jmicro"
 extra["scmUrl"] = "https://github.com/jiangtj/jmicro/tree/master"
