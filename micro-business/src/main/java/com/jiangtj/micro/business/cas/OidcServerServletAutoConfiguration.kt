@@ -32,7 +32,7 @@ class OidcServerServletAutoConfiguration {
     @ConditionalOnMissingBean
     fun oidcRedirectAuth(): OidcRedirectAuth {
         return object : OidcRedirectAuth {
-            override fun userInfo(): Map<String, Any?> {
+            override fun userInfo(authContext: AuthContext): Map<String, Any?> {
                 TODO("Not yet implemented")
             }
         }
