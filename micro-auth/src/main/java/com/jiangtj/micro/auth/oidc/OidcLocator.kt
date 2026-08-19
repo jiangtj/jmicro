@@ -20,8 +20,7 @@ const val ORDER: Int = 10000
 
 @Order(ORDER)
 class OidcLocator(
-    private val oidcProvider: List<OidcClient>,
-    private val oidcKeyService: Locator<Key>?,
+    private val oidcProvider: List<OidcClient>
 ) : Locator<Key> {
 
     data class OICF(
@@ -41,11 +40,6 @@ class OidcLocator(
 
     override fun locate(header: Header): Key? {
         val kid = header.getKid() ?: return null
-
-        val selfKey = oidcKeyService?.locate(header)
-        if (selfKey != null) {
-            return selfKey
-        }
 
         val key = cache.getIfPresent(kid)
         if (key != null) {

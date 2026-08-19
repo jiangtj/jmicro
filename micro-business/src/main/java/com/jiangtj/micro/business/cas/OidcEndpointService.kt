@@ -132,7 +132,7 @@ class OidcEndpointService(
                 }
             }
 
-            val user = oidcRedirectAuth.userInfo()
+            val user = oidcRedirectAuth.userInfo(AuthContext(clientId, redirectUri, scope))
             val authCode = AuthCodeData(
                 clientId = clientId,
                 redirectUri = redirectUri,
