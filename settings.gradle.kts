@@ -1,11 +1,5 @@
 pluginManagement {
     repositories {
-        maven {
-            url = uri("https://maven.aliyun.com/repository/central")
-        }
-        maven {
-            url = uri("https://maven.aliyun.com/repository/gradle-plugin")
-        }
         gradlePluginPortal()
         mavenCentral()
         maven { url = uri("https://repo.spring.io/milestone") }
@@ -16,9 +10,6 @@ pluginManagement {
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
     repositories {
-        maven {
-            url = uri("https://maven.aliyun.com/repository/central")
-        }
         mavenCentral()
         maven { url = uri("https://repo.spring.io/milestone") }
         maven { url = uri("https://repo.spring.io/snapshot") }
