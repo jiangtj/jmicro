@@ -22,4 +22,10 @@ dependencies {
     // compilation and runtime but non-transitive (not forced onto consumers).
     compileOnly("org.springframework.boot:spring-boot-starter-flyway")
     compileOnly("org.flywaydb:flyway-core")
+
+    testImplementation(project(":micro-test"))
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.mockito:mockito-core")
+    testImplementation("org.mockito:mockito-junit-jupiter")
+    testImplementation(libs.mockito.kotlin)
 }
