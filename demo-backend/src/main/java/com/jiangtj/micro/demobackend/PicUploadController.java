@@ -1,7 +1,7 @@
 package com.jiangtj.micro.demobackend;
 
-import com.jiangtj.micro.pic.upload.PicUploadResult;
-import com.jiangtj.micro.pic.upload.PicUploadService;
+import com.jiangtj.micro.business.pic.upload.PicUploadResult;
+import com.jiangtj.micro.business.pic.upload.PicUploadService;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

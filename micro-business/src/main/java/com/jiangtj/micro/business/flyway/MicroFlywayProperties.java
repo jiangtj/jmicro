@@ -4,7 +4,7 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Data
-@ConfigurationProperties("micro.flyway")
+@ConfigurationProperties("jmicro.flyway")
 public class MicroFlywayProperties {
     private boolean cleanOnValidationError = false;
 }

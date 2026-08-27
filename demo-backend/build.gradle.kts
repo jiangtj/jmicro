@@ -12,7 +12,6 @@ dependencies {
     implementation(project(":micro-spring-boot-starter"))
     implementation(project(":micro-auth"))
     implementation(project(":micro-business"))
-    implementation(project(":micro-pic-upload-starter"))
     implementation("org.springframework.boot:spring-boot-starter-actuator")
 
     testImplementation(project(":micro-test"))

@@ -21,7 +21,6 @@ J Micro 是一个基于 Spring Boot 的轻量级基础工具集，帮助开发�
     - [micro-auth 认证与鉴权](#micro-auth-认证与鉴权)
     - [micro-web Web 工具](#micro-web-web-工具)
     - [micro-common 通用工具](#micro-common-通用工具)
-    - [micro-pic-upload-starter 图片上传](#micro-pic-upload-starter-图片上传)
     - [micro-sql-jooq 数据库扩展](#micro-sql-jooq-数据库扩展)
     - [micro-business 业务聚合](#micro-business-业务聚合)
     - [micro-spring-boot-starter 应用默认配置](#micro-spring-boot-starter-应用默认配置)
@@ -41,8 +40,7 @@ J Micro 是一个基于 Spring Boot 的轻量级基础工具集，帮助开发�
 | `micro-auth` | library | 轻量认证与鉴权（filter + 注解 + OIDC 基础能力） | [README](./micro-auth/README.md) | [api](https://jiangtj.com/jmicro/micro-auth/api) |
 | `micro-spring-boot-starter` | starter | 应用默认配置（异常处理 + Web 过滤器自动装配） | [README](./micro-spring-boot-starter/README.md) | [api](https://jiangtj.com/jmicro/micro-spring-boot-starter/api) |
 | `micro-sql-jooq` | library | JOOQ 业务封装（分页、代码生成扩展） | [README](./micro-sql-jooq/README.md) | [api](https://jiangtj.com/jmicro/micro-sql-jooq/api) |
-| `micro-pic-upload-starter` | starter | 图片上传（本地 / OSS / OBS / MinIO / EasyImages） | [README](./micro-pic-upload-starter/README.md) | [api](https://jiangtj.com/jmicro/micro-pic-upload-starter/api) |
-| `micro-business` | library | 业务聚合（Flyway 扩展、可选 OIDC Server） | [README](./micro-business/README.md) | [api](https://jiangtj.com/jmicro/micro-business/api) |
+| `micro-business` | library | 业务聚合（Flyway 扩展、可选 OIDC Server、图片上传） | [README](./micro-business/README.md) | [api](https://jiangtj.com/jmicro/micro-business/api) |
 | `micro-test` | library | 集成测试支持（`@JMicroTest`、`@WithMockUser` 等） | [README](./micro-test/README.md) | [api](https://jiangtj.com/jmicro/micro-test/api) |
 | `micro-dependencies` | bom (platform) | 内部模块版本对齐表，供使用方 `import` | [README](./micro-dependencies/README.md) | - |
 | `demo-backend` | demo | Servlet 后端示例（端口 17001） | - | - |
@@ -195,25 +193,6 @@ Map<String, List<FormRule>> generate = FormRuleGenerator.generate(Example.class)
 
 > 完整功能与示例见 [micro-common/README.md](./micro-common/README.md)。
 
-### micro-pic-upload-starter 图片上传
-
-```xml
-<dependency>
-    <groupId>com.jiangtj.micro</groupId>
-    <artifactId>micro-pic-upload-starter</artifactId>
-</dependency>
-```
-
-图片上传常用且繁琐，本模块旨在简化上传：配置好参数即可将图片转换为可访问 URL，支持以下服务商：
-
-- [x] 本地上传
-- [x] 阿里云 OSS
-- [x] 华为云 OBS
-- [x] MinIO (aka S3)
-- [x] EasyImages 2.0
-
-> 配置方式与代码示例见 [micro-pic-upload-starter/README.md](./micro-pic-upload-starter/README.md)。
-
 ### micro-sql-jooq 数据库扩展
 
 ```xml
@@ -282,6 +261,20 @@ Flyway 为可选能力，需自行引入依赖：
 ```
 
 > 完整配置与扩展指南见 [micro-business/README.md](./micro-business/README.md)。
+
+#### 图片上传（合并自 micro-pic-upload-starter）
+
+图片上传常用且繁琐，本模块旨在简化上传：配置好参数即可将图片转换为可访问 URL，支持以下服务商：
+
+- [x] 本地上传
+- [x] 阿里云 OSS
+- [x] 华为云 OBS
+- [x] MinIO (aka S3)
+- [x] EasyImages 2.0
+
+各服务商依赖为可选（`compileOnly`），使用时需自行引入对应 SDK；本地上传无需额外依赖。
+
+> 配置方式与代码示例见 [micro-business/README.md](./micro-business/README.md)。
 
 ### micro-spring-boot-starter 应用默认配置
 

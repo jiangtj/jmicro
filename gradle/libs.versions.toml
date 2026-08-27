@@ -63,7 +63,6 @@ micro-auth = { module = "com.jiangtj.micro:micro-auth" }
 micro-spring-boot-starter = { module = "com.jiangtj.micro:micro-spring-boot-starter" }
 micro-sql-jooq = { module = "com.jiangtj.micro:micro-sql-jooq" }
 micro-test = { module = "com.jiangtj.micro:micro-test" }
-micro-pic-upload-starter = { module = "com.jiangtj.micro:micro-pic-upload-starter" }
 micro-business = { module = "com.jiangtj.micro:micro-business" }
 
 [plugins]

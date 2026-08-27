@@ -28,7 +28,6 @@ include(
     "micro-sql-jooq",
     "micro-test",
     "micro-dependencies",
-    "micro-pic-upload-starter",
     "micro-business",
     // server (demo apps)
     "demo-backend",

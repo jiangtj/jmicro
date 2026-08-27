@@ -4,7 +4,7 @@
 - This repo is a Spring Boot 4 multi-module monorepo built with Gradle (Kotlin DSL: `settings.gradle.kts`, `build.gradle.kts`, `gradle/libs.versions.toml`). `micro-dependencies` is a `java-platform` project (Gradle BOM equivalent).
 - Core library modules live under `micro-*`; runnable demos are `demo-backend` (Servlet) and `demo-reactive` (WebFlux), both configured for port `17001` (`demo-*/src/main/resources/application.properties`).
 - Dependency version alignment is centralized in the `micro-dependencies` java-platform project and consumed by other modules; the Spring Boot BOM is imported via the `io.spring.dependency-management` plugin configured in the root `build.gradle.kts`.
-- `micro-spring-boot-starter` is the opinionated entry point for app defaults (exception handling + web filter wiring), while specialized features stay in dedicated starters (`micro-auth`, `micro-pic-upload-starter`, `micro-business`). Flyway support now lives in `micro-business` as an optional dependency.
+- `micro-spring-boot-starter` is the opinionated entry point for app defaults (exception handling + web filter wiring), while specialized features stay in dedicated starters (`micro-auth`, `micro-business`). Flyway support now lives in `micro-business` as an optional dependency, alongside the picture-upload capability (merged from the former `micro-pic-upload-starter`, package `com.jiangtj.micro.business.pic`).
 - OIDC/JWT 核心能力（包 `com.jiangtj.micro.auth.oidc`）位于 `micro-auth` 模块；可选的 OIDC Server（Cas）能力位于 `micro-business` 模块（包 `com.jiangtj.micro.business.oidc.cas`，默认关闭），并依赖 `micro-auth` 提供的 OIDC 基础能力。
 
 ## Architecture Patterns You Should Follow
@@ -14,7 +14,7 @@
 - Shared JSON behavior is initialized in auto-config (`micro-web/src/main/java/com/jiangtj/micro/web/JMicroCommonAutoConfiguration.java` -> `JsonUtils.init(mapper)`).
 
 ## Config and Integration Hotspots
-- Property namespaces are module-specific and important: `jmicro.auth.*`, `jmicro.jwt.*`, `micro.flyway.*`, `micro.pic.upload.*`, plus provider namespaces (`minio.*`, `ali.oss.*`, `hw.obs.*`, `easyimages.api.*`).
+- Property namespaces are module-specific and important: `jmicro.auth.*`, `jmicro.jwt.*`, `jmicro.flyway.*`, `jmicro.pic.upload.*` (picture upload, lives in `micro-business`), plus provider namespaces (`minio.*`, `ali.oss.*`, `hw.obs.*`, `easyimages.api.*`).
 - OIDC/JWT support is in `micro-auth` (package `com.jiangtj.micro.auth.oidc`); the optional OIDC server (Cas) support is in `micro-business` (package `com.jiangtj.micro.business.oidc.cas`) and is opt-in.
 - Demo auth integration depends on Casdoor (`docker-compose.yml` and root `README.md` Casdoor setup).
 
