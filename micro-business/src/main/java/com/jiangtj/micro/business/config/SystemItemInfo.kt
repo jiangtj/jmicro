@@ -10,8 +10,6 @@ data class SystemItemInfo(
     var formatedValue: String? = null,
     var secret: Boolean = false,
     var needRefresh: Boolean = false,
-    /** 该配置项的值是否使用 bcrypt 哈希存储（常用于密码类 secret 项）。 */
-    var bcrypt: Boolean = false,
     var group: SystemGroup = SystemGroup("default"),
     var type: String = SystemItemType.TEXT.name,
     var provider: List<Pair<String, String>> = listOf(),
