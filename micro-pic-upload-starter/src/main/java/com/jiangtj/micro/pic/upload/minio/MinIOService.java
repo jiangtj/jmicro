@@ -10,8 +10,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 
 @Slf4j
 @PicUploadType("minio")
@@ -56,7 +54,7 @@ public class MinIOService implements PicUploadProvider {
                 PutObjectArgs.builder()
                     .bucket(bucket)
                     .object(path)
-                    .stream(inputStream, file.getSize(), -1)
+                    .stream(inputStream, file.getSize(), -1L)
                     .contentType(file.getContentType())
                     .build()
             );
@@ -75,7 +73,7 @@ public class MinIOService implements PicUploadProvider {
             log.error("Error occurred: {}", String.valueOf(e));
             log.error("HTTP trace: {}", e.httpTrace());
             throw new PicUploadInternalException("MinIO 上传失败！", e);
-        } catch (IOException | NoSuchAlgorithmException | InvalidKeyException e) {
+        } catch (IOException e) {
             log.error("获取图片失败", e);
             throw new PicUploadInternalException("获取图片失败！", e);
         }
