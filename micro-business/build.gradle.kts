@@ -12,6 +12,7 @@ dependencies {
     api("org.springframework.boot:spring-boot-starter")
     api(project(":micro-common"))
     api(project(":micro-auth"))
+    api("org.springframework.security:spring-security-crypto")
 
     // optional web stacks (OIDC server endpoints use servlet functional endpoints)
     compileOnly("org.springframework.boot:spring-boot-starter-web")
