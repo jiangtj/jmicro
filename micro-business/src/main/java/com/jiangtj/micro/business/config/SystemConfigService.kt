@@ -69,7 +69,7 @@ class SystemConfigService(
         }
         return map.values
             .map {
-                if (it.secret) {
+                if (it.secret || it.bcrypt) {
                     it.value = "******"
                 }
                 it
@@ -107,6 +107,9 @@ class SystemConfigService(
             } catch (e: Exception) {
                 throw MicroConfigException("配置项值不合法: ${e.message}")
             }
+        }
+        if (item.bcrypt && !BCryptUtils.isEncoded(newV)) {
+            newV = BCryptUtils.encode(newV)
         }
         systemConfigSaver.save(key, newV)
         cache.put(key, newV)
