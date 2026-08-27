@@ -39,7 +39,7 @@ jmicro 的业务能力聚合模块，用于承载通用的业务侧自动配置�
 
 ### 系统配置 SystemConfig（可选）
 
-系统配置能力位于包 `com.jiangtj.micro.business.config`，**默认不开启**，需显式配置 `system.config.enabled=true` 才生效。它通过 `SystemConfigService` 集中管理配置项，支持从 `SystemConfigLoader` 加载默认值、通过 `SystemConfigSaver` 持久化覆盖值，并在变更时发布 `SystemConfigUpdateEvent` / `SystemConfigRefreshEvent` 事件。
+系统配置能力位于包 `com.jiangtj.micro.business.config`，**默认不开启**，需显式配置 `jmicro.system.config.enabled=true` 才生效。它通过 `SystemConfigService` 集中管理配置项，支持从 `SystemConfigLoader` 加载默认值、通过 `SystemConfigSaver` 持久化覆盖值，并在变更时发布 `SystemConfigUpdateEvent` / `SystemConfigRefreshEvent` 事件。
 
 默认实现提供了 `InMemorySystemConfigSaver`（基于 `ConcurrentHashMap` 的内存存储），并通过 `@ConditionalOnMissingBean` 注册，使用者可自定义 `SystemConfigSaver` Bean 接入数据库等持久化方案。
 
@@ -47,27 +47,28 @@ jmicro 的业务能力聚合模块，用于承载通用的业务侧自动配置�
 
 ```properties
 # 开启系统配置能力（默认 false）
-system.config.enabled=true
+jmicro.system.config.enabled=true
 # 配置文件路径（默认 upload）
-system.config.file-path=upload
+jmicro.system.config.file-path=upload
 # 覆盖默认配置值的键值对
-system.config.kv.site-name=JMicro
-system.config.kv.max-upload-size=10MB
+jmicro.system.config.kv.site-name=JMicro
+jmicro.system.config.kv.max-upload-size=10MB
 ```
 
 ```yaml
-system:
-  config:
-    enabled: true
-    file-path: upload
-    kv:
-      site-name: JMicro
-      max-upload-size: 10MB
+jmicro:
+  system:
+    config:
+      enabled: true
+      file-path: upload
+      kv:
+        site-name: JMicro
+        max-upload-size: 10MB
 ```
 
 #### 工作机制
 
-- 启动时 `SystemConfigService` 收集所有 `SystemConfigLoader` 提供的 `SystemItemInfo` 作为默认配置，再应用 `system.config.kv` 中的覆盖值。
+- 启动时 `SystemConfigService` 收集所有 `SystemConfigLoader` 提供的 `SystemItemInfo` 作为默认配置，再应用 `jmicro.system.config.kv` 中的覆盖值。
 - 取值：`getValue(key)` / `isTrue(key)` 优先读取 `SystemConfigSaver` 中的覆盖值，未命中则回退到默认值；结果经 Caffeine 缓存加速，可通过 `refreshConfig()` 主动失效缓存。
 - 写值：`updateConfig(key, value)` 会做值格式校验（`valueFormatter`），保存到 `SystemConfigSaver` 并发布 `SystemConfigUpdateEvent`；`deleteConfig(key)` 删除覆盖值并回退默认值，同时发布事件。
 - `getAllConfig()` 返回排序后的配置视图（按分组 `group.order` 与 `order`），并对 `secret=true` 的项做脱敏（`******`），对带 `formatter` 的项生成 `formatedValue`。

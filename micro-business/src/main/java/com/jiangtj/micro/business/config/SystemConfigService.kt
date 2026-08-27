@@ -90,10 +90,10 @@ class SystemConfigService(
     fun generateConfig(key: String, value: String?): String {
         val k = key.replace("_", "-").lowercase()
         if (value.isNullOrBlank()) {
-            return "system.config.kv.${k}="
+            return "jmicro.system.config.kv.${k}="
         }
         val v = defaultConfig[key.trimKey()]?.valueFormatter?.apply(value) ?: value
-        return "system.config.kv.${k}=${v}"
+        return "jmicro.system.config.kv.${k}=${v}"
     }
 
     fun updateConfig(key: String, value: String) {

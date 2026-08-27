@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Data
-@ConfigurationProperties(prefix = "system.config")
+@ConfigurationProperties(prefix = "jmicro.system.config")
 public class SystemConfigProperties {
     private Boolean enabled = false;
     private String filePath = "upload";

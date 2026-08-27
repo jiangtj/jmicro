@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Bean
 
 @AutoConfiguration
 @EnableConfigurationProperties(SystemConfigProperties::class)
-@ConditionalOnBooleanProperty(prefix = "system.config", name = ["enabled"], havingValue = true)
+@ConditionalOnBooleanProperty(prefix = "jmicro.system.config", name = ["enabled"], havingValue = true)
 class SystemConfigAutoConfiguration {
 
     @Bean

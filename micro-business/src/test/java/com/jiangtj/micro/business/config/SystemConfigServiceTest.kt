@@ -236,9 +236,9 @@ class SystemConfigServiceTest {
         val item = defaultItem(key = "My_Key", value = "default")
         service = buildService(item)
 
-        assertEquals("system.config.kv.my-key=", service.generateConfig("My_Key", null))
-        assertEquals("system.config.kv.my-key=", service.generateConfig("My_Key", ""))
-        assertEquals("system.config.kv.my-key=", service.generateConfig("My_Key", "   "))
+        assertEquals("jmicro.system.config.kv.my-key=", service.generateConfig("My_Key", null))
+        assertEquals("jmicro.system.config.kv.my-key=", service.generateConfig("My_Key", ""))
+        assertEquals("jmicro.system.config.kv.my-key=", service.generateConfig("My_Key", "   "))
     }
 
     @Test
@@ -250,7 +250,7 @@ class SystemConfigServiceTest {
         )
         service = buildService(item)
 
-        assertEquals("system.config.kv.k=v:input", service.generateConfig("k", "input"))
+        assertEquals("jmicro.system.config.kv.k=v:input", service.generateConfig("k", "input"))
     }
 
     @Test
@@ -258,7 +258,7 @@ class SystemConfigServiceTest {
         val item = defaultItem(key = "My_Key", value = "default")
         service = buildService(item)
 
-        assertEquals("system.config.kv.my-key=default", service.generateConfig("My_Key", "default"))
+        assertEquals("jmicro.system.config.kv.my-key=default", service.generateConfig("My_Key", "default"))
     }
 
     // ---- updateConfig ----
