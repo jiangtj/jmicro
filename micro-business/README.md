@@ -69,7 +69,7 @@ system:
 - 取值：`getValue(key)` / `isTrue(key)` 优先读取 `SystemConfigSaver` 中的覆盖值，未命中则回退到默认值；结果经 Caffeine 缓存加速，可通过 `refreshConfig()` 主动失效缓存。
 - 写值：`updateConfig(key, value)` 会做值格式校验（`valueFormatter`），保存到 `SystemConfigSaver` 并发布 `SystemConfigUpdateEvent`；`deleteConfig(key)` 删除覆盖值并回退默认值，同时发布事件。
 - `getAllConfig()` 返回排序后的配置视图（按分组 `group.order` 与 `order`），并对 `secret=true` 的项做脱敏（`******`），对带 `formatter` 的项生成 `formatedValue`。
-- **bcrypt 支持（通过 formatter 实现）**：不再使用 `bcrypt` 配置项。密码类 `secret` 项应直接配置 `valueFormatter` 与 `formatter`，例如使用 `BCryptUtils.encodeFormatter`（写入明文时若非 bcrypt 哈希则哈希后持久化，已是哈希则透传，避免二次哈希）与 `BCryptUtils.maskFormatter`（展示时统一脱敏为 `******`）。读取校验明文可用 `BCryptUtils.matches(raw, stored)`。
+- **bcrypt 支持（通过 formatter 实现）**：使用 `BCryptUtils.encodeFormatter` 写入明文时若非 bcrypt 哈希则哈希后持久化，已是哈希则透传，避免二次哈希。读取校验明文可用 `BCryptUtils.matches(raw, stored)`。
 - `getConfigByTag(tag)` 可按标签筛选配置项。
 
 #### 扩展指南
