@@ -15,7 +15,7 @@ buildscript {
         classpath("io.spring.gradle:dependency-management-plugin:1.1.7")
         // Workaround: kotlin-build-statistics is needed by Kotlin Gradle plugin's
         // ClasspathEntrySnapshotTransform but isn't always resolved automatically.
-        classpath("org.jetbrains.kotlin:kotlin-build-statistics:2.2.20")
+        classpath("org.jetbrains.kotlin:kotlin-build-statistics:2.4.10")
     }
 }
 
