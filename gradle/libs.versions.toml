@@ -1,6 +1,6 @@
 [versions]
 # Platform
-springBoot = "4.0.8"
+springBoot = "4.1.1"
 springDependencyManagement = "1.1.7"
 java = "17"
 kotlin = "2.2.20"
