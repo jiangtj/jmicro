@@ -4,37 +4,29 @@
 package com.jiangtj.micro.sql.jooq.jooq;
 
 
-import com.jiangtj.micro.sql.jooq.jooq.tables.*;
+import com.jiangtj.micro.sql.jooq.jooq.tables.SystemOperateRecord;
+import com.jiangtj.micro.sql.jooq.jooq.tables.SystemUser;
+import com.jiangtj.micro.sql.jooq.jooq.tables.SystemUserRole;
 
 
 /**
- * Convenience access to all tables in system-db.
+ * Convenience access to all tables in the default schema.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Tables {
 
     /**
-     * The table <code>system-db.DATABASECHANGELOG</code>.
-     */
-    public static final Databasechangelog DATABASECHANGELOG = Databasechangelog.DATABASECHANGELOG;
-
-    /**
-     * The table <code>system-db.DATABASECHANGELOGLOCK</code>.
-     */
-    public static final Databasechangeloglock DATABASECHANGELOGLOCK = Databasechangeloglock.DATABASECHANGELOGLOCK;
-
-    /**
-     * The table <code>system-db.system_operate_record</code>.
+     * The table <code>system_operate_record</code>.
      */
     public static final SystemOperateRecord SYSTEM_OPERATE_RECORD = SystemOperateRecord.SYSTEM_OPERATE_RECORD;
 
     /**
-     * The table <code>system-db.system_user</code>.
+     * The table <code>system_user</code>.
      */
     public static final SystemUser SYSTEM_USER = SystemUser.SYSTEM_USER;
 
     /**
-     * The table <code>system-db.system_user_role</code>.
+     * The table <code>system_user_role</code>.
      */
     public static final SystemUserRole SYSTEM_USER_ROLE = SystemUserRole.SYSTEM_USER_ROLE;
 }

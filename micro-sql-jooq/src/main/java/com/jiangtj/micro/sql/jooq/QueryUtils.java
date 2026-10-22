@@ -76,7 +76,7 @@ public abstract class QueryUtils {
             if (dataType.isString() && !nullable && value instanceof String str && str.isEmpty()) {
                 log.debug("{} is empty, type is nonnull", field.getName());
                 record.set(field, null);
-                record.changed(field, false);
+                record.touched(field, false);
             }
         }
     }

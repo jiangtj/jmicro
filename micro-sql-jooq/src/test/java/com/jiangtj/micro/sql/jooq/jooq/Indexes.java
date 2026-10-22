@@ -5,6 +5,7 @@ package com.jiangtj.micro.sql.jooq.jooq;
 
 
 import com.jiangtj.micro.sql.jooq.jooq.tables.SystemOperateRecord;
+
 import org.jooq.Index;
 import org.jooq.OrderField;
 import org.jooq.impl.DSL;
@@ -12,14 +13,14 @@ import org.jooq.impl.Internal;
 
 
 /**
- * A class modelling indexes of tables in system-db.
+ * A class modelling indexes of tables in the default schema.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Indexes {
 
     // -------------------------------------------------------------------------
     // INDEX definitions
     // -------------------------------------------------------------------------
 
-    public static final Index SYSTEM_OPERATE_RECORD_IDX_OPERATOR = Internal.createIndex(DSL.name("idx_operator"), SystemOperateRecord.SYSTEM_OPERATE_RECORD, new OrderField[] { SystemOperateRecord.SYSTEM_OPERATE_RECORD.OPERATOR }, false);
+    public static final Index IDX_OPERATOR = Internal.createIndex(DSL.name("idx_operator"), SystemOperateRecord.SYSTEM_OPERATE_RECORD, new OrderField[] { SystemOperateRecord.SYSTEM_OPERATE_RECORD.OPERATOR }, false);
 }

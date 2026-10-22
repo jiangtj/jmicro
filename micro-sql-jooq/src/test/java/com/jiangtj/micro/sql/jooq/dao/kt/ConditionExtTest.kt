@@ -13,7 +13,6 @@ import org.jooq.tools.jdbc.MockResult
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.time.LocalDate
-import java.time.LocalDateTime
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -29,7 +28,7 @@ class ConditionExtTest {
             apply(sql)
             
             val result = create.newResult(SYSTEM_USER)
-            result.add(create.newRecord(SYSTEM_USER).values(1, "name", "ps", 0))
+            result.add(create.newRecord(SYSTEM_USER).apply { fromArray(1, "name", "ps", 0) })
             return arrayOf(MockResult(1, result))
         }
     }

@@ -33,7 +33,7 @@ class PageUtilsTest {
                 return arrayOf(MockResult(1, result))
             }
             val result = create.newResult(SYSTEM_USER)
-            result.add(create.newRecord(SYSTEM_USER).values(1, "name", "ps", 0))
+            result.add(create.newRecord(SYSTEM_USER).apply { fromArray(1, "name", "ps", 0) })
             return arrayOf(MockResult(1, result))
         }
     }
