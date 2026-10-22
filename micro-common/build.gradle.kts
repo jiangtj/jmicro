@@ -1,7 +1,8 @@
 plugins {
     `java-library`
-    // Kotlin plugins are applied by the root build script (see `subprojects`), at the
-    // Kotlin version managed by the Spring Boot BOM.
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.spring)
+    alias(libs.plugins.kotlin.lombok)
     alias(libs.plugins.spring.dependency.management)
     alias(libs.plugins.maven.publish)
     alias(libs.plugins.dokka)
