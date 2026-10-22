@@ -1,4 +1,4 @@
-package com.jiangtj.micro.spring.boot.servlet;
+package com.jiangtj.micro.web;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.ErrorResponseException;

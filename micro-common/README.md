@@ -121,6 +121,4 @@ val map = dto.toMap()
 
 - `MicroException`：通用运行时异常基类。
 - `MicroHttpException`：携带 HTTP 状态码的异常。
-- `MicroProblemDetailException`：携带 `title`/`detail` 的问题详情异常（供上层 starter 转换为 RFC 9457 响应）。
-
-> 上层异常处理见 [micro-spring-boot-starter/README.md](../micro-spring-boot-starter/README.md)。
+- `MicroProblemDetailException`：携带 `title`/`detail` 的问题详情异常（可用于转换为 RFC 9457 响应）。

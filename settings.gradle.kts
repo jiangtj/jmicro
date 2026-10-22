@@ -24,12 +24,10 @@ include(
     "micro-common",
     "micro-web",
     "micro-auth",
-    "micro-spring-boot-starter",
     "micro-sql-jooq",
     "micro-test",
     "micro-dependencies",
     "micro-business",
     // server (demo apps)
     "demo-backend",
-    "demo-reactive",
 )

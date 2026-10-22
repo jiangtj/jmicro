@@ -58,7 +58,7 @@ jobs:
 
       - name: Move dokka into site
         run: |
-          for m in micro-common micro-web micro-auth micro-auth-oidc micro-spring-boot-starter micro-sql-jooq micro-test micro-pic-upload-starter micro-flyway-starter; do
+          for m in micro-common micro-web micro-auth micro-sql-jooq micro-test; do
             if [ -d "./$m/build/dokka/html" ]; then
               mkdir -p "./temp_site/$m/api"
               cp -r "./$m/build/dokka/html/." "./temp_site/$m/api"

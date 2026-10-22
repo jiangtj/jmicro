@@ -3,11 +3,11 @@
 ![doc](https://img.shields.io/badge/document-grey.svg?logo=readme)
 [![dokka](https://img.shields.io/badge/dokka-grey.svg?logo=kotlin)](https://jiangtj.com/jmicro/micro-web/api)
 
-`micro-web` 提供 Web 层通用扩展能力，是 `micro-spring-boot-starter` 与 `micro-auth` 的底层支撑：
+`micro-web` 提供 Web 层通用扩展能力，是 `micro-auth` / `micro-business` 的底层支撑：
 
 - **`FluentWebFilter`**：响应式（WebFlux）下以流式 API 声明过滤器链，支持按路径分组与嵌套。
 - **过滤器/拦截器扩展**：基于 Spring `WebFilter` 与 `HandlerInterceptor` 的通用封装。
-- **异常基础能力**：`BaseException` / `BaseExceptionUtils`，统一异常模型，供上层 starter 做 RFC 9457 Problem Details 处理。
+- **异常基础能力**：`BaseException` / `BaseExceptionUtils`，统一异常模型，可用于 RFC 9457 Problem Details 处理。
 
 ## 引入依赖
 
@@ -49,7 +49,7 @@ public class MyConfiguration {
 
 ## 异常基础能力
 
-`BaseException` 提供统一的异常模型（携带 `reason` 与 `status`），`BaseExceptionUtils` 提供从异常中提取信息的工具方法。上层 `micro-spring-boot-starter` 会基于这些能力做统一异常处理，并返回符合 RFC 9457 的 Problem Details 响应体。
+`BaseException` 提供统一的异常模型（携带 `reason` 与 `status`），`BaseExceptionUtils` 提供从异常中提取信息的工具方法，业务侧可基于这些能力做统一异常处理并返回符合 RFC 9457 的 Problem Details 响应体。
 
 ## JSON 初始化
 
@@ -58,7 +58,7 @@ public class MyConfiguration {
 ## 模块关系
 
 ```
-micro-web  ──►  micro-spring-boot-starter  ──►  micro-auth / micro-business
+micro-web  ──►  micro-auth / micro-business
    │
    └──► 提供 FluentWebFilter 与异常基础能力
 ```

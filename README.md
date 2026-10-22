@@ -23,7 +23,6 @@ J Micro 是一个基于 Spring Boot 的轻量级基础工具集，帮助开发�
     - [micro-common 通用工具](#micro-common-通用工具)
     - [micro-sql-jooq 数据库扩展](#micro-sql-jooq-数据库扩展)
     - [micro-business 业务聚合](#micro-business-业务聚合)
-    - [micro-spring-boot-starter 应用默认配置](#micro-spring-boot-starter-应用默认配置)
     - [micro-test 测试支持](#micro-test-测试支持)
     - [micro-dependencies 依赖对齐（BOM）](#micro-dependencies-依赖对齐bom)
 - [Demo 应用](#demo-应用)
@@ -38,13 +37,11 @@ J Micro 是一个基于 Spring Boot 的轻量级基础工具集，帮助开发�
 | `micro-common` | library | JSON、日期、表单校验规则、基础校验注解与常用工具类 | [README](./micro-common/README.md) | [api](https://jiangtj.com/jmicro/micro-common/api) |
 | `micro-web` | library | 过滤器/拦截器扩展、`FluentWebFilter`、异常基础能力 | [README](./micro-web/README.md) | [api](https://jiangtj.com/jmicro/micro-web/api) |
 | `micro-auth` | library | 轻量认证与鉴权（filter + 注解 + OIDC 基础能力） | [README](./micro-auth/README.md) | [api](https://jiangtj.com/jmicro/micro-auth/api) |
-| `micro-spring-boot-starter` | starter | 应用默认配置（异常处理 + Web 过滤器自动装配） | [README](./micro-spring-boot-starter/README.md) | [api](https://jiangtj.com/jmicro/micro-spring-boot-starter/api) |
 | `micro-sql-jooq` | library | JOOQ 业务封装（分页、代码生成扩展） | [README](./micro-sql-jooq/README.md) | [api](https://jiangtj.com/jmicro/micro-sql-jooq/api) |
 | `micro-business` | library | 业务聚合（Flyway 扩展、可选 OIDC Server、图片上传） | [README](./micro-business/README.md) | [api](https://jiangtj.com/jmicro/micro-business/api) |
 | `micro-test` | library | 集成测试支持（`@JMicroTest`、`@WithMockUser` 等） | [README](./micro-test/README.md) | [api](https://jiangtj.com/jmicro/micro-test/api) |
 | `micro-dependencies` | bom (platform) | 内部模块版本对齐表，供使用方 `import` | [README](./micro-dependencies/README.md) | - |
 | `demo-backend` | demo | Servlet 后端示例（端口 17001） | - | - |
-| `demo-reactive` | demo | WebFlux 后端示例（端口 17001） | - | - |
 
 > 所有 `micro-*` 库模块均已发布至 Maven Central；`demo-*` 仅为示例应用，不在发布范围内。
 
@@ -276,19 +273,6 @@ Flyway 为可选能力，需自行引入依赖：
 
 > 配置方式与代码示例见 [micro-business/README.md](./micro-business/README.md)。
 
-### micro-spring-boot-starter 应用默认配置
-
-```xml
-<dependency>
-    <groupId>com.jiangtj.micro</groupId>
-    <artifactId>micro-spring-boot-starter</artifactId>
-</dependency>
-```
-
-提供应用默认配置：启用 `micro-web` 的过滤器（引入 starter 后默认启用），并对异常做统一处理（遵循 RFC 9457 Problem Details）。
-
-> 详见 [micro-spring-boot-starter/README.md](./micro-spring-boot-starter/README.md)。
-
 ### micro-test 测试支持
 
 ```xml
@@ -325,21 +309,14 @@ Flyway 为可选能力，需自行引入依赖：
 
 ## Demo 应用
 
-项目提供两个功能一致的示例后端（前后端分离，前端为 Vue），均默认运行在端口 `17001`：
+项目提供一个示例后端（前后端分离，前端为 Vue），默认运行在端口 `17001`：
 
 - [demo-backend](demo-backend)：基于 Servlet 的后端服务
-- [demo-reactive](demo-reactive)：基于 WebFlux 的后端服务
-
-两者提供一致功能，部署在同一端口。运行 Demo 时，请**二选一**启动。
 
 ### 运行 Demo
 
 ```shell
-# Servlet 版
 ./gradlew :demo-backend:bootRun
-
-# 或 WebFlux 版
-./gradlew :demo-reactive:bootRun
 ```
 
 ### 配置 Casdoor
