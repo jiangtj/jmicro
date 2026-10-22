@@ -9,7 +9,7 @@
 
 J Micro 是一个基于 Spring Boot 的轻量级基础工具集，帮助开发者更轻松地构建应用（提供基于 Vue 的前后端分离 Demo）。它由 [JCPlatform](https://github.com/JiangTJ/jc-platform) 拆分而来，专注于基础应用能力；后续也将支撑另一个面向微服务的项目。
 
-> 设计理念：做更少的事，只做必要的扩展（如基于过滤器与注解的鉴权），不强依赖特定框架，支持 Servlet 与 WebFlux 双栈。
+> 设计理念：做更少的事，只做必要的扩展（如基于过滤器与注解的鉴权），不强依赖特定框架，面向 Servlet 栈。
 
 ## 目录
 
@@ -35,7 +35,7 @@ J Micro 是一个基于 Spring Boot 的轻量级基础工具集，帮助开发�
 | 模块 | 类型 | 说明 | 文档 | API |
 | --- | --- | --- | --- | --- |
 | `micro-common` | library | JSON、日期、表单校验规则、基础校验注解与常用工具类 | [README](./micro-common/README.md) | [api](https://jiangtj.com/jmicro/micro-common/api) |
-| `micro-web` | library | 过滤器/拦截器扩展、`FluentWebFilter`、异常基础能力 | [README](./micro-web/README.md) | [api](https://jiangtj.com/jmicro/micro-web/api) |
+| `micro-web` | library | 拦截器/AOP 扩展、异常基础能力 | [README](./micro-web/README.md) | [api](https://jiangtj.com/jmicro/micro-web/api) |
 | `micro-auth` | library | 轻量认证与鉴权（filter + 注解 + OIDC 基础能力） | [README](./micro-auth/README.md) | [api](https://jiangtj.com/jmicro/micro-auth/api) |
 | `micro-sql-jooq` | library | JOOQ 业务封装（分页、代码生成扩展） | [README](./micro-sql-jooq/README.md) | [api](https://jiangtj.com/jmicro/micro-sql-jooq/api) |
 | `micro-business` | library | 业务聚合（Flyway 扩展、可选 OIDC Server、图片上传） | [README](./micro-business/README.md) | [api](https://jiangtj.com/jmicro/micro-business/api) |
@@ -119,7 +119,7 @@ public class JsonAuthContextConverter implements AuthContextConverter {
 }
 ```
 
-配置好转换器后，即可通过授权类（`AuthService` / `AuthReactiveService`）或注解（`@HasLogin` `@HasRole` `@HasPermission`）控制权限：
+配置好转换器后，即可通过授权类（`AuthService`）或注解（`@HasLogin` `@HasRole` `@HasPermission`）控制权限：
 
 ```java
 @Service
@@ -145,27 +145,9 @@ class ExampleService {
 </dependency>
 ```
 
-在响应式开发中，`FluentWebFilter` 让过滤器配置变得轻松：
+提供基于 Spring `HandlerInterceptor` 的函数式拦截器扩展（`PreHandleInterceptor` / `PostHandleInterceptor` / `AfterCompletionInterceptor` / `FunctionHandlerInterceptor`）与 AOP 注解增强基础设施。
 
-```java
-@EnableFluentWebFilter
-@Configuration
-public class MyConfiguration {
-    @Bean
-    public FluentWebFilter fluentWebFilter(AuthReactiveService authReactiveService) {
-        return FluentWebFilter.create()
-            .exclude("/", "/login")
-            .action((exchange, chain) ->
-                authReactiveService.hasLogin().then(chain.filter(exchange)))
-            .path("/roleA/**").action((exchange, chain) ->
-                authReactiveService.hasRole("roleA").then(chain.filter(exchange)));
-    }
-}
-```
-
-> Tip: 这是对过滤器的扩展，不只可用于鉴权——任何希望拦截的场景都可以使用。传统 Servlet 中仍可使用 Spring 提供的、支持 ant-style 路径匹配的拦截器。
->
-> 若使用 Spring Boot 3.5+，也可使用官方 `@FilterRegistration`：`@FilterRegistration(name = "my-filter", urlPatterns = "/test/*", order = 0)`
+> Tip: 若使用 Spring Boot 3.5+，也可使用官方 `@FilterRegistration`：`@FilterRegistration(name = "my-filter", urlPatterns = "/test/*", order = 0)`
 
 > 更多内容见 [micro-web/README.md](./micro-web/README.md)。
 
@@ -207,23 +189,6 @@ public Page<AdminUser> fetchPage() {
         .conditions(condition(new AdminUserRecord(user)))
         .pageable(pageable)
         .fetchPage(AdminUser.class);
-}
-```
-
-同样提供响应式支持：
-
-```java
-@Bean
-public DSLContext dslContext(ConnectionFactory connectionFactory) {
-    return DSL.using(connectionFactory);
-}
-
-public Mono<Page<AdminUser>> fetchPage() {
-    return PageUtils.selectFrom(create, ADMIN_USER)
-        .conditions(condition(new AdminUserRecord(user)))
-        .pageable(pageable)
-        .subscribe(Flux::from, Mono::from)
-        .map(PageReactiveUtils.toPage(AdminUser.class));
 }
 ```
 
@@ -283,7 +248,7 @@ Flyway 为可选能力，需自行引入依赖：
 </dependency>
 ```
 
-为模块提供集成测试支持：`@JMicroTest` 组合注解与基于注解的模拟用户（`@WithMockUser` / `@WithMockSubject` / `@WithMockRole` / `@WithMockPermission`），以及响应式中替换 `StepVerifier` 的 `AuthStepVerifier`。
+为模块提供集成测试支持：`@JMicroTest` 组合注解与基于注解的模拟用户（`@WithMockUser` / `@WithMockSubject` / `@WithMockRole` / `@WithMockPermission`），以及用于断言 RFC 9457 响应的 `ProblemDetailMvcConsumer`。
 
 > 详见 [micro-test/README.md](./micro-test/README.md)。
 

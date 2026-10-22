@@ -1,4 +1,3 @@
 com.jiangtj.micro.auth.AuthAutoConfiguration
-com.jiangtj.micro.auth.reactive.ReactiveAutoConfiguration
 com.jiangtj.micro.auth.servlet.ServletAutoConfiguration
 com.jiangtj.micro.auth.oidc.OpenIDConnectAutoConfiguration

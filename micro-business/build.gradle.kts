@@ -20,7 +20,6 @@ dependencies {
     api("org.springframework:spring-context")
     compileOnly("org.springframework.boot:spring-boot-starter-web")
     compileOnly("org.springframework:spring-webmvc")
-    compileOnly("org.springframework:spring-webflux")
 
     // Flyway support is optional: consumers must opt-in by adding the Flyway
     // dependencies themselves. compileOnly + runtimeOnly keeps them visible for

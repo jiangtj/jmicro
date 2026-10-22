@@ -15,6 +15,4 @@ dependencies {
 
     compileOnly("org.springframework.boot:spring-boot-webmvc-test")
     compileOnly("org.springframework.boot:spring-boot-starter-restclient-test")
-
-    api("io.projectreactor:reactor-test")
 }

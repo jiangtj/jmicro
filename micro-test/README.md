@@ -51,19 +51,9 @@ class AuthTest {
 
 > 这些注解最终由 `TestAnnotationConverterFactory` 转换为 `AuthContext`，通过 `TestAuthContextHolder` 在测试线程内生效。
 
-## 响应式测试：AuthStepVerifier
-
-在 WebFlux 下，用 `AuthStepVerifier` 替代 `StepVerifier`，它会自动把当前模拟 `AuthContext` 写入 Reactor 上下文：
-
-```java
-AuthStepVerifier.create(someMono)
-    .expectNextMatches(...)
-    .verifyComplete();
-```
-
 ## Problem Details 断言
 
-提供 `ProblemDetailConsumer` / `ProblemDetailMvcConsumer`，用于在测试中便捷断言 RFC 9457 异常响应：
+提供 `ProblemDetailMvcConsumer`，用于在测试中便捷断言 RFC 9457 异常响应：
 
 ```java
 // 示例：断言返回 401 且 detail 匹配
@@ -76,7 +66,7 @@ ProblemDetailMvcConsumer.expectProblemDetail(401, "需要登录");
 micro-auth  ──►  提供 AuthContext / AuthService
     │
     ▼
-micro-test  ──►  @JMicroTest + @WithMockUser + AuthStepVerifier
+micro-test  ──►  @JMicroTest + @WithMockUser + ProblemDetailMvcConsumer
 ```
 
 > 鉴权用法见 [micro-auth/README.md](../micro-auth/README.md)。

@@ -11,7 +11,6 @@
 - [PageUtils 分页查询](#pageutils-分页查询)
   - [Fluent API](#fluent-api)
   - [分别查询列表与总数](#分别查询列表与总数)
-  - [响应式](#响应式)
 - [GenerateHelper 代码生成](#generatehelper-代码生成)
 - [ExtendGenerator 扩展生成器](#extendgenerator-扩展生成器)
 
@@ -53,29 +52,6 @@ PageUtils.select(create, field("val1"), field("val2") /* ... */)
 Condition condition = ...;
 PageUtils.selectLimitList(create.select(table).from(table), pageable, condition);
 PageUtils.selectCount(create.selectCount().from(table), condition);
-```
-
-### 响应式
-
-首先添加一个 `DSLContext` 配置：
-
-```java
-@Bean
-public DSLContext dslContext(ConnectionFactory connectionFactory) {
-    return DSL.using(connectionFactory);
-}
-```
-
-之后，使用 `subscribe()` 获取并转换值：
-
-```java
-public Mono<Page<AdminUser>> fetchPage() {
-    return PageUtils.selectFrom(create, ADMIN_USER)
-        .conditions(condition(new AdminUserRecord(user)))
-        .pageable(pageable)
-        .subscribe(Flux::from, Mono::from)
-        .map(PageReactiveUtils.toPage(AdminUser.class));
-}
 ```
 
 ## GenerateHelper 代码生成

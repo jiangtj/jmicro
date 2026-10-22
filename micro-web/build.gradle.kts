@@ -19,7 +19,4 @@ dependencies {
     // servlet
     compileOnly("org.springframework:spring-webmvc")
     compileOnly("org.apache.tomcat.embed:tomcat-embed-core")
-
-    // reactive
-    compileOnly("io.projectreactor:reactor-core")
 }

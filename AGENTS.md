@@ -10,7 +10,7 @@
 ## Architecture Patterns You Should Follow
 - Prefer Spring Boot auto-configuration extension points over direct wiring: each starter registers via `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports`.
 - Auth is intentionally lightweight and filter/AOP-centered (not Spring Security-first): see `micro-auth/README.md` and `micro-auth/src/main/java/com/jiangtj/micro/auth/AuthAutoConfiguration.java`.
-- Servlet/reactive parity is a design goal: many features provide both sides (`micro-auth` has servlet + reactive auto-config entries).
+- The library targets the Servlet stack only (Spring MVC); WebFlux/reactive support is intentionally out of scope.
 - Shared JSON behavior is initialized in auto-config (`micro-web/src/main/java/com/jiangtj/micro/web/JMicroCommonAutoConfiguration.java` -> `JsonUtils.init(mapper)`).
 
 ## Config and Integration Hotspots

@@ -16,9 +16,8 @@ dependencies {
     runtimeOnly(libs.jjwt.impl)
     api("com.github.ben-manes.caffeine:caffeine")
 
-    // optional web stacks
+    // optional web stack
     compileOnly("org.springframework.boot:spring-boot-starter-web")
-    compileOnly("org.springframework.boot:spring-boot-starter-webflux")
 
     testImplementation(project(":micro-test"))
     testImplementation("org.springframework.boot:spring-boot-starter-test")

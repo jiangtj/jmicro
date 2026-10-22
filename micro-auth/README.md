@@ -5,7 +5,7 @@
 
 当你需要对 Spring Boot 应用进行权限认证与鉴权时，可能会选择 Spring Security、Apache Shiro 或 SaToken 等框架，按文档一步步搭建。但假如不引入框架、从零搭建鉴权模块，你会发现大部分情况下**一个 filter 就足够了**。那些框架真的必要吗？这是本模块的设计初衷：做更少的事——仅仅是对 filter 的扩展，再提供我们熟知的注解。这就是它做的事。
 
-> 定位：轻量、filter / AOP 中心化（非 Spring Security-first）、支持 Servlet 与 WebFlux 双栈。
+> 定位：轻量、filter / AOP 中心化（非 Spring Security-first）、面向 Servlet 栈。
 
 ## 目录
 
@@ -65,7 +65,7 @@ public class JsonAuthContextConverter implements AuthContextConverter {
 
 配置好转换器后，即可在任意位置进行权限控制：
 
-- 授权类 `AuthService` / `AuthReactiveService`：可在过滤器或业务代码中使用。
+- 授权类 `AuthService`：可在过滤器或业务代码中使用。
 - 注解 `@HasLogin` / `@HasRole` / `@HasPermission`：控制方法或类级别的权限。
 
 ```java
@@ -139,7 +139,7 @@ public @interface HasAdminOrUser {
 // 那么 @HasAdminOrUser 等价于 @HasRole(value = {"admin", "user"}, logic = Logic.OR)
 ```
 
-也可以通过提供的切面类 `AnnotationMethodBeforeAdvice` / `ReactiveAnnotationMethodBeforeAdvice` 与 `AnnotationPointcut`（不限于鉴权）实现，以下是 `@HasRole` 的实现过程：
+也可以通过提供的切面类 `AnnotationMethodBeforeAdvice` 与 `AnnotationPointcut`（不限于鉴权）实现，以下是 `@HasRole` 的实现过程：
 
 ```java
 public class HasRoleAdvice extends AnnotationMethodBeforeAdvice<HasRole> {
@@ -186,37 +186,23 @@ public class MyConfiguration {
 `micro-test` 提供测试支持，使用 `@WithMockUser`（或 `@WithMockSubject` / `@WithMockRole` / `@WithMockPermission`）即可模拟用户进行集成测试：
 
 ```java
-@JMicroTest
-@AutoConfigureWebTestClient
+@JMicroMvcTest
 class Test {
 
     @Resource
-    WebTestClient client;
+    RestTestClient client;
 
     @Test
     @WithMockUser(subject = "user", roles = {"roleA", "roleB"})
     void getRole() {
-        client.build().get().uri("/")
+        client.get().uri("/")
             .exchange()
             .expectStatus().isOk();
     }
 }
 ```
 
-响应式中，service 层需要权限时，可用 `AuthStepVerifier` 替换 `StepVerifier`，它会自动提供授权上下文；也可通过 `TestAuthContextHolder` 获取上下文自行注入：
-
-```java
-@JMicroTest
-class Test {
-    @Test
-    @WithMockUser(subject = "user", roles = {"roleA", "roleB"})
-    void getRole() {
-        AuthStepVerifier.create(someService.call())
-            .expectComplete()
-            .verify();
-    }
-}
-```
+service 层需要权限时，也可通过 `TestAuthContextHolder` 获取上下文自行注入。
 
 > 详细测试能力见 [micro-test/README.md](../micro-test/README.md)。
 

@@ -135,7 +135,7 @@ spring.flyway.enabled=false
 
 OIDC 服务器能力位于包 `com.jiangtj.micro.business.cas`，**默认不开启**，需显式配置 `jmicro.oidc.server.enabled=true` 才生效。它依赖 `micro-auth` 提供的 OIDC 基础能力（`com.jiangtj.micro.auth.oidc`）与 JJWT 运行时，并通过 `OidcKeyService` 实现 jjwt 的 `Locator<Key>` 接口与 `micro-auth` 解耦。
 
-该能力当前提供 **Servlet** 自动配置入口（`OidcServerServletAutoConfiguration`，基于 Spring MVC 的 `RouterFunction`），并通过 `@ConditionalOnWebApplication(type = SERVLET)` 限定；仅当 `jmicro.oidc.server.enabled=true` 且为 Servlet Web 应用类型时注册。Reactive 自动配置入口尚未提供。
+该能力当前提供 **Servlet** 自动配置入口（`OidcServerServletAutoConfiguration`，基于 Spring MVC 的 `RouterFunction`），并通过 `@ConditionalOnWebApplication(type = SERVLET)` 限定；仅当 `jmicro.oidc.server.enabled=true` 且为 Servlet Web 应用类型时注册。
 
 #### 添加依赖
 
