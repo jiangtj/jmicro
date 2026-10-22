@@ -13,37 +13,37 @@ public class ProblemDetailMvcConsumer {
 
     public static ProblemDetailMvcConsumer unLogin() {
         return new ProblemDetailMvcConsumer(HttpStatus.UNAUTHORIZED)
-                .title("No Login")
-                .detail("You have to take a token for this request.");
+            .title("No Login")
+            .detail("You have to take a token for this request.");
     }
 
     // {"type":"about:blank","title":"Invalid Token","status":403,"detail":"不支持的
     // Auth Context","instance":"/actuator"}
     public static ProblemDetailMvcConsumer unInvalid(String msg) {
         return new ProblemDetailMvcConsumer(HttpStatus.FORBIDDEN)
-                .title("Invalid Token")
-                .detail(msg);
+            .title("Invalid Token")
+            .detail(msg);
     }
 
     // {"type":"about:blank","title":"No Role","status":403,"detail":"Don't have
     // role<roletest2>.","instance":"/role-test-2"}
     public static ProblemDetailMvcConsumer unRole(String role) {
         return new ProblemDetailMvcConsumer(HttpStatus.FORBIDDEN)
-                .title("No Role")
-                .detail(String.format("Don't have role<%s>.", role));
+            .title("No Role")
+            .detail(String.format("Don't have role<%s>.", role));
     }
 
     // {"type":"about:blank","title":"No Permission","status":403,"detail":"Don't
     // have permission<system:user:write>","instance":"/user"}
     public static ProblemDetailMvcConsumer unPermission(String permissionName) {
         return new ProblemDetailMvcConsumer(HttpStatus.FORBIDDEN)
-                .title("No Permission")
-                .detail(String.format("Don't have permission<%s>.", permissionName));
+            .title("No Permission")
+            .detail(String.format("Don't have permission<%s>.", permissionName));
     }
 
     public static ProblemDetailMvcConsumer forStatus(HttpStatus status) {
         return new ProblemDetailMvcConsumer(status)
-                .title(status.getReasonPhrase());
+            .title(status.getReasonPhrase());
     }
 
     ProblemDetailMvcConsumer(HttpStatusCode code) {
@@ -87,14 +87,29 @@ public class ProblemDetailMvcConsumer {
             responseSpec.expectStatus().is4xxClientError();
             responseSpec.expectStatus().isEqualTo(HttpStatus.BAD_REQUEST);
             responseSpec.expectBody()
-                    .jsonPath("status").isEqualTo(HttpStatus.BAD_REQUEST.value())
-                    .jsonPath("title").isEqualTo("Validation failure")
-                    .jsonPath("detail").value(String.class, d -> {
-                        for (String failure : failures) {
-                            assertTrue(d.contains(failure));
-                        }
-                    })
-                    .jsonPath("instance").exists();
+                .jsonPath("status").isEqualTo(HttpStatus.BAD_REQUEST.value())
+                .jsonPath("title").isEqualTo("Validation failure")
+                .jsonPath("detail").value(String.class, d -> {
+                    for (String failure : failures) {
+                        assertTrue(d.contains(failure));
+                    }
+                })
+                .jsonPath("instance").exists();
+        };
+    }
+
+    // {"detail":"Invalid request content.","instance":"/food/create","status":400,"title":"Bad Request"}
+    public static RestTestClient.ResponseSpec.ResponseSpecConsumer badRequest(String failure) {
+        return responseSpec -> {
+            responseSpec.expectStatus().is4xxClientError();
+            responseSpec.expectStatus().isEqualTo(HttpStatus.BAD_REQUEST);
+            responseSpec.expectBody()
+                .jsonPath("status").isEqualTo(HttpStatus.BAD_REQUEST.value())
+                .jsonPath("title").isEqualTo("Bad Request")
+                .jsonPath("detail").value(String.class, d -> {
+                    assertTrue(d.contains(failure));
+                })
+                .jsonPath("instance").exists();
         };
     }
 

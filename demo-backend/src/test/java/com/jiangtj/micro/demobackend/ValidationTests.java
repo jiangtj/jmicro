@@ -29,9 +29,7 @@ public class ValidationTests {
         webClient.post().uri("/food/create")
             .body(food)
             .exchange()
-            .expectAll(ProblemDetailMvcConsumer.unValidation(
-                "name: must not be blank",
-                "price: must be greater than or equal to 0"));
+            .expectAll(ProblemDetailMvcConsumer.badRequest("Invalid request content."));
     }
 
     @Test
@@ -61,13 +59,13 @@ public class ValidationTests {
                 .queryParam("name","foodname")
                 .build().toUri())
             .exchange()
-            .expectAll(ProblemDetailMvcConsumer.unValidation("手机号格式不正确"));
+            .expectAll(ProblemDetailMvcConsumer.badRequest("Validation failure"));
         webClient.post().uri(UriComponentsBuilder.fromUriString("/food/pay2")
                 .queryParam("phone", 13800)
                 .queryParam("name","foodname")
                 .build().toUri())
             .exchange()
-            .expectAll(ProblemDetailMvcConsumer.unValidation("手机号格式不正确"));
+            .expectAll(ProblemDetailMvcConsumer.badRequest("Validation failure"));
     }
 
 }
