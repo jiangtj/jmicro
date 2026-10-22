@@ -2,7 +2,9 @@
 # Platform
 springBoot = "4.1.1"
 springDependencyManagement = "1.1.7"
-java = "17"
+# jOOQ 3.21 (managed by the Spring Boot BOM) is compiled for Java 21 (class file 65),
+# so the whole build targets Java 21.
+java = "21"
 kotlin = "2.4.20"
 kotlinLogging = "8.0.4"
 dokka = "2.2.0"

@@ -7,6 +7,9 @@ package com.jiangtj.micro.sql.jooq.jooq.tables.daos;
 import com.jiangtj.micro.sql.jooq.PageUtils;
 import com.jiangtj.micro.sql.jooq.jooq.tables.SystemUserRole;
 import com.jiangtj.micro.sql.jooq.jooq.tables.records.SystemUserRoleRecord;
+
+import java.util.List;
+
 import org.jooq.Condition;
 import org.jooq.Configuration;
 import org.jooq.Record2;
@@ -15,8 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 
 /**

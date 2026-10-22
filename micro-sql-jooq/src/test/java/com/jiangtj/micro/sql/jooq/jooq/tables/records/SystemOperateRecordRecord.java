@@ -5,12 +5,14 @@ package com.jiangtj.micro.sql.jooq.jooq.tables.records;
 
 
 import com.jiangtj.micro.sql.jooq.jooq.tables.SystemOperateRecord;
+
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import org.jooq.Record1;
-import org.jooq.impl.UpdatableRecordImpl;
 
 import java.time.LocalDateTime;
+
+import org.jooq.Record1;
+import org.jooq.impl.UpdatableRecordImpl;
 
 
 /**

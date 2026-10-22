@@ -7,16 +7,30 @@ package com.jiangtj.micro.sql.jooq.jooq.tables;
 import com.jiangtj.micro.sql.jooq.jooq.Indexes;
 import com.jiangtj.micro.sql.jooq.jooq.Keys;
 import com.jiangtj.micro.sql.jooq.jooq.tables.records.SystemOperateRecordRecord;
-import org.jooq.*;
-import org.jooq.impl.DSL;
-import org.jooq.impl.Internal;
-import org.jooq.impl.SQLDataType;
-import org.jooq.impl.TableImpl;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+
+import org.jooq.Condition;
+import org.jooq.Field;
+import org.jooq.Identity;
+import org.jooq.Index;
+import org.jooq.Name;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
+import org.jooq.SQL;
+import org.jooq.Stringly;
+import org.jooq.Table;
+import org.jooq.TableField;
+import org.jooq.TableLike;
+import org.jooq.TableOptions;
+import org.jooq.UniqueKey;
+import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
+import org.jooq.impl.SQLDataType;
+import org.jooq.impl.TableImpl;
 
 
 /**

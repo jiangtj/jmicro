@@ -63,8 +63,8 @@ subprojects {
             "testImplementation"("org.springframework.boot:spring-boot-starter-test")
         }
 
-        // Compile to Java 17 bytecode regardless of the JDK running Gradle,
-        // matching the Maven parent's <java.version>17</java.version>.
+        // Compile to Java 21 bytecode regardless of the JDK running Gradle.
+        // Java 21 is required by jOOQ 3.21 (class file version 65).
         tasks.withType<JavaCompile>().configureEach {
             options.encoding = "UTF-8"
             options.release.set(libs.versions.java.get().toInt())
