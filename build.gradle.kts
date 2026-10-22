@@ -15,7 +15,7 @@ buildscript {
         classpath("io.spring.gradle:dependency-management-plugin:1.1.7")
         // Workaround: kotlin-build-statistics is needed by Kotlin Gradle plugin's
         // ClasspathEntrySnapshotTransform but isn't always resolved automatically.
-        classpath("org.jetbrains.kotlin:kotlin-build-statistics:2.2.20")
+        classpath("org.jetbrains.kotlin:kotlin-build-statistics:2.4.20")
     }
 }
 
@@ -99,6 +99,11 @@ subprojects {
 
     // Spring Dependency Management: import Spring Boot BOM so managed versions resolve.
     plugins.withId("io.spring.dependency-management") {
+        // Override the Spring Boot BOM's kotlin.version property so that every
+        // BOM-managed Kotlin artifact (kotlin-stdlib, kotlin-compiler-embeddable, ...)
+        // stays in sync with the Kotlin version declared in the version catalog.
+        // A mismatch breaks the Kotlin Build Tools API used by the compiler.
+        extra["kotlin.version"] = libs.versions.kotlin.get()
         extensions.configure<io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension> {
             imports {
                 mavenBom("org.springframework.boot:spring-boot-dependencies:${libs.versions.springBoot.get()}")

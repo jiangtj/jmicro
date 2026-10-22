@@ -1,9 +1,9 @@
 [versions]
 # Platform
-springBoot = "4.0.8"
+springBoot = "4.1.1"
 springDependencyManagement = "1.1.7"
 java = "17"
-kotlin = "2.2.20"
+kotlin = "2.4.20"
 kotlinLogging = "8.0.4"
 dokka = "2.2.0"
 mavenPublish = "0.37.0"
