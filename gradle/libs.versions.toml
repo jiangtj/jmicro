@@ -1,9 +1,12 @@
 [versions]
 # Platform
-springBoot = "4.0.8"
+springBoot = "4.1.1"
 springDependencyManagement = "1.1.7"
 java = "17"
-kotlin = "2.2.20"
+# Kotlin is NOT pinned here on purpose: the Kotlin toolchain version is read from the
+# Spring Boot BOM (`kotlin.version` property) in the root build.gradle.kts, so upgrading
+# springBoot also upgrades Kotlin. Kotlin libraries below are declared without a version
+# and get theirs from the imported spring-boot-dependencies BOM (kotlin-bom).
 kotlinLogging = "8.0.4"
 dokka = "2.2.0"
 mavenPublish = "0.37.0"
@@ -24,10 +27,10 @@ minio = "9.0.3"
 awssdk = "2.42.41"
 
 [libraries]
-# Kotlin
-kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
-kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
-kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5", version.ref = "kotlin" }
+# Kotlin (versions come from the spring-boot-dependencies BOM)
+kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect" }
+kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib" }
+kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5" }
 kotlin-logging-jvm = { module = "io.github.oshai:kotlin-logging-jvm", version.ref = "kotlinLogging" }
 
 # Nullness
@@ -66,10 +69,9 @@ micro-test = { module = "com.jiangtj.micro:micro-test" }
 micro-business = { module = "com.jiangtj.micro:micro-business" }
 
 [plugins]
+# The Kotlin plugins are intentionally absent: they are put on the build script classpath
+# by the root build.gradle.kts at the Kotlin version managed by the Spring Boot BOM.
 spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
 spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "springDependencyManagement" }
-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-kotlin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }
-kotlin-lombok = { id = "org.jetbrains.kotlin.plugin.lombok", version.ref = "kotlin" }
 maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }

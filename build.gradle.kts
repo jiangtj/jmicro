@@ -8,23 +8,51 @@ buildscript {
         maven { url = uri("https://repo.spring.io/milestone") }
         maven { url = uri("https://repo.spring.io/snapshot") }
     }
+    // ---------------------------------------------------------------------------------
+    // The Kotlin version follows the Spring Boot BOM.
+    // Gradle cannot take *plugin* versions from a BOM, so read `kotlin.version` from
+    // spring-boot-dependencies and put the Kotlin Gradle plugin on the build script
+    // classpath with exactly that version. Kotlin libraries (stdlib/reflect/test) are then
+    // version-less in the catalog and get their versions from the imported BOM as well.
+    // Result: bumping `springBoot` in gradle/libs.versions.toml also bumps Kotlin, and no
+    // Kotlin version has to be maintained by hand (mismatching the two used to break the
+    // compile with "CommonCompilerArguments.getPluginClasspaths() is null").
+    // ---------------------------------------------------------------------------------
+    val springBootVersion = Regex("""^\s*springBoot\s*=\s*"([^"]+)"""", RegexOption.MULTILINE)
+        .find(file("gradle/libs.versions.toml").readText())
+        ?.groupValues?.get(1)
+        ?: error("Cannot read the 'springBoot' version from gradle/libs.versions.toml")
+
+    val springBootBomPom = project.configurations.detachedConfiguration(
+        project.dependencies.create("org.springframework.boot:spring-boot-dependencies:$springBootVersion@pom")
+    ).apply { isTransitive = false }.singleFile
+
+    val kotlinVersion = Regex("<kotlin\\.version>\\s*([^<\\s]+)\\s*</kotlin\\.version>")
+        .find(springBootBomPom.readText())
+        ?.groupValues?.get(1)
+        ?: error(
+            "Cannot read the 'kotlin.version' property from " +
+                "org.springframework.boot:spring-boot-dependencies:$springBootVersion"
+        )
+
     dependencies {
         // Make the dependency-management plugin's types available to this build script
         // so we can type-safely configure the Spring Boot BOM import in the subprojects block.
         // Version catalog (libs) is not available in buildscript, so version is hardcoded here.
         classpath("io.spring.gradle:dependency-management-plugin:1.1.7")
+        // Kotlin toolchain at the Spring Boot managed Kotlin version (see above).
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
+        classpath("org.jetbrains.kotlin:kotlin-allopen:$kotlinVersion")
+        classpath("org.jetbrains.kotlin:kotlin-lombok:$kotlinVersion")
         // Workaround: kotlin-build-statistics is needed by Kotlin Gradle plugin's
         // ClasspathEntrySnapshotTransform but isn't always resolved automatically.
-        classpath("org.jetbrains.kotlin:kotlin-build-statistics:2.2.20")
+        classpath("org.jetbrains.kotlin:kotlin-build-statistics:$kotlinVersion")
     }
 }
 
 plugins {
     alias(libs.plugins.spring.boot) apply false
     alias(libs.plugins.spring.dependency.management) apply false
-    alias(libs.plugins.kotlin.jvm) apply false
-    alias(libs.plugins.kotlin.spring) apply false
-    alias(libs.plugins.kotlin.lombok) apply false
     alias(libs.plugins.maven.publish) apply false
     alias(libs.plugins.dokka) apply false
 }
@@ -39,6 +67,16 @@ subprojects {
     // Common group/version
     group = rootProject.group
     version = rootProject.version
+
+    // Every JVM module is a Kotlin module. The Kotlin Gradle plugin and its compiler
+    // plugins are already on the build script classpath (see the buildscript block, they
+    // follow the Spring Boot managed Kotlin version), so they are applied by id here
+    // instead of pinning a version per module / in the version catalog.
+    pluginManager.withPlugin("java") {
+        pluginManager.apply("org.jetbrains.kotlin.jvm")
+        pluginManager.apply("org.jetbrains.kotlin.plugin.spring")
+        pluginManager.apply("org.jetbrains.kotlin.plugin.lombok")
+    }
 
     // Apply JVM plugins uniformly so subprojects block can configure them.
     // micro-dependencies is a java-platform project (no java sources).
@@ -103,6 +141,8 @@ subprojects {
             imports {
                 mavenBom("org.springframework.boot:spring-boot-dependencies:${libs.versions.springBoot.get()}")
             }
+            // The BOM imports kotlin-bom, so all Kotlin artifacts (compiler included) resolve
+            // to the same version the Kotlin Gradle plugin uses (read from the same BOM above).
         }
     }
 
