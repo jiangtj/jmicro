@@ -1,44 +1,35 @@
-package com.jiangtj.micro.business.pic.upload.rustfs;
+package com.jiangtj.micro.business.pic.upload.rustfs
 
-import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Bean;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.s3.S3Client;
+import com.jiangtj.micro.business.config.SystemConfigAutoConfiguration
+import com.jiangtj.micro.business.config.SystemConfigService
+import org.springframework.boot.autoconfigure.AutoConfiguration
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
+import org.springframework.context.annotation.Bean
+import software.amazon.awssdk.services.s3.S3Client
 
-import java.net.URI;
-
-@AutoConfiguration
-@ConditionalOnProperty(prefix = "jmicro.rustfs", name = "enable", havingValue = "true")
-@EnableConfigurationProperties(RustFSProperties.class)
-public class RustFSAutoConfiguration {
-
-    /**
-     * 注册 RustFSClient 服务
-     */
-    @Bean
-    public S3Client rustFSClient(RustFSProperties properties) {
-        return S3Client.builder()
-            .endpointOverride(URI.create(properties.getEndpoint())) // RustFS 地址
-            .region(Region.US_EAST_1) // 可写死，RustFS 不校验 region
-            .credentialsProvider(
-                StaticCredentialsProvider.create(
-                    AwsBasicCredentials.create(properties.getAccessKey(), properties.getSecretKey())
-                )
-            )
-            .forcePathStyle(true) // 关键配置！RustFS 需启用 Path-Style
-            .build();
-    }
+/**
+ * RustFS 自动配置，配置项来自系统配置（需开启 `jmicro.system.config.enabled=true`，
+ * 并通过 `jmicro.rustfs.enable` 开启上传能力）
+ */
+@AutoConfiguration(after = [SystemConfigAutoConfiguration::class])
+@ConditionalOnClass(S3Client::class)
+@ConditionalOnBean(SystemConfigService::class)
+class RustFSAutoConfiguration {
 
     /**
-     * 注册 MinIOService 服务
+     * 注册 RustFS 配置项
      */
     @Bean
-    public RustFSService minioService(S3Client rustFSClient, RustFSProperties properties) {
-        return new RustFSService(rustFSClient, properties);
-    }
+    @ConditionalOnMissingBean
+    fun rustFSConfigLoader(): RustFSConfigLoader = RustFSConfigLoader()
 
+    /**
+     * 注册 RustFSService 服务
+     */
+    @Bean
+    fun rustFSService(systemConfigService: SystemConfigService): RustFSService {
+        return RustFSService(systemConfigService)
+    }
 }

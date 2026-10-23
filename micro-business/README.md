@@ -22,7 +22,7 @@ jmicro 的业务能力聚合模块，用于承载通用的业务侧自动配置�
 - 内置 **系统配置（SystemConfig）能力**（可选，默认关闭，见下文），提供以键值对方式管理、持久化与动态刷新系统运行配置的能力，支持默认值加载、类型化表单（TEXT/SWITCH/SELECT 等）、配置变更事件与基于 Caffeine 的缓存。
 - 内置 **Flyway 扩展**（可选依赖，见下文），在校验失败时提供可选的自动清理能力，适合开发、测试环境的快速重建。
 - 内置 **OpenID Connect 服务器（Cas）能力**（可选，默认关闭，见下文），提供 JWKS、Well-known 配置与授权/令牌端点，复用 `micro-auth` 的 OIDC 基础能力（`com.jiangtj.micro.auth.oidc`）。
-- 内置 **图片上传能力**（合并自原 `micro-pic-upload-starter`，见下文），位于包 `com.jiangtj.micro.business.pic`，提供本地 / 阿里云 OSS / 华为云 OBS / MinIO / EasyImages 2.0 等多种上传方式，配置即用的图片上传服务。
+- 内置 **图片上传能力**（合并自原 `micro-pic-upload-starter`，见下文），位于包 `com.jiangtj.micro.business.pic`，提供本地 / 阿里云 OSS / 华为云 OBS / MinIO / EasyImages 2.0 / RustFS 等多种上传方式，各服务商配置统一由系统配置（SystemConfig）提供。
 
 ## 使用方法
 
@@ -210,13 +210,14 @@ jmicro.oidc.server.clients[0].callback-uri[0]=http://localhost:17001/callback
 - [x] 华为云 OBS
 - [x] MinIO (aka S3)
 - [x] EasyImages 2.0
+- [x] RustFS (aka S3)
 
 #### 通用配置
 
 在 `application.properties` 或 `application.yml` 中添加配置，决定文件的上传位置：
 
 ```properties
-# 上传提供者，可选值：local, ali, hw, minio, easyimages
+# 上传提供者，可选值：local, ali, hw, minio, easyimages, rustfs
 jmicro.pic.upload.provider=minio
 # 默认允许的文件类型
 jmicro.pic.upload.allowed-extensions=jpg,jpeg,png,gif,webp
@@ -227,15 +228,16 @@ jmicro.pic.upload.dirs.target-name.path=/common
 # jmicro.pic.upload.dirs.target-name.provider=ali
 ```
 
-不同 `provider` 对应不同的属性命名空间，并可能需要引入对应 SDK：
+各服务商（`local` / `ali` / `hw` / `minio` / `easyimages` / `rustfs`）的配置项统一由**系统配置（SystemConfig）**提供，使用前需开启 `jmicro.system.config.enabled=true`；未开启时对应服务商的上传服务不会注册。配置项定义在各自的 `*ConfigItem` 枚举中（`systemConfigService.getValue(key)` 读取），可通过 `jmicro.system.config.kv.*` 提供值，也可在运行期通过 `SystemConfigService.updateConfig(key, value)` 动态修改（上传时实时读取）。各服务商并可能需要引入对应 SDK：
 
-| Provider | 命名空间 | 说明 |
+| Provider | 配置来源 | 说明 |
 | --- | --- | --- |
-| `local` | `jmicro.pic.upload.dirs.*` | 本地磁盘上传，无需额外 SDK |
-| `ali` | 系统配置项 `ali.oss.*` | 阿里云 OSS（需开启 `jmicro.system.config.enabled=true`） |
-| `hw` | `hw.obs.*` | 华为云 OBS |
-| `minio` | `minio.*` | 兼容 S3 的 MinIO |
-| `easyimages` | `easyimages.api.*` | EasyImages 2.0（纯 HTTP API，无需 SDK） |
+| `local` | 系统配置项 `jmicro.pic.upload.local.*` | 本地磁盘上传，无需额外 SDK |
+| `ali` | 系统配置项 `ali.oss.*` | 阿里云 OSS |
+| `hw` | 系统配置项 `hw.obs.*` | 华为云 OBS |
+| `minio` | 系统配置项 `minio.*` | 兼容 S3 的 MinIO |
+| `easyimages` | 系统配置项 `easyimages.api.*` | EasyImages 2.0（纯 HTTP API，无需 SDK） |
+| `rustfs` | 系统配置项 `jmicro.rustfs.*` | 兼容 S3 的 RustFS（需 `jmicro.rustfs.enable=true`） |
 
 #### 各服务商配置
 
@@ -250,10 +252,13 @@ jmicro.pic.upload.dirs.target-name.path=/common
 ```
 
 ```properties
-minio.endpoint=http://localhost:9000
-minio.access-key=access-key
-minio.secret-key=secret-key
-minio.bucket=bucket
+jmicro.system.config.enabled=true
+jmicro.system.config.kv.minio.endpoint=http://localhost:9000
+jmicro.system.config.kv.minio.access-key=access-key
+jmicro.system.config.kv.minio.secret-key=secret-key
+jmicro.system.config.kv.minio.bucket=bucket
+# 是否允许匿名读取（默认 false）
+jmicro.system.config.kv.minio.is-allow-get-object=false
 ```
 
 ##### Ali OSS
@@ -291,17 +296,40 @@ jmicro.system.config.kv.ali.oss.url=https://bucket-name.oss-cn-hangzhou.aliyuncs
 ```
 
 ```properties
-hw.obs.end-point=https://obs.cn-north-1.myhuaweicloud.com
-hw.obs.bucket-name=bucket-name
-hw.obs.key=key
-hw.obs.secret=secret
+jmicro.system.config.enabled=true
+jmicro.system.config.kv.hw.obs.end-point=https://obs.cn-north-1.myhuaweicloud.com
+jmicro.system.config.kv.hw.obs.bucket-name=bucket-name
+jmicro.system.config.kv.hw.obs.key=key
+jmicro.system.config.kv.hw.obs.secret=secret
 ```
 
 ##### EasyImages 2.0
 
 ```properties
-easyimages.api.url=http://localhost:40061/api/index.php
-easyimages.api.token=token
+jmicro.system.config.enabled=true
+jmicro.system.config.kv.easyimages.api.url=http://localhost:40061/api/index.php
+jmicro.system.config.kv.easyimages.api.token=token
+```
+
+##### RustFS
+
+```xml
+<dependency>
+    <groupId>software.amazon.awssdk</groupId>
+    <artifactId>s3</artifactId>
+    <version>2.42.41</version>
+</dependency>
+```
+
+```properties
+jmicro.system.config.enabled=true
+# 开启 RustFS 上传能力（默认 false）
+jmicro.system.config.kv.jmicro.rustfs.enable=true
+jmicro.system.config.kv.jmicro.rustfs.endpoint=http://localhost:9000
+jmicro.system.config.kv.jmicro.rustfs.access-key=access-key
+jmicro.system.config.kv.jmicro.rustfs.secret-key=secret-key
+jmicro.system.config.kv.jmicro.rustfs.bucket=bucket
+jmicro.system.config.kv.jmicro.rustfs.is-allow-get-object=false
 ```
 
 ##### 本地上传（local）
@@ -309,11 +337,14 @@ easyimages.api.token=token
 无需引入额外 SDK，配置 `provider=local` 并指定目录路径与访问 URL 即可：
 
 ```properties
+jmicro.system.config.enabled=true
 jmicro.pic.upload.provider=local
-# 本地存储根路径
-jmicro.pic.upload.dirs.target-name.path=/data/uploads
-# 对应的可访问 URL 前缀（由你的静态资源映射暴露）
-jmicro.pic.upload.dirs.target-name.url-prefix=/files
+# 本地存储根路径（系统配置项默认值为系统临时目录）
+jmicro.system.config.kv.jmicro.pic.upload.local.upload-path=/data/uploads
+# 上传文件的可访问 URL 前缀（由你的静态资源映射暴露）
+jmicro.system.config.kv.jmicro.pic.upload.local.url=/files
+# 目录映射（仍由 jmicro.pic.upload.dirs.* 决定）
+jmicro.pic.upload.dirs.target-name.path=/uploads
 ```
 
 #### 在代码中使用

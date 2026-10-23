@@ -1,62 +1,59 @@
-package com.jiangtj.micro.business.pic.upload.easyimages;
+package com.jiangtj.micro.business.pic.upload.easyimages
 
-import com.jiangtj.micro.business.pic.upload.PicUploadProperties;
-import com.jiangtj.micro.business.pic.upload.PicUploadProvider;
-import com.jiangtj.micro.business.pic.upload.PicUploadResult;
-import com.jiangtj.micro.business.pic.upload.PicUploadType;
-import com.jiangtj.micro.business.pic.upload.ex.PicUploadInternalException;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestClient;
-import org.springframework.web.multipart.MultipartFile;
+import com.jiangtj.micro.business.config.SystemConfigService
+import com.jiangtj.micro.business.pic.upload.PicUploadProperties
+import com.jiangtj.micro.business.pic.upload.PicUploadProvider
+import com.jiangtj.micro.business.pic.upload.PicUploadResult
+import com.jiangtj.micro.business.pic.upload.PicUploadType
+import com.jiangtj.micro.business.pic.upload.ex.PicUploadInternalException
+import org.slf4j.LoggerFactory
+import org.springframework.http.MediaType
+import org.springframework.util.LinkedMultiValueMap
+import org.springframework.web.client.RestClient
+import org.springframework.web.multipart.MultipartFile
 
-@Slf4j
 @PicUploadType("easyimages")
-@RequiredArgsConstructor
-public class EasyImagesService implements PicUploadProvider {
-    private final EasyImagesProperties config;
-    private final RestClient webClient;
+class EasyImagesService(
+    private val systemConfigService: SystemConfigService,
+) : PicUploadProvider {
 
-    public EasyImagesService(EasyImagesProperties config) {
-        this.config = config;
-        this.webClient = RestClient.builder()
-                .baseUrl(config.getUrl())
-                .build();
-    }
-
-    public EasyImagesResponse uploadImage(MultipartFile file) {
-        MultiValueMap<String, Object> parts = new LinkedMultiValueMap<>();
-        parts.add("token", config.getToken());
-        parts.add("image", file.getResource());
+    fun uploadImage(file: MultipartFile): EasyImagesResponse {
+        val settings = EasyImagesSettings.from(systemConfigService)
+        val parts = LinkedMultiValueMap<String, Any>()
+        parts.add("token", settings.token)
+        parts.add("image", file.resource)
 
         try {
-            EasyImagesResponse body = webClient.post()
+            val body = RestClient.builder()
+                .baseUrl(settings.url)
+                .build()
+                .post()
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .body(parts)
                 .retrieve()
-                .body(EasyImagesResponse.class);
-            if (body != null && body.getCode() != 200) {
-                throw new PicUploadInternalException("EasyImages 错误码" + body.getCode(), null);
+                .body(EasyImagesResponse::class.java)
+            if (body != null && body.code != 200) {
+                throw PicUploadInternalException("EasyImages 错误码" + body.code, null)
             }
-            return body;
-        } catch (Exception e) {
-            log.error("图片上传失败", e);
-            throw new PicUploadInternalException("EasyImages 异常", e);
+            return body ?: throw PicUploadInternalException("EasyImages 返回内容为空", null)
+        } catch (e: Exception) {
+            log.error("图片上传失败", e)
+            throw PicUploadInternalException("EasyImages 异常", e)
         }
     }
 
-    @Override
-    public PicUploadResult upload(PicUploadProperties.Dir dir, MultipartFile file) {
-        EasyImagesResponse response = uploadImage(file);
-        String url = response.getUrl();
-        String[] split = url.split("/");
+    override fun upload(dir: PicUploadProperties.Dir, file: MultipartFile): PicUploadResult {
+        val response = uploadImage(file)
+        val url = response.url ?: throw PicUploadInternalException("EasyImages 未返回文件链接", null)
+        val split = url.split("/")
         return PicUploadResult.builder()
-            .fileName(split[split.length - 1])
+            .fileName(split[split.size - 1])
             .fileUrl(url)
-            .thumbnailUrl(response.getThumb())
-            .build();
+            .apply { response.thumb?.let { thumbnailUrl(it) } }
+            .build()
+    }
+
+    companion object {
+        private val log = LoggerFactory.getLogger(EasyImagesService::class.java)
     }
 }

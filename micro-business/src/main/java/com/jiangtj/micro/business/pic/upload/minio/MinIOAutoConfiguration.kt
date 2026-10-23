@@ -1,33 +1,34 @@
-package com.jiangtj.micro.business.pic.upload.minio;
+package com.jiangtj.micro.business.pic.upload.minio
 
-import io.minio.MinioClient;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Bean;
+import com.jiangtj.micro.business.config.SystemConfigAutoConfiguration
+import com.jiangtj.micro.business.config.SystemConfigService
+import io.minio.MinioClient
+import org.springframework.boot.autoconfigure.AutoConfiguration
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
+import org.springframework.context.annotation.Bean
 
-@AutoConfiguration
-@ConditionalOnClass(MinioClient.class)
-@EnableConfigurationProperties(MinIOProperties.class)
-public class MinIOAutoConfiguration {
+/**
+ * MinIO 自动配置，配置项来自系统配置（需开启 `jmicro.system.config.enabled=true`）
+ */
+@AutoConfiguration(after = [SystemConfigAutoConfiguration::class])
+@ConditionalOnClass(MinioClient::class)
+@ConditionalOnBean(SystemConfigService::class)
+class MinIOAutoConfiguration {
 
     /**
-     * 注册 MinioClient 服务
+     * 注册 MinIO 配置项
      */
     @Bean
-    public MinioClient minioClient(MinIOProperties properties) {
-        return MinioClient.builder()
-            .endpoint(properties.getEndpoint())
-            .credentials(properties.getAccessKey(), properties.getSecretKey())
-            .build();
-    }
+    @ConditionalOnMissingBean
+    fun minIOConfigLoader(): MinIOConfigLoader = MinIOConfigLoader()
 
     /**
      * 注册 MinIOService 服务
      */
     @Bean
-    public MinIOService minioService(MinioClient minioClient, MinIOProperties properties) {
-        return new MinIOService(minioClient, properties);
+    fun minioService(systemConfigService: SystemConfigService): MinIOService {
+        return MinIOService(systemConfigService)
     }
-
 }

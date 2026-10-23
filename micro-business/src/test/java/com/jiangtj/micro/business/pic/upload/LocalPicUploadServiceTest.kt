@@ -1,113 +1,107 @@
-package com.jiangtj.micro.business.pic.upload;
+package com.jiangtj.micro.business.pic.upload
 
-import com.jiangtj.micro.business.pic.upload.ex.PicUploadCheckException;
-import com.jiangtj.micro.business.pic.upload.local.LocalPicUploadProperties;
-import com.jiangtj.micro.business.pic.upload.local.LocalPicUploadService;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.util.unit.DataSize;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.*;
+import com.jiangtj.micro.business.config.SystemConfigLoader
+import com.jiangtj.micro.business.config.SystemConfigProperties
+import com.jiangtj.micro.business.config.SystemConfigSaver
+import com.jiangtj.micro.business.config.SystemConfigService
+import com.jiangtj.micro.business.config.SystemItemInfo
+import com.jiangtj.micro.business.pic.upload.ex.PicUploadCheckException
+import com.jiangtj.micro.business.pic.upload.local.LocalPicUploadConfigItem
+import com.jiangtj.micro.business.pic.upload.local.LocalPicUploadService
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.io.TempDir
+import org.mockito.kotlin.mock
+import org.springframework.context.ApplicationEventPublisher
+import org.springframework.mock.web.MockMultipartFile
+import org.springframework.util.unit.DataSize
+import java.nio.file.Path
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class LocalPicUploadServiceTest {
 
-    private LocalPicUploadService localPicUploadService;
-    private LocalPicUploadProperties localProperties;
-    private PicUploadService picUploadService;
-    private PicUploadProperties properties;
-    PicUploadProperties.Dir dir;
-
     @TempDir
-    Path tempDir;
+    lateinit var tempDir: Path
+
+    private lateinit var dir: PicUploadProperties.Dir
+    private lateinit var picUploadService: PicUploadService
 
     @BeforeEach
-    void setUp() {
-        localProperties = new LocalPicUploadProperties();
-        localProperties.setUploadPath(tempDir.toString());
-        localPicUploadService = new LocalPicUploadService(localProperties);
+    fun setUp() {
+        val systemConfigService = SystemConfigService(
+            listOf(
+                object : SystemConfigLoader {
+                    override fun load(): List<SystemItemInfo> = listOf(
+                        SystemItemInfo(
+                            key = LocalPicUploadConfigItem.UPLOAD_PATH.key,
+                            name = "上传路径",
+                            value = tempDir.toString(),
+                        ),
+                        SystemItemInfo(
+                            key = LocalPicUploadConfigItem.URL.key,
+                            name = "访问地址",
+                            value = "http://localhost:8080",
+                        ),
+                    )
+                },
+            ),
+            mock<ApplicationEventPublisher>(),
+            SystemConfigProperties(),
+            mock<SystemConfigSaver>(),
+        )
 
-        properties = new PicUploadProperties();
-        Map<String, PicUploadProperties.Dir> dirs = new HashMap<>();
-        dir = new PicUploadProperties.Dir();
-        dir.setPath("test");
-        dirs.put("test", dir);
-        properties.setDirs(dirs);
-        picUploadService = new PicUploadService(properties, List.of(localPicUploadService));
+        val properties = PicUploadProperties()
+        val dirs = HashMap<String, PicUploadProperties.Dir>()
+        dir = PicUploadProperties.Dir()
+        dir.path = "test"
+        dirs["test"] = dir
+        properties.dirs = dirs
+
+        picUploadService = PicUploadService(properties, listOf(LocalPicUploadService(systemConfigService)))
     }
 
     @Test
-    void testUploadValidImage() throws IOException {
+    fun `test upload valid image`() {
         // 创建模拟的图片文件
-        byte[] content = new byte[1024];
-        MockMultipartFile file = new MockMultipartFile(
-            "test-image",
-            "test-image.jpg",
-            "image/jpeg",
-            content
-        );
+        val file = MockMultipartFile("test-image", "test-image.jpg", "image/jpeg", ByteArray(1024))
 
-        // 上传图片
-        PicUploadResult result = picUploadService.upload("test", file);
+        val result = picUploadService.upload("test", file)
 
-        // 验证结果
-        assertNotNull(result);
-        assertEquals("test-image.jpg", result.getOriginalFileName());
-        assertTrue(result.getFileName().endsWith(".jpg"));
-        assertTrue(result.getFileUrl().startsWith("http://localhost:8080/"));
+        assertNotNull(result)
+        assertEquals("test-image.jpg", result.originalFileName)
+        assertTrue(result.fileName.endsWith(".jpg"))
+        assertTrue(result.fileUrl.startsWith("http://localhost:8080/"))
     }
 
     @Test
-    void testUploadInvalidExtension() {
-        // 创建不支持的文件类型
-        byte[] content = new byte[1024];
-        MockMultipartFile file = new MockMultipartFile(
-            "test-file",
-            "test-file.exe",
-            "application/octet-stream",
-            content
-        );
+    fun `test upload invalid extension`() {
+        val file = MockMultipartFile("test-file", "test-file.exe", "application/octet-stream", ByteArray(1024))
 
-        // 验证上传不支持的文件类型会抛出异常
-        Exception exception = assertThrows(PicUploadCheckException.class, () -> {
-            picUploadService.upload("test", file);
-        });
-
-        assertTrue(exception.getMessage().contains("不支持的文件类型"));
+        val exception = assertThrows<PicUploadCheckException> {
+            picUploadService.upload("test", file)
+        }
+        assertTrue(exception.message!!.contains("不支持的文件类型"))
     }
 
     @Test
-    void testUploadExceedMaxSize() {
-        // 设置最大文件大小为500字节
-        dir.setMaxFileSize(DataSize.ofKilobytes(1));
+    fun `test upload exceed max size`() {
+        // 设置最大文件大小为 1kb
+        dir.maxFileSize = DataSize.ofKilobytes(1)
 
-        // 创建超过大小限制的文件
-        byte[] content = new byte[2000];
-        MockMultipartFile file = new MockMultipartFile(
-            "test-image",
-            "test-image.jpg",
-            "image/jpeg",
-            content
-        );
+        val file = MockMultipartFile("test-image", "test-image.jpg", "image/jpeg", ByteArray(2000))
 
-        // 验证上传超过大小限制的文件会抛出异常
-        Exception exception = assertThrows(PicUploadCheckException.class, () -> {
-            picUploadService.upload("test", file);
-        });
-
-        assertTrue(exception.getMessage().contains("文件大小超过限制"));
+        val exception = assertThrows<PicUploadCheckException> {
+            picUploadService.upload("test", file)
+        }
+        assertTrue(exception.message!!.contains("文件大小超过限制"))
     }
 
     @Test
-    void testDataSize() {
-        assertEquals(1024 * 1024, DataSize.ofMegabytes(1).toBytes());
-        assertEquals(1024, DataSize.ofKilobytes(1).toBytes());
+    fun `test data size`() {
+        assertEquals(1024 * 1024, DataSize.ofMegabytes(1).toBytes())
+        assertEquals(1024, DataSize.ofKilobytes(1).toBytes())
     }
 }

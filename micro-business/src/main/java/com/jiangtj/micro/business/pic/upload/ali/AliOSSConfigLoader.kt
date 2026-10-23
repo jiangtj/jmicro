@@ -3,7 +3,8 @@ package com.jiangtj.micro.business.pic.upload.ali
 import com.jiangtj.micro.business.config.SystemConfigLoader
 import com.jiangtj.micro.business.config.SystemGroup
 import com.jiangtj.micro.business.config.SystemItemInfo
-import com.jiangtj.micro.business.config.SystemItemType
+import com.jiangtj.micro.business.pic.upload.PicUploadConfigItem
+import com.jiangtj.micro.business.pic.upload.toSystemConfigItems
 
 /**
  * 阿里云 OSS 配置项定义
@@ -11,11 +12,11 @@ import com.jiangtj.micro.business.config.SystemItemType
  * [key] 为系统配置项的键（即原 `ali.oss.*` 属性名），取值需使用 `systemConfigService.getValue(key.key)`。
  */
 enum class AliOSSConfigItem(
-    val key: String,
-    val label: String,
-    val defaultValue: String,
-    val secret: Boolean = false,
-) {
+    override val key: String,
+    override val label: String,
+    override val defaultValue: String,
+    override val secret: Boolean = false,
+) : PicUploadConfigItem {
     ENDPOINT("ali.oss.endpoint", "Endpoint", "https://oss-cn-hangzhou.aliyuncs.com"),
     REGION("ali.oss.region", "Region", "cn-hangzhou"),
     BUCKET_NAME("ali.oss.bucket-name", "Bucket 名称", "examplebucket"),
@@ -39,17 +40,5 @@ const val ALI_OSS_TAG = "ali-oss"
  */
 class AliOSSConfigLoader : SystemConfigLoader {
 
-    override fun load(): List<SystemItemInfo> = AliOSSConfigItem.entries.mapIndexed { index, item ->
-        SystemItemInfo(
-            key = item.key,
-            name = item.label,
-            description = item.label,
-            value = item.defaultValue,
-            secret = item.secret,
-            group = aliOSSGroup,
-            type = SystemItemType.TEXT.name,
-            order = index,
-            tag = listOf(ALI_OSS_TAG),
-        )
-    }
+    override fun load(): List<SystemItemInfo> = AliOSSConfigItem.entries.toSystemConfigItems(aliOSSGroup, ALI_OSS_TAG)
 }

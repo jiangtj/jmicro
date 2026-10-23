@@ -6,4 +6,6 @@ com.jiangtj.micro.business.pic.upload.PicUploadAutoConfiguration
 com.jiangtj.micro.business.pic.upload.ali.AliOSSAutoConfiguration
 com.jiangtj.micro.business.pic.upload.hw.ObsAutoConfiguration
 com.jiangtj.micro.business.pic.upload.easyimages.EasyImagesAutoConfiguration
+com.jiangtj.micro.business.pic.upload.local.LocalPicUploadAutoConfiguration
 com.jiangtj.micro.business.pic.upload.minio.MinIOAutoConfiguration
+com.jiangtj.micro.business.pic.upload.rustfs.RustFSAutoConfiguration

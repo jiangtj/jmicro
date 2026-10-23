@@ -1,13 +1,37 @@
-package com.jiangtj.micro.business.pic.upload.easyimages;
+package com.jiangtj.micro.business.pic.upload.easyimages
 
-import lombok.Data;
+/**
+ * EasyImages API 响应
+ */
+class EasyImagesResponse {
 
-@Data
-public class EasyImagesResponse {
-    private String result;      // 返回状态
-    private Integer code;       // 返回状态编号
-    private String url;         // 文件链接
-    private String srcName;     // 原始名称
-    private String thumb;       // 缩略图
-    private String del;         // 文件删除链接
+    /**
+     * 返回状态
+     */
+    var result: String? = null
+
+    /**
+     * 返回状态编号
+     */
+    var code: Int? = null
+
+    /**
+     * 文件链接
+     */
+    var url: String? = null
+
+    /**
+     * 原始名称
+     */
+    var srcName: String? = null
+
+    /**
+     * 缩略图
+     */
+    var thumb: String? = null
+
+    /**
+     * 文件删除链接
+     */
+    var del: String? = null
 }
