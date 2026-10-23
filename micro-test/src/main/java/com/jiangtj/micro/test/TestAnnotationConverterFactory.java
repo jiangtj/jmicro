@@ -13,17 +13,11 @@ public class TestAnnotationConverterFactory {
     public static void setAuthContext(ExtensionContext extensionContext, ApplicationContext applicationContext) {
         Class<?> testClass = extensionContext.getRequiredTestClass();
         Method testMethod = extensionContext.getRequiredTestMethod();
-        Optional<WithMockAuth> methodAuthHandler = AnnotationUtils.findAnnotation(testMethod, WithMockAuth.class);
-        if (methodAuthHandler.isPresent()) {
-            TestAuthHandler handler = applicationContext.getBean(methodAuthHandler.get().value());
+        Optional<WithMockAuth> authHandler = AnnotationUtils.findAnnotation(testMethod, WithMockAuth.class)
+            .or(() -> AnnotationUtils.findAnnotation(testClass, WithMockAuth.class));
+        if (authHandler.isPresent()) {
+            TestAuthHandler handler = applicationContext.getBean(authHandler.get().value());
             AuthContext context = handler.convert(testMethod, applicationContext);
-            TestAuthContextHolder.setAuthContext(context);
-            return;
-        }
-        Optional<WithMockAuth> classAuthHandler = AnnotationUtils.findAnnotation(testClass, WithMockAuth.class);
-        if (classAuthHandler.isPresent()) {
-            TestAuthHandler handler = applicationContext.getBean(classAuthHandler.get().value());
-            AuthContext context = handler.convert(testClass, applicationContext);
             TestAuthContextHolder.setAuthContext(context);
             return;
         }
