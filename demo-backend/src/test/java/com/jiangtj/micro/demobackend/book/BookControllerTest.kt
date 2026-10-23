@@ -123,6 +123,20 @@ class BookControllerTest {
     }
 
     @Test
+    fun bookFormSchema() {
+        client.get().uri("/books/form-schema")
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody()
+            .jsonPath("$.type").isEqualTo("object")
+            .jsonPath("$.title").isEqualTo("BookForm")
+            .jsonPath("$.properties.title.type").isEqualTo("string")
+            .jsonPath("$.properties.title.maxLength").isEqualTo(128)
+            .jsonPath("$.properties.stock.type").isEqualTo("integer")
+            .jsonPath("$.required").isArray()
+    }
+
+    @Test
     fun loginWithWrongPassword() {
         client.post().uri("/login")
             .contentType(MediaType.APPLICATION_JSON)

@@ -170,6 +170,14 @@ class ExampleService {
 Map<String, List<FormRule>> generate = FormRuleGenerator.generate(Example.class);
 ```
 
+#### JSON Schema 生成
+
+根据数据类生成 JSON Schema，便于前端动态渲染表单：
+
+```java
+JsonSchema schema = JsonSchemaGenerator.generate(BookForm.class);
+```
+
 > 完整功能与示例见 [micro-common/README.md](./micro-common/README.md)。
 
 ### micro-sql-jooq 数据库扩展

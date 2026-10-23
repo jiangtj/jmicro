@@ -13,6 +13,7 @@
   - [JSON 处理](#json-处理)
   - [日期格式化](#日期格式化)
   - [表单规则生成](#表单规则生成)
+  - [JSON Schema 生成](#json-schema-生成)
   - [校验注解](#校验注解)
   - [常用工具类](#常用工具类)
   - [异常基类](#异常基类)
@@ -33,6 +34,7 @@
 - **JSON 工具**：`JsonUtils` 统一的 `JsonMapper` 封装、扩展函数 `toJson/fromJson`。
 - **日期格式化**：常用 `DateTimeFormatter` 常量（`DATE_TIME`、`RFC3339` 等）。
 - **表单规则生成**：`FormRuleGenerator` 根据 `jakarta.validation` 注解生成 [async-validator](https://github.com/yiminghe/async-validator) 规则。
+- **JSON Schema 生成**：`JsonSchemaGenerator` 根据数据类生成 [JSON Schema](https://json-schema.org/)（draft 2020-12）。
 - **校验注解**：`@MobilePhone`、`@MinLength`、`@MaxLength`。
 - **异常基类**：`MicroException`、`MicroHttpException`、`MicroProblemDetailException`。
 - **常用工具类**：`FileNameUtils`、`UUIDUtils`、`RandomStringUtils`、`PhoneNumberUtils`、`MapUtils`。
@@ -97,6 +99,48 @@ val rules = FormRuleGenerator.generate<Example>()
 ```kotlin
 FormRuleGenerator.addHandler(CustomHandler())
 ```
+
+### JSON Schema 生成
+
+`JsonSchemaGenerator` 会根据字段类型、Jackson 注解与 `jakarta.validation` 注解，把数据类转换为 [JSON Schema](https://json-schema.org/)（draft 2020-12）：
+
+```kotlin
+data class BookForm(
+    @field:NotBlank @field:Size(max = 128) val title: String,
+    @field:Size(max = 32) val isbn: String? = null,
+    @field:NotNull @field:DecimalMin("0") val price: BigDecimal,
+)
+
+val schema = JsonSchemaGenerator.generate<BookForm>()
+val json = JsonUtils.toJson(schema)
+```
+
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BookForm",
+  "type": "object",
+  "properties": {
+    "title": {"type": "string", "minLength": 1, "maxLength": 128},
+    "isbn": {"type": "string", "maxLength": 32},
+    "price": {"type": "number", "minimum": 0}
+  },
+  "required": ["title", "price"]
+}
+```
+
+Java 中可直接传入 `Class`：
+
+```java
+JsonSchema schema = JsonSchemaGenerator.generate(BookForm.class);
+```
+
+说明：
+
+- Kotlin 非空属性以及 `@NotNull` / `@NotBlank` / `@NotEmpty` 会进入 `required`。
+- 支持嵌套对象、集合/数组（`items`）、`Map`（`additionalProperties`）、枚举（`enum`）。
+- 日期时间类型会映射为 `format`：`date`、`time`、`date-time`；`UUID`、`URI` 也会带上 `format`。
+- 结果按类缓存，重复调用不会重复解析；存在循环引用时会截断为 `{"type": "object"}`。
 
 ### 校验注解
 

@@ -2,6 +2,8 @@ package com.jiangtj.micro.demobackend.controller
 
 import com.jiangtj.micro.auth.annotations.HasPermission
 import com.jiangtj.micro.auth.annotations.HasRole
+import com.jiangtj.micro.common.schema.JsonSchema
+import com.jiangtj.micro.common.schema.JsonSchemaGenerator
 import com.jiangtj.micro.demobackend.book.BookForm
 import com.jiangtj.micro.demobackend.book.BookService
 import com.jiangtj.micro.demobackend.jooq.tables.pojos.Book
@@ -34,6 +36,12 @@ class BookController(
     @HasPermission("book:read")
     @GetMapping("/{id}")
     fun get(@PathVariable id: Long): Book = bookService.get(id)
+
+    /**
+     * 返回 [BookForm] 的 JSON Schema，供前端动态生成表单
+     */
+    @GetMapping("/form-schema")
+    fun formSchema(): JsonSchema = JsonSchemaGenerator.generate<BookForm>()
 
     @HasPermission("book:write")
     @PostMapping
