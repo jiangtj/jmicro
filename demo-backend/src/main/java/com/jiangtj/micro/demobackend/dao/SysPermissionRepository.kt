@@ -1,0 +1,31 @@
+package com.jiangtj.micro.demobackend.dao
+
+import com.jiangtj.micro.demobackend.jooq.tables.SysPermission
+import com.jiangtj.micro.demobackend.jooq.tables.SysRolePermission
+import com.jiangtj.micro.demobackend.jooq.tables.SysUserRole
+import org.jooq.DSLContext
+import org.springframework.stereotype.Repository
+
+/**
+ * `sys_permission` 的自定义查询，用于补充 jOOQ 生成的 `SysPermissionDao` 未覆盖的关联查询。
+ */
+@Repository
+class SysPermissionRepository(
+    private val dsl: DSLContext,
+) {
+
+    /**
+     * 查询用户通过角色间接拥有的权限编码，按权限编码排序
+     */
+    fun findCodesByUserId(userId: Long?): List<String> =
+        dsl.selectDistinct(SysPermission.SYS_PERMISSION.CODE)
+            .from(SysUserRole.SYS_USER_ROLE)
+            .join(SysRolePermission.SYS_ROLE_PERMISSION)
+            .on(SysUserRole.SYS_USER_ROLE.ROLE_ID.eq(SysRolePermission.SYS_ROLE_PERMISSION.ROLE_ID))
+            .join(SysPermission.SYS_PERMISSION)
+            .on(SysRolePermission.SYS_ROLE_PERMISSION.PERMISSION_ID.eq(SysPermission.SYS_PERMISSION.ID))
+            .where(SysUserRole.SYS_USER_ROLE.USER_ID.eq(userId))
+            .orderBy(SysPermission.SYS_PERMISSION.CODE)
+            .fetch(SysPermission.SYS_PERMISSION.CODE)
+            .filterNotNull()
+}

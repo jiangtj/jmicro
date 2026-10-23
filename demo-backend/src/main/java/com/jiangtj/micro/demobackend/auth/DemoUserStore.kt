@@ -1,13 +1,10 @@
 package com.jiangtj.micro.demobackend.auth
 
 import com.jiangtj.micro.auth.BCryptUtils
-import com.jiangtj.micro.demobackend.jooq.tables.SysPermission
-import com.jiangtj.micro.demobackend.jooq.tables.SysRole
-import com.jiangtj.micro.demobackend.jooq.tables.SysRolePermission
-import com.jiangtj.micro.demobackend.jooq.tables.SysUserRole
+import com.jiangtj.micro.demobackend.dao.SysPermissionRepository
+import com.jiangtj.micro.demobackend.dao.SysRoleRepository
 import com.jiangtj.micro.demobackend.jooq.tables.daos.SysUserDao
 import com.jiangtj.micro.web.BaseExceptionUtils
-import org.jooq.DSLContext
 import org.springframework.stereotype.Component
 
 /**
@@ -20,7 +17,8 @@ import org.springframework.stereotype.Component
 @Component
 open class DemoUserStore(
     private val userDao: SysUserDao,
-    private val dsl: DSLContext,
+    private val roleRepository: SysRoleRepository,
+    private val permissionRepository: SysPermissionRepository,
 ) {
 
     /**
@@ -44,27 +42,10 @@ open class DemoUserStore(
     /**
      * 查询用户拥有的角色编码
      */
-    fun findRoles(userId: Long?): List<String> =
-        dsl.select(SysRole.SYS_ROLE.CODE)
-            .from(SysUserRole.SYS_USER_ROLE)
-            .join(SysRole.SYS_ROLE).on(SysUserRole.SYS_USER_ROLE.ROLE_ID.eq(SysRole.SYS_ROLE.ID))
-            .where(SysUserRole.SYS_USER_ROLE.USER_ID.eq(userId))
-            .orderBy(SysRole.SYS_ROLE.ID)
-            .fetch(SysRole.SYS_ROLE.CODE)
-            .filterNotNull()
+    fun findRoles(userId: Long?): List<String> = roleRepository.findCodesByUserId(userId)
 
     /**
      * 查询用户通过角色间接拥有的权限编码
      */
-    fun findPermissions(userId: Long?): List<String> =
-        dsl.selectDistinct(SysPermission.SYS_PERMISSION.CODE)
-            .from(SysUserRole.SYS_USER_ROLE)
-            .join(SysRolePermission.SYS_ROLE_PERMISSION)
-            .on(SysUserRole.SYS_USER_ROLE.ROLE_ID.eq(SysRolePermission.SYS_ROLE_PERMISSION.ROLE_ID))
-            .join(SysPermission.SYS_PERMISSION)
-            .on(SysRolePermission.SYS_ROLE_PERMISSION.PERMISSION_ID.eq(SysPermission.SYS_PERMISSION.ID))
-            .where(SysUserRole.SYS_USER_ROLE.USER_ID.eq(userId))
-            .orderBy(SysPermission.SYS_PERMISSION.CODE)
-            .fetch(SysPermission.SYS_PERMISSION.CODE)
-            .filterNotNull()
+    fun findPermissions(userId: Long?): List<String> = permissionRepository.findCodesByUserId(userId)
 }
