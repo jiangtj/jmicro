@@ -8,14 +8,14 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean
 
 /**
- * 上传目录映射的系统配置项注册，仅在开启 `jmicro.system.config.enabled=true` 后生效。
+ * 图片上传配置项（通用配置 + 目录映射）的系统配置注册，仅在开启 `jmicro.system.config.enabled=true` 后生效。
  */
 @AutoConfiguration(after = [SystemConfigAutoConfiguration::class, PicUploadAutoConfiguration::class])
 @ConditionalOnBean(SystemConfigService::class)
-class PicUploadDirsAutoConfiguration {
+class PicUploadConfigAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    fun picUploadDirsConfigLoader(properties: PicUploadProperties): PicUploadDirsConfigLoader =
-        PicUploadDirsConfigLoader(properties)
+    fun picUploadConfigLoader(properties: PicUploadProperties): PicUploadConfigLoader =
+        PicUploadConfigLoader(properties)
 }

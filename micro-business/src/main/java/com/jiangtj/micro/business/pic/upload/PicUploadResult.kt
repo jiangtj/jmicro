@@ -1,36 +1,51 @@
-package com.jiangtj.micro.business.pic.upload;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+package com.jiangtj.micro.business.pic.upload
 
 /**
  * 图片上传结果
  */
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class PicUploadResult {
-
+class PicUploadResult(
     /**
      * 原始文件名
      */
-    private String originalFileName;
-
+    var originalFileName: String? = null,
     /**
      * 新文件名
      */
-    private String fileName;
-
+    var fileName: String? = null,
     /**
      * 文件Url
      */
-    private String fileUrl;
-
+    var fileUrl: String? = null,
     /**
      * 缩略图Url（如果生成）
      */
-    private String thumbnailUrl;
+    var thumbnailUrl: String? = null,
+) {
+
+    class Builder {
+        private var originalFileName: String? = null
+        private var fileName: String? = null
+        private var fileUrl: String? = null
+        private var thumbnailUrl: String? = null
+
+        fun originalFileName(originalFileName: String?): Builder = apply { this.originalFileName = originalFileName }
+
+        fun fileName(fileName: String?): Builder = apply { this.fileName = fileName }
+
+        fun fileUrl(fileUrl: String?): Builder = apply { this.fileUrl = fileUrl }
+
+        fun thumbnailUrl(thumbnailUrl: String?): Builder = apply { this.thumbnailUrl = thumbnailUrl }
+
+        fun build(): PicUploadResult =
+            PicUploadResult(originalFileName, fileName, fileUrl, thumbnailUrl)
+    }
+
+    override fun toString(): String =
+        "PicUploadResult(originalFileName=$originalFileName, fileName=$fileName, " +
+            "fileUrl=$fileUrl, thumbnailUrl=$thumbnailUrl)"
+
+    companion object {
+        @JvmStatic
+        fun builder(): Builder = Builder()
+    }
 }

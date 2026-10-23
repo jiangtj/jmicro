@@ -1,13 +1,19 @@
-package com.jiangtj.micro.business.pic.upload;
+package com.jiangtj.micro.business.pic.upload
 
-import com.jiangtj.micro.common.utils.FileNameUtils;
-import org.springframework.web.multipart.MultipartFile;
+import com.jiangtj.micro.common.utils.FileNameUtils
+import org.springframework.web.multipart.MultipartFile
 
-public interface PicUploadUtils {
+/**
+ * 图片上传工具类
+ */
+object PicUploadUtils {
 
-    static String generateNewFileName(MultipartFile file) {
-        String originalFilename = file.getOriginalFilename();
-        String extension = FileNameUtils.getFileExtension(originalFilename);
-        return FileNameUtils.getRandomFileNameWithSuffix(extension);
+    /**
+     * 按原始文件的扩展名生成随机文件名
+     */
+    @JvmStatic
+    fun generateNewFileName(file: MultipartFile): String {
+        val extension = FileNameUtils.getFileExtension(file.originalFilename)
+        return FileNameUtils.getRandomFileNameWithSuffix(extension)
     }
 }

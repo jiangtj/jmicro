@@ -23,7 +23,7 @@ class PicUploadSystemConfigWiringTest {
             AutoConfigurations.of(
                 SystemConfigAutoConfiguration::class.java,
                 PicUploadAutoConfiguration::class.java,
-                PicUploadDirsAutoConfiguration::class.java,
+                PicUploadConfigAutoConfiguration::class.java,
                 LocalPicUploadAutoConfiguration::class.java,
                 EasyImagesAutoConfiguration::class.java,
             )

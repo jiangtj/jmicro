@@ -72,8 +72,8 @@ class LocalPicUploadServiceTest {
 
         assertNotNull(result)
         assertEquals("test-image.jpg", result.originalFileName)
-        assertTrue(result.fileName.endsWith(".jpg"))
-        assertTrue(result.fileUrl.startsWith("http://localhost:8080/"))
+        assertTrue(result.fileName!!.endsWith(".jpg"))
+        assertTrue(result.fileUrl!!.startsWith("http://localhost:8080/"))
     }
 
     @Test

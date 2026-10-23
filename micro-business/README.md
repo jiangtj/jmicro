@@ -265,22 +265,32 @@ jmicro.oidc.server.clients[0].callback-uri[0]=http://localhost:17001/callback
 jmicro.pic.upload.provider=minio
 # 默认允许的文件类型
 jmicro.pic.upload.allowed-extensions=jpg,jpeg,png,gif,webp
-# 最大文件大小（字节）
+# 最大文件大小（支持 10MB、1KB 或字节数）
 jmicro.pic.upload.max-file-size=5242880
 # 上传路径（必填）。target-name 可替换为任意名称，同时支持覆盖默认配置
 jmicro.pic.upload.dirs.target-name.path=/common
 # jmicro.pic.upload.dirs.target-name.provider=ali
 ```
 
-目录映射也可以作为系统配置项 `jmicro.pic.upload.dirs`（`JSON` 类型，`Map<String, Dir>`）在运行期覆盖，开启系统配置后生效，未配置时回退到上面的启动绑定值：
+以上配置同时会注册为系统配置项（由 `PicUploadConfigLoader` 提供，需开启 `jmicro.system.config.enabled=true`），可在运行期覆盖，未配置时回退到上面的启动绑定值：
+
+| 配置项 | 类型 | 说明 |
+| --- | --- | --- |
+| `jmicro.pic.upload.provider` | 文本 | 默认上传服务商 |
+| `jmicro.pic.upload.allowed-extensions` | 文本 | 默认允许的文件类型，逗号分隔 |
+| `jmicro.pic.upload.max-file-size` | 文本 | 默认最大文件大小，支持 `10MB`、`1KB` 或字节数 |
+| `jmicro.pic.upload.dirs` | `JSON` | 目录映射 `Map<String, Dir>` |
 
 ```properties
 jmicro.system.config.enabled=true
+jmicro.system.config.kv.jmicro.pic.upload.provider=minio
+jmicro.system.config.kv.jmicro.pic.upload.max-file-size=5MB
 jmicro.system.config.kv.jmicro.pic.upload.dirs={"target-name":{"path":"/common","provider":"ali","maxFileSize":10485760}}
 ```
 
 ```kotlin
 // 运行期修改（立即生效，无需重启）
+systemConfigService.updateConfig("jmicro.pic.upload.provider", "local")
 systemConfigService.updateMapEntry("jmicro.pic.upload.dirs", "avatar", mapOf("path" to "/avatar"))
 ```
 

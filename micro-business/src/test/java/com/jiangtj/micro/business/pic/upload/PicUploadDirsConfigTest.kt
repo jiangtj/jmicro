@@ -16,7 +16,7 @@ import org.springframework.util.unit.DataSize
 class PicUploadDirsConfigTest {
 
     private fun dirsItem(value: String) = SystemItemInfo(
-        key = PicUploadDirsConfigLoader.KEY,
+        key = PicUploadConfigLoader.KEY,
         name = "dirs",
         value = value,
         type = SystemItemType.JSON.name,
@@ -43,8 +43,8 @@ class PicUploadDirsConfigTest {
         dir.path = "/avatar"
         properties.dirs = hashMapOf("avatar" to dir)
 
-        val item = PicUploadDirsConfigLoader(properties).load().single()
-        assertEquals(PicUploadDirsConfigLoader.KEY, item.key)
+        val item = PicUploadConfigLoader(properties).load().single { it.key == PicUploadConfigLoader.KEY }
+        assertEquals(PicUploadConfigLoader.KEY, item.key)
         assertEquals(SystemItemType.JSON.name, item.type)
         assertNotNull(item.jsonType)
         assertTrue(item.value.contains("\"path\":\"/avatar\""))
@@ -97,7 +97,7 @@ class PicUploadDirsConfigTest {
         val picUploadService = PicUploadService(properties, emptyList(), service)
         assertEquals("/old", picUploadService.getDir("avatar").path)
 
-        service.updateMapEntry(PicUploadDirsConfigLoader.KEY, "avatar", mapOf("path" to "/new"))
+        service.updateMapEntry(PicUploadConfigLoader.KEY, "avatar", mapOf("path" to "/new"))
         assertEquals("/new", picUploadService.getDir("avatar").path)
     }
 
@@ -112,5 +112,42 @@ class PicUploadDirsConfigTest {
         assertTrue(json!!.contains("\"maxFileSize\":2048"))
         // 未设置的字段不进入 JSON
         assertFalse(json.contains("provider"))
+    }
+
+    @Test
+    fun `loader exposes base config items from bound properties`() {
+        val properties = PicUploadProperties()
+        properties.provider = "minio"
+        properties.maxFileSize = DataSize.ofMegabytes(5)
+
+        val items = PicUploadConfigLoader(properties).load().associateBy { it.key }
+        val providerItem = items.getValue(PicUploadBaseConfigItem.PROVIDER.key)
+        assertEquals(SystemItemType.TEXT.name, providerItem.type)
+        assertEquals("minio", providerItem.value)
+        assertEquals(
+            "jpg,jpeg,png,gif,webp,bmp,svg,avif",
+            items.getValue(PicUploadBaseConfigItem.ALLOWED_EXTENSIONS.key).value,
+        )
+        assertEquals(
+            5,
+            DataSize.parse(items.getValue(PicUploadBaseConfigItem.MAX_FILE_SIZE.key).value).toMegabytes(),
+        )
+    }
+
+    @Test
+    fun `service reads base defaults from system config`() {
+        val properties = PicUploadProperties()
+        val service = buildService(
+            SystemItemInfo(key = PicUploadBaseConfigItem.PROVIDER.key, value = "minio"),
+            SystemItemInfo(key = PicUploadBaseConfigItem.ALLOWED_EXTENSIONS.key, value = "png, webp"),
+            SystemItemInfo(key = PicUploadBaseConfigItem.MAX_FILE_SIZE.key, value = "2KB"),
+            dirsItem("""{"avatar":{"path":"/avatar"}}"""),
+        )
+        val picUploadService = PicUploadService(properties, emptyList(), service)
+
+        val dir = picUploadService.getDir("avatar")
+        assertEquals("minio", dir.provider)
+        assertEquals(2048, dir.maxFileSize!!.toBytes())
+        assertArrayEquals(arrayOf("png", "webp"), dir.allowedExtensions)
     }
 }
