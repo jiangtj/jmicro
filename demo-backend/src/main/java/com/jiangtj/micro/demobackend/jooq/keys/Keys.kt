@@ -5,10 +5,12 @@
 package com.jiangtj.micro.demobackend.jooq.keys
 
 
+import com.jiangtj.micro.demobackend.jooq.tables.Book
 import com.jiangtj.micro.demobackend.jooq.tables.FlywaySchemaHistory
 import com.jiangtj.micro.demobackend.jooq.tables.SystemOperateRecord
 import com.jiangtj.micro.demobackend.jooq.tables.SystemUser
 import com.jiangtj.micro.demobackend.jooq.tables.SystemUserRole
+import com.jiangtj.micro.demobackend.jooq.tables.records.BookRecord
 import com.jiangtj.micro.demobackend.jooq.tables.records.FlywaySchemaHistoryRecord
 import com.jiangtj.micro.demobackend.jooq.tables.records.SystemOperateRecordRecord
 import com.jiangtj.micro.demobackend.jooq.tables.records.SystemUserRecord
@@ -24,6 +26,7 @@ import org.jooq.impl.Internal
 // UNIQUE and PRIMARY KEY definitions
 // -------------------------------------------------------------------------
 
+val CONSTRAINT_2: UniqueKey<BookRecord> = Internal.createUniqueKey(Book.BOOK, DSL.name("CONSTRAINT_2"), arrayOf(Book.BOOK.ID), true)
 val FLYWAY_SCHEMA_HISTORY_PK: UniqueKey<FlywaySchemaHistoryRecord> = Internal.createUniqueKey(FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY, DSL.name("flyway_schema_history_pk"), arrayOf(FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY.INSTALLED_RANK), true)
 val CONSTRAINT_9: UniqueKey<SystemOperateRecordRecord> = Internal.createUniqueKey(SystemOperateRecord.SYSTEM_OPERATE_RECORD, DSL.name("CONSTRAINT_9"), arrayOf(SystemOperateRecord.SYSTEM_OPERATE_RECORD.ID), true)
 val CONSTRAINT_A: UniqueKey<SystemUserRecord> = Internal.createUniqueKey(SystemUser.SYSTEM_USER, DSL.name("CONSTRAINT_A"), arrayOf(SystemUser.SYSTEM_USER.ID), true)

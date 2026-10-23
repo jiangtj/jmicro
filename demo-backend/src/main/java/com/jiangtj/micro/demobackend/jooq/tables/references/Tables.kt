@@ -5,12 +5,18 @@
 package com.jiangtj.micro.demobackend.jooq.tables.references
 
 
+import com.jiangtj.micro.demobackend.jooq.tables.Book
 import com.jiangtj.micro.demobackend.jooq.tables.FlywaySchemaHistory
 import com.jiangtj.micro.demobackend.jooq.tables.SystemOperateRecord
 import com.jiangtj.micro.demobackend.jooq.tables.SystemUser
 import com.jiangtj.micro.demobackend.jooq.tables.SystemUserRole
 
 
+
+/**
+ * The table <code>book</code>.
+ */
+val BOOK: Book = Book.BOOK
 
 /**
  * The table <code>flyway_schema_history</code>.
