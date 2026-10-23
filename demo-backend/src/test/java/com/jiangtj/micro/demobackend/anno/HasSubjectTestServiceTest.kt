@@ -1,29 +1,28 @@
-package com.jiangtj.micro.demobackend.anno;
+package com.jiangtj.micro.demobackend.anno
 
-import com.jiangtj.micro.auth.exceptions.UnAuthorizationException;
-import com.jiangtj.micro.test.JMicroTest;
-import com.jiangtj.micro.test.WithMockSubject;
-import jakarta.annotation.Resource;
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import com.jiangtj.micro.auth.exceptions.UnAuthorizationException
+import com.jiangtj.micro.test.JMicroTest
+import com.jiangtj.micro.test.WithMockSubject
+import org.junit.jupiter.api.Assertions.assertDoesNotThrow
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import org.springframework.beans.factory.annotation.Autowired
 
 @JMicroTest
 class HasSubjectTestServiceTest {
 
-    @Resource
-    HasSubjectTestService hasSubjectTestService;
+    @Autowired
+    lateinit var hasSubjectTestService: HasSubjectTestService
 
     @Test
     @WithMockSubject(id = "1")
-    void testId1() {
-        assertDoesNotThrow(() -> hasSubjectTestService.hasId1());
-        assertThrows(UnAuthorizationException.class, () -> hasSubjectTestService.hasId2());
-        assertThrows(UnAuthorizationException.class, () -> hasSubjectTestService.hasName());
-        assertThrows(UnAuthorizationException.class, () -> hasSubjectTestService.hasDisplayName());
-        assertThrows(UnAuthorizationException.class, () -> hasSubjectTestService.hasType());
-        assertThrows(UnAuthorizationException.class, () -> hasSubjectTestService.hasIss());
+    fun testId1() {
+        assertDoesNotThrow { hasSubjectTestService.hasId1() }
+        assertThrows<UnAuthorizationException> { hasSubjectTestService.hasId2() }
+        assertThrows<UnAuthorizationException> { hasSubjectTestService.hasName() }
+        assertThrows<UnAuthorizationException> { hasSubjectTestService.hasDisplayName() }
+        assertThrows<UnAuthorizationException> { hasSubjectTestService.hasType() }
+        assertThrows<UnAuthorizationException> { hasSubjectTestService.hasIss() }
     }
 
     @Test
@@ -32,15 +31,14 @@ class HasSubjectTestServiceTest {
         name = "name",
         displayName = "displayName",
         type = "type",
-        issuer = "iss"
+        issuer = "iss",
     )
-    void testId2() {
-        assertThrows(UnAuthorizationException.class, () -> hasSubjectTestService.hasId1());
-        assertDoesNotThrow(() -> hasSubjectTestService.hasId2());
-        assertDoesNotThrow(() -> hasSubjectTestService.hasName());
-        assertDoesNotThrow(() -> hasSubjectTestService.hasDisplayName());
-        assertDoesNotThrow(() -> hasSubjectTestService.hasType());
-        assertDoesNotThrow(() -> hasSubjectTestService.hasIss());
+    fun testId2() {
+        assertThrows<UnAuthorizationException> { hasSubjectTestService.hasId1() }
+        assertDoesNotThrow { hasSubjectTestService.hasId2() }
+        assertDoesNotThrow { hasSubjectTestService.hasName() }
+        assertDoesNotThrow { hasSubjectTestService.hasDisplayName() }
+        assertDoesNotThrow { hasSubjectTestService.hasType() }
+        assertDoesNotThrow { hasSubjectTestService.hasIss() }
     }
-
 }

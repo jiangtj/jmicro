@@ -1,78 +1,73 @@
-package com.jiangtj.micro.demobackend.book;
+package com.jiangtj.micro.demobackend.book
 
-import com.jiangtj.micro.demobackend.auth.LoginController;
-import com.jiangtj.micro.test.JMicroRestTestClientMvcConfiguration;
-import com.jiangtj.micro.test.ProblemDetailMvcConsumer;
-import jakarta.annotation.Resource;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.context.annotation.Import;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.client.RestTestClient;
-
-import java.math.BigDecimal;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import com.jiangtj.micro.demobackend.auth.LoginController
+import com.jiangtj.micro.test.JMicroRestTestClientMvcConfiguration
+import com.jiangtj.micro.test.ProblemDetailMvcConsumer
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
+import org.springframework.context.annotation.Import
+import org.springframework.core.ParameterizedTypeReference
+import org.springframework.http.HttpHeaders
+import org.springframework.http.MediaType
+import org.springframework.test.web.servlet.client.RestTestClient
+import java.math.BigDecimal
 
 /**
- * 未使用 {@code @JMicroMvcTest}：它会把上下文固定为测试注入的 mock 用户，
+ * 未使用 `@JMicroMvcTest`：它会把上下文固定为测试注入的 mock 用户，
  * 这里需要验证真实的登录 + token 解析流程。
  */
 @SpringBootTest
 @AutoConfigureMockMvc
-@Import(JMicroRestTestClientMvcConfiguration.class)
+@Import(JMicroRestTestClientMvcConfiguration::class)
 class BookControllerTest {
 
-    @Resource
-    RestTestClient client;
+    @Autowired
+    lateinit var client: RestTestClient
 
-    private String login(String username, String password) {
-        return client.post().uri("/login")
+    private fun login(username: String, password: String): String {
+        val body = client.post().uri("/login")
             .contentType(MediaType.APPLICATION_JSON)
-            .body(new LoginController.LoginRequest(username, password))
+            .body(LoginController.LoginRequest(username, password))
             .exchange()
             .expectStatus().isOk()
-            .returnResult(LoginController.LoginResult.class)
-            .getResponseBody()
-            .token();
+            .returnResult(LoginController.LoginResult::class.java)
+            .responseBody
+        return checkNotNull(body) { "login response body is null" }.token
     }
 
     @Test
-    void adminCanManageBooks() {
-        String token = login("admin", "admin123");
-        String bearer = "Bearer " + token;
+    fun adminCanManageBooks() {
+        val bearer = "Bearer " + login("admin", "admin123")
 
-        Map<String, Object> created = client.post().uri("/books")
+        val created = client.post().uri("/books")
             .header(HttpHeaders.AUTHORIZATION, bearer)
             .contentType(MediaType.APPLICATION_JSON)
-            .body(new BookForm("测试驱动开发", "Kent Beck", "9787111639428", new BigDecimal("69.00"), 2))
+            .body(BookForm("测试驱动开发", "Kent Beck", "9787111639428", BigDecimal("69.00"), 2))
             .exchange()
             .expectStatus().isOk()
-            .returnResult(new ParameterizedTypeReference<Map<String, Object>>() {
-            })
-            .getResponseBody();
+            .returnResult(object : ParameterizedTypeReference<Map<String, Any>>() {})
+            .responseBody
 
-        assertThat(created).isNotNull();
-        assertThat(created.get("id")).isNotNull();
-        long id = ((Number) created.get("id")).longValue();
+        checkNotNull(created) { "created book is null" }
+        assertThat(created["id"]).isNotNull()
+        val id = (created["id"] as Number).toLong()
 
         // 查
         client.get().uri("/books/{id}", id)
             .header(HttpHeaders.AUTHORIZATION, bearer)
             .exchange()
-            .expectStatus().isOk();
+            .expectStatus().isOk()
 
         // 改
         client.put().uri("/books/{id}", id)
             .header(HttpHeaders.AUTHORIZATION, bearer)
             .contentType(MediaType.APPLICATION_JSON)
-            .body(new BookForm("测试驱动开发（第2版）", "Kent Beck", "9787111639428", new BigDecimal("79.00"), 5))
+            .body(BookForm("测试驱动开发（第2版）", "Kent Beck", "9787111639428", BigDecimal("79.00"), 5))
             .exchange()
-            .expectStatus().isOk();
+            .expectStatus().isOk()
 
         // 列表
         client.get().uri("/books")
@@ -80,35 +75,35 @@ class BookControllerTest {
             .exchange()
             .expectStatus().isOk()
             .expectBody()
-            .jsonPath("$").isArray();
+            .jsonPath("$").isArray()
 
         // 删
         client.delete().uri("/books/{id}", id)
             .header(HttpHeaders.AUTHORIZATION, bearer)
             .exchange()
-            .expectStatus().isOk();
+            .expectStatus().isOk()
 
         // 删除后再查 -> 404
         client.get().uri("/books/{id}", id)
             .header(HttpHeaders.AUTHORIZATION, bearer)
             .exchange()
-            .expectStatus().isNotFound();
+            .expectStatus().isNotFound()
     }
 
     @Test
-    void readerCanReadButNotDelete() {
-        String bearer = "Bearer " + login("reader", "reader123");
+    fun readerCanReadButNotDelete() {
+        val bearer = "Bearer " + login("reader", "reader123")
 
         client.get().uri("/books")
             .header(HttpHeaders.AUTHORIZATION, bearer)
             .exchange()
-            .expectStatus().isOk();
+            .expectStatus().isOk()
 
         // 删除需要 admin 角色
         client.delete().uri("/books/{id}", 1)
             .header(HttpHeaders.AUTHORIZATION, bearer)
             .exchange()
-            .expectStatus().isForbidden();
+            .expectStatus().isForbidden()
 
         // 当前登录用户信息
         client.get().uri("/me")
@@ -117,22 +112,22 @@ class BookControllerTest {
             .expectStatus().isOk()
             .expectBody()
             .jsonPath("$.username").isEqualTo("reader")
-            .jsonPath("$.roles[0]").isEqualTo("reader");
+            .jsonPath("$.roles[0]").isEqualTo("reader")
     }
 
     @Test
-    void anonymousCannotRead() {
+    fun anonymousCannotRead() {
         client.get().uri("/books")
             .exchange()
-            .expectAll(ProblemDetailMvcConsumer.unLogin().expect());
+            .expectAll(ProblemDetailMvcConsumer.unLogin().expect())
     }
 
     @Test
-    void loginWithWrongPassword() {
+    fun loginWithWrongPassword() {
         client.post().uri("/login")
             .contentType(MediaType.APPLICATION_JSON)
-            .body(new LoginController.LoginRequest("admin", "wrong"))
+            .body(LoginController.LoginRequest("admin", "wrong"))
             .exchange()
-            .expectStatus().isUnauthorized();
+            .expectStatus().isUnauthorized()
     }
 }

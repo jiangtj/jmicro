@@ -1,56 +1,54 @@
-package com.jiangtj.micro.demobackend;
+package com.jiangtj.micro.demobackend
 
-import com.jiangtj.micro.test.JMicroMvcTest;
-import com.jiangtj.micro.test.ProblemDetailMvcConsumer;
-import com.jiangtj.micro.test.WithMockUser;
-import jakarta.annotation.Resource;
-import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ProblemDetail;
-import org.springframework.test.web.servlet.client.RestTestClient;
-
-import java.net.URI;
+import com.jiangtj.micro.test.JMicroMvcTest
+import com.jiangtj.micro.test.ProblemDetailMvcConsumer
+import com.jiangtj.micro.test.WithMockUser
+import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
+import org.springframework.http.ProblemDetail
+import org.springframework.test.web.servlet.client.RestTestClient
+import java.net.URI
 
 @JMicroMvcTest
 class BaseControllerTests {
 
-    @Resource
-    RestTestClient webClient;
+    @Autowired
+    lateinit var webClient: RestTestClient
 
     @Test
-    void testIndex() {
+    fun testIndex() {
         webClient.get().uri("/")
             .exchange()
             .expectStatus().isOk()
-            .expectBody(String.class).isEqualTo("Base Servlet Client Started !!");
+            .expectBody(String::class.java).isEqualTo("Base Servlet Client Started !!")
     }
 
     @Test
-    void testErr() {
-        ProblemDetail detail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
-        detail.setTitle(HttpStatus.BAD_REQUEST.getReasonPhrase());
-        detail.setDetail("insecure");
-        detail.setInstance(URI.create("/insecure/err"));
+    fun testErr() {
+        val detail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST)
+        detail.title = HttpStatus.BAD_REQUEST.reasonPhrase
+        detail.detail = "insecure"
+        detail.instance = URI.create("/insecure/err")
         webClient.get().uri("/insecure/err")
             .exchange()
             .expectStatus().is4xxClientError()
-            .expectBody(ProblemDetail.class).isEqualTo(detail);
+            .expectBody(ProblemDetail::class.java).isEqualTo(detail)
     }
 
     @Test
     @WithMockUser
-    void testHaveToken() {
+    fun testHaveToken() {
         webClient.get().uri("/needtoken")
             .exchange()
-            .expectStatus().isOk();
+            .expectStatus().isOk()
     }
 
     @Test
-    void testNotHaveToken() {
+    fun testNotHaveToken() {
         webClient.get().uri("/needtoken")
             .exchange()
             .expectStatus().is4xxClientError()
-            .expectAll(ProblemDetailMvcConsumer.unLogin().expect());
+            .expectAll(ProblemDetailMvcConsumer.unLogin().expect())
     }
-
 }

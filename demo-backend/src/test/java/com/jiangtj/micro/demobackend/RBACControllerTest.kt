@@ -1,30 +1,30 @@
-package com.jiangtj.micro.demobackend;
+package com.jiangtj.micro.demobackend
 
-import com.jiangtj.micro.test.JMicroMvcTest;
-import com.jiangtj.micro.test.ProblemDetailMvcConsumer;
-import com.jiangtj.micro.test.WithMockUser;
-import jakarta.annotation.Resource;
-import org.junit.jupiter.api.Test;
-import org.springframework.test.web.servlet.client.RestTestClient;
+import com.jiangtj.micro.test.JMicroMvcTest
+import com.jiangtj.micro.test.ProblemDetailMvcConsumer
+import com.jiangtj.micro.test.WithMockUser
+import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.test.web.servlet.client.RestTestClient
 
 @JMicroMvcTest
 class RBACControllerTest {
 
-    @Resource
-    RestTestClient client;
+    @Autowired
+    lateinit var client: RestTestClient
 
     @Test
     @WithMockUser
-    void hasLoginWithToken() {
+    fun hasLoginWithToken() {
         client.get().uri("/anno/hasLogin")
-                .exchange()
-                .expectStatus().isOk();
+            .exchange()
+            .expectStatus().isOk()
     }
 
     @Test
-    void hasLoginWithoutToken() {
+    fun hasLoginWithoutToken() {
         client.get().uri("/anno/hasLogin")
-                .exchange()
-                .expectAll(ProblemDetailMvcConsumer.unLogin().expect());
+            .exchange()
+            .expectAll(ProblemDetailMvcConsumer.unLogin().expect())
     }
 }

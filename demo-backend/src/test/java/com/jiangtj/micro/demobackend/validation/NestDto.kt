@@ -1,20 +1,14 @@
-package com.jiangtj.micro.demobackend.validation;
+package com.jiangtj.micro.demobackend.validation
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import lombok.Data;
+import jakarta.validation.Valid
+import jakarta.validation.constraints.NotNull
 
-@Data
-public class NestDto {
-    @NotNull
-    private String name;
+data class NestDto(
+    @field:NotNull val name: String? = null,
+    @field:Valid val nest: Example1? = null,
+) {
 
-    @Valid
-    private Example1 nest;
-
-    @Data
-    public static class Example1 {
-        @NotNull
-        private String name1;
-    }
+    data class Example1(
+        @field:NotNull val name1: String? = null,
+    )
 }

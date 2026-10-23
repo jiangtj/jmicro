@@ -1,42 +1,36 @@
-package com.jiangtj.micro.demobackend.anno;
+package com.jiangtj.micro.demobackend.anno
 
-import com.jiangtj.micro.auth.annotations.HasLogin;
-import com.jiangtj.micro.auth.annotations.HasPermission;
-import com.jiangtj.micro.auth.annotations.HasRole;
-import com.jiangtj.micro.demobackend.HasAdminOrUser;
-import org.springframework.stereotype.Service;
+import com.jiangtj.micro.auth.annotations.HasLogin
+import com.jiangtj.micro.auth.annotations.HasPermission
+import com.jiangtj.micro.auth.annotations.HasRole
+import com.jiangtj.micro.demobackend.HasAdminOrUser
+import org.springframework.stereotype.Service
 
 @Service
-public class RbacTestService {
+class RbacTestService {
 
     @HasLogin
-    public String hasLogin(){
-        return "hasLogin !!";
-    }
+    fun hasLogin(): String = "hasLogin !!"
 
     @HasRole("roleA")
-    public String hasRoleA(){
-        return "hasRoleA !!";
-    }
+    fun hasRoleA(): String = "hasRoleA !!"
 
     @HasPermission("permissionB")
-    public String hasPermissionB(){
-        return "hasPermissionB !!";
-    }
+    fun hasPermissionB(): String = "hasPermissionB !!"
 
     @HasRole("admin")
-    public void hasAdmin(){
+    fun hasAdmin() {
     }
 
     @HasAdminOrUser
-    public void hasAdminOrUser(){
+    fun hasAdminOrUser() {
     }
 
     @HasPermission("a:a")
-    public void hasAntPermissionAA(){
+    fun hasAntPermissionAA() {
     }
 
     @HasPermission("a:a:a")
-    public void hasAntPermissionAAA(){
+    fun hasAntPermissionAAA() {
     }
 }

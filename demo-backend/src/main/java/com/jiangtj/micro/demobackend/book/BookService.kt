@@ -1,56 +1,52 @@
-package com.jiangtj.micro.demobackend.book;
+package com.jiangtj.micro.demobackend.book
 
-import com.jiangtj.micro.demobackend.jooq.tables.daos.BookDao;
-import com.jiangtj.micro.demobackend.jooq.tables.pojos.Book;
-import com.jiangtj.micro.web.BaseExceptionUtils;
-import jakarta.annotation.Resource;
-import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.List;
+import com.jiangtj.micro.demobackend.jooq.tables.daos.BookDao
+import com.jiangtj.micro.demobackend.jooq.tables.pojos.Book
+import com.jiangtj.micro.web.BaseExceptionUtils
+import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 /**
  * 图书增删改查，持久层使用 jOOQ 生成的 BookDao
  */
 @Service
-public class BookService {
+class BookService(
+    private val bookDao: BookDao,
+) {
 
-    @Resource
-    private BookDao bookDao;
+    fun list(): List<Book> = bookDao.findAll()
 
-    public List<Book> list() {
-        return bookDao.findAll();
+    fun get(id: Long): Book = bookDao.fetchOneById(id)
+        ?: throw BaseExceptionUtils.notFound("图书不存在：$id")
+
+    fun create(form: BookForm): Book {
+        val book = Book(
+            id = null,
+            title = form.title,
+            author = form.author,
+            isbn = form.isbn,
+            price = form.price,
+            stock = form.stock,
+            createTime = LocalDateTime.now(),
+        )
+        bookDao.insert(book)
+        return book
     }
 
-    public Book get(Long id) {
-        Book book = bookDao.fetchOneById(id);
-        if (book == null) {
-            throw BaseExceptionUtils.notFound("图书不存在：" + id);
-        }
-        return book;
+    fun update(id: Long, form: BookForm): Book {
+        val book = get(id)
+        book.title = form.title
+        book.author = form.author
+        book.isbn = form.isbn
+        book.price = form.price
+        book.stock = form.stock
+        bookDao.update(book)
+        return book
     }
 
-    public Book create(BookForm form) {
-        Book book = new Book(null, form.title(), form.author(), form.isbn(),
-            form.price(), form.stock(), LocalDateTime.now());
-        bookDao.insert(book);
-        return book;
-    }
-
-    public Book update(Long id, BookForm form) {
-        Book book = get(id);
-        book.setTitle(form.title());
-        book.setAuthor(form.author());
-        book.setIsbn(form.isbn());
-        book.setPrice(form.price());
-        book.setStock(form.stock());
-        bookDao.update(book);
-        return book;
-    }
-
-    public void delete(Long id) {
+    fun delete(id: Long) {
         // 先确认存在，不存在时返回 404
-        get(id);
-        bookDao.deleteById(id);
+        get(id)
+        bookDao.deleteById(id)
     }
 }

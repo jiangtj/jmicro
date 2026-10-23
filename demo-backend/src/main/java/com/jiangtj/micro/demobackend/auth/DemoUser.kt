@@ -1,10 +1,12 @@
-package com.jiangtj.micro.demobackend.auth;
-
-import java.util.List;
+package com.jiangtj.micro.demobackend.auth
 
 /**
  * demo 账户，包含角色与权限
  */
-public record DemoUser(String username, String password, String nickname,
-                       List<String> roles, List<String> permissions) {
-}
+data class DemoUser(
+    val username: String,
+    val password: String,
+    val nickname: String,
+    val roles: List<String>,
+    val permissions: List<String>,
+)

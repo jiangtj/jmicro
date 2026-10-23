@@ -1,89 +1,79 @@
-package com.jiangtj.micro.demobackend.auth;
+package com.jiangtj.micro.demobackend.auth
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
-import org.springframework.stereotype.Component;
-
-import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import io.jsonwebtoken.Claims
+import io.jsonwebtoken.JwtException
+import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.security.Keys
+import org.springframework.stereotype.Component
+import java.nio.charset.StandardCharsets
+import java.time.Instant
+import java.util.Date
+import javax.crypto.SecretKey
 
 /**
  * demo 的 JWT 服务：基于 HS256 签发与校验 token。
- * <p>
+ *
  * 角色与权限直接写入 claims，服务端无需保存会话（无状态）。
  */
 @Component
-public class DemoJwtService {
+class DemoJwtService(
+    private val properties: DemoJwtProperties,
+) {
 
-    public static final String CLAIM_NAME = "name";
-    public static final String CLAIM_TYPE = "type";
-    public static final String CLAIM_ROLES = "roles";
-    public static final String CLAIM_PERMISSIONS = "permissions";
+    companion object {
+        const val CLAIM_NAME: String = "name"
+        const val CLAIM_TYPE: String = "type"
+        const val CLAIM_ROLES: String = "roles"
+        const val CLAIM_PERMISSIONS: String = "permissions"
 
-    /**
-     * 标识 demo 自己签发的账号体系
-     */
-    public static final String SUBJECT_TYPE = "demo";
-
-    private final SecretKey signKey;
-    private final DemoJwtProperties properties;
-
-    public DemoJwtService(DemoJwtProperties properties) {
-        this.properties = properties;
-        this.signKey = Keys.hmacShaKeyFor(properties.getSecret().getBytes(StandardCharsets.UTF_8));
+        /**
+         * 标识 demo 自己签发的账号体系
+         */
+        const val SUBJECT_TYPE: String = "demo"
     }
+
+    private val signKey: SecretKey = Keys.hmacShaKeyFor(properties.secret.toByteArray(StandardCharsets.UTF_8))
 
     /**
      * 为登录成功的用户签发 JWT
      */
-    public String createToken(DemoUser user) {
-        Instant now = Instant.now();
+    fun createToken(user: DemoUser): String {
+        val now = Instant.now()
         return Jwts.builder()
-            .issuer(properties.getIssuer())
-            .subject(user.username())
-            .claim(CLAIM_NAME, user.nickname())
+            .issuer(properties.issuer)
+            .subject(user.username)
+            .claim(CLAIM_NAME, user.nickname)
             .claim(CLAIM_TYPE, SUBJECT_TYPE)
-            .claim(CLAIM_ROLES, user.roles())
-            .claim(CLAIM_PERMISSIONS, user.permissions())
+            .claim(CLAIM_ROLES, user.roles)
+            .claim(CLAIM_PERMISSIONS, user.permissions)
             .issuedAt(Date.from(now))
-            .expiration(Date.from(now.plus(properties.getTtl())))
+            .expiration(Date.from(now.plus(properties.ttl)))
             .signWith(signKey, Jwts.SIG.HS256)
-            .compact();
+            .compact()
     }
 
     /**
-     * 校验签名与有效期，失败（含格式错误、过期）返回 empty
+     * 校验签名与有效期，失败（含格式错误、过期）返回 null
      */
-    public Optional<Claims> parse(String token) {
+    fun parse(token: String): Claims? =
         try {
-            return Optional.of(Jwts.parser()
+            Jwts.parser()
                 .verifyWith(signKey)
                 .build()
                 .parseSignedClaims(token)
-                .getPayload());
-        } catch (JwtException | IllegalArgumentException e) {
-            return Optional.empty();
+                .payload
+        } catch (e: JwtException) {
+            null
+        } catch (e: IllegalArgumentException) {
+            null
         }
-    }
 
-    public List<String> roles(Claims claims) {
-        return stringList(claims, CLAIM_ROLES);
-    }
+    fun roles(claims: Claims): List<String> = stringList(claims, CLAIM_ROLES)
 
-    public List<String> permissions(Claims claims) {
-        return stringList(claims, CLAIM_PERMISSIONS);
-    }
+    fun permissions(claims: Claims): List<String> = stringList(claims, CLAIM_PERMISSIONS)
 
-    private List<String> stringList(Claims claims, String name) {
-        if (claims.get(name) instanceof List<?> list) {
-            return list.stream().map(String::valueOf).toList();
-        }
-        return List.of();
+    private fun stringList(claims: Claims, name: String): List<String> {
+        val value = claims[name]
+        return if (value is List<*>) value.map { it.toString() } else emptyList()
     }
 }

@@ -33,11 +33,11 @@ open class DemoUserStore(
             throw BaseExceptionUtils.unauthorized("用户名或密码错误")
         }
         return DemoUser(
-            user.username,
-            encoded,
-            user.nickname,
-            findRoles(user.id),
-            findPermissions(user.id),
+            username = username,
+            password = encoded,
+            nickname = user.nickname ?: username,
+            roles = findRoles(user.id),
+            permissions = findPermissions(user.id),
         )
     }
 

@@ -1,32 +1,32 @@
-package com.jiangtj.micro.demobackend.anno;
+package com.jiangtj.micro.demobackend.anno
 
-import com.jiangtj.micro.auth.annotations.HasSubject;
-import org.springframework.stereotype.Service;
+import com.jiangtj.micro.auth.annotations.HasSubject
+import org.springframework.stereotype.Service
 
 @Service
-public class HasSubjectTestService {
+class HasSubjectTestService {
 
     @HasSubject(id = "1")
-    public void hasId1() {
+    fun hasId1() {
     }
 
     @HasSubject("2")
-    public void hasId2() {
+    fun hasId2() {
     }
 
     @HasSubject(name = "name")
-    public void hasName() {
+    fun hasName() {
     }
 
     @HasSubject(displayName = "displayName")
-    public void hasDisplayName() {
+    fun hasDisplayName() {
     }
 
     @HasSubject(type = "type")
-    public void hasType() {
+    fun hasType() {
     }
 
     @HasSubject(issuer = "iss")
-    public void hasIss() {
+    fun hasIss() {
     }
 }

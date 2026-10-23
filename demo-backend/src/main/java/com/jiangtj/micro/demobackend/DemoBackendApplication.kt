@@ -1,13 +1,11 @@
-package com.jiangtj.micro.demobackend;
+package com.jiangtj.micro.demobackend
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.SpringApplication
+import org.springframework.boot.autoconfigure.SpringBootApplication
 
 @SpringBootApplication
-public class DemoBackendApplication {
+class DemoBackendApplication
 
-    public static void main(String[] args) {
-        SpringApplication.run(DemoBackendApplication.class, args);
-    }
-
+fun main(args: Array<String>) {
+    SpringApplication.run(DemoBackendApplication::class.java, *args)
 }

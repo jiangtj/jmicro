@@ -1,29 +1,21 @@
-package com.jiangtj.micro.demobackend;
+package com.jiangtj.micro.demobackend
 
-import com.jiangtj.micro.auth.core.AuthService;
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
-import org.springframework.web.servlet.HandlerInterceptor;
+import com.jiangtj.micro.auth.core.AuthService
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
+import org.springframework.web.servlet.HandlerInterceptor
 
+@Deprecated("请使用 WebConfig 中的 FunctionHandlerInterceptor")
+class LoginHandlerInterceptor(
+    private val authService: AuthService,
+) : HandlerInterceptor {
 
-@Slf4j
-@Deprecated
-public class LoginHandlerInterceptor implements HandlerInterceptor {
-
-    @Resource
-    private AuthService authService;
-
-    @Override
-    public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object o) throws Exception {
-        if ("options".equalsIgnoreCase(request.getMethod())) {
-            return true;
+    override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
+        if ("options".equals(request.method, ignoreCase = true)) {
+            return true
         }
 
-        authService.hasLogin();
-        return true;
+        authService.hasLogin()
+        return true
     }
-
 }

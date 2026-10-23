@@ -1,58 +1,52 @@
-package com.jiangtj.micro.demobackend.auth;
+package com.jiangtj.micro.demobackend.auth
 
-import com.jiangtj.micro.auth.AuthRequestAttributes;
-import com.jiangtj.micro.auth.context.AuthContext;
-import com.jiangtj.micro.auth.context.AuthContextConverter;
-import com.jiangtj.micro.auth.context.AuthRequest;
-import com.jiangtj.micro.auth.context.Authorization;
-import com.jiangtj.micro.auth.context.Subject;
-import io.jsonwebtoken.Claims;
-import org.springframework.core.Ordered;
-import org.springframework.stereotype.Component;
+import com.jiangtj.micro.auth.AuthRequestAttributes
+import com.jiangtj.micro.auth.context.AuthContext
+import com.jiangtj.micro.auth.context.AuthContextConverter
+import com.jiangtj.micro.auth.context.AuthRequest
+import com.jiangtj.micro.auth.context.Authorization
+import com.jiangtj.micro.auth.context.Subject
+import io.jsonwebtoken.Claims
+import org.springframework.core.Ordered
+import org.springframework.stereotype.Component
 
 /**
  * 将请求头中的 JWT 转换为鉴权上下文。
- * <p>
- * token 由 {@code POST /login} 以 HS256 签发；签名或有效期校验失败时视为未登录。
- * 优先级高于内置的 {@code JwtConverter}（后者用于 OIDC/JWKS 场景）。
+ *
+ * token 由 `POST /login` 以 HS256 签发；签名或有效期校验失败时视为未登录。
+ * 优先级高于内置的 `JwtConverter`（后者用于 OIDC/JWKS 场景）。
  */
 @Component
-public class DemoAuthContextConverter implements AuthContextConverter, Ordered {
+class DemoAuthContextConverter(
+    private val jwtService: DemoJwtService,
+) : AuthContextConverter, Ordered {
 
-    private final DemoJwtService jwtService;
+    override fun getOrder(): Int = 0
 
-    public DemoAuthContextConverter(DemoJwtService jwtService) {
-        this.jwtService = jwtService;
+    override fun convert(request: AuthRequest): AuthContext {
+        val token = request.getHeader(AuthRequestAttributes.TOKEN_HEADER_NAME).orElse(null)
+            ?: return AuthContext.unLogin()
+        val claims = jwtService.parse(removePrefix(token))
+            ?: return AuthContext.unLogin()
+        return toContext(claims)
     }
 
-    @Override
-    public int getOrder() {
-        return 0;
+    private fun toContext(claims: Claims): AuthContext {
+        val subject = Subject.builder()
+            .id(claims.subject)
+            .name(claims.subject)
+            .displayName(claims.get(DemoJwtService.CLAIM_NAME, String::class.java))
+            .type(claims.get(DemoJwtService.CLAIM_TYPE, String::class.java))
+            .issuer(claims.issuer)
+            .build()
+        return AuthContext.create(
+            subject,
+            Authorization.create(jwtService.roles(claims), jwtService.permissions(claims)),
+        )
     }
 
-    @Override
-    public AuthContext convert(AuthRequest request) {
-        return request.getHeader(AuthRequestAttributes.TOKEN_HEADER_NAME)
-            .map(this::removePrefix)
-            .flatMap(jwtService::parse)
-            .map(this::toContext)
-            .orElseGet(AuthContext::unLogin);
-    }
-
-    private AuthContext toContext(Claims claims) {
-        Subject subject = Subject.builder()
-            .id(claims.getSubject())
-            .name(claims.getSubject())
-            .displayName(claims.get(DemoJwtService.CLAIM_NAME, String.class))
-            .type(claims.get(DemoJwtService.CLAIM_TYPE, String.class))
-            .issuer(claims.getIssuer())
-            .build();
-        return AuthContext.create(subject,
-            Authorization.create(jwtService.roles(claims), jwtService.permissions(claims)));
-    }
-
-    private String removePrefix(String token) {
-        String prefix = AuthRequestAttributes.TOKEN_HEADER_PREFIX;
-        return token.startsWith(prefix) ? token.substring(prefix.length()).trim() : token;
+    private fun removePrefix(token: String): String {
+        val prefix = AuthRequestAttributes.TOKEN_HEADER_PREFIX
+        return if (token.startsWith(prefix)) token.substring(prefix.length).trim() else token
     }
 }

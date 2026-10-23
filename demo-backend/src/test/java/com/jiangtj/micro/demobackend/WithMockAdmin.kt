@@ -1,13 +1,11 @@
-package com.jiangtj.micro.demobackend;
+package com.jiangtj.micro.demobackend
 
-import com.jiangtj.micro.test.WithMockUser;
+import com.jiangtj.micro.test.WithMockUser
+import java.lang.annotation.Inherited
 
-import java.lang.annotation.*;
-
-@Target({ElementType.TYPE, ElementType.METHOD})
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+@MustBeDocumented
 @Inherited
-@WithMockUser(subject = "admin", roles = {"admin"})
-public @interface WithMockAdmin {
-}
+@WithMockUser(subject = "admin", roles = ["admin"])
+annotation class WithMockAdmin
