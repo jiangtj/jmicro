@@ -12,7 +12,6 @@ dependencies {
     api("org.springframework.boot:spring-boot-starter")
     api(project(":micro-common"))
     api(project(":micro-auth"))
-    api("org.springframework.security:spring-security-crypto")
 
     // web stacks shared by OIDC server endpoints and pic upload
     api(project(":micro-web"))

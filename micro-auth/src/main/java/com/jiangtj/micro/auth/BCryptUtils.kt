@@ -1,4 +1,4 @@
-package com.jiangtj.micro.business.config
+package com.jiangtj.micro.auth
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 
@@ -21,14 +21,14 @@ object BCryptUtils {
         || value.startsWith("$2y$")
 
     /**
-     * 可作为 [SystemItemInfo.valueFormatter] 使用：仅当传入值还不是 bcrypt 哈希时才对其哈希，
+     * 可作为配置项的 `valueFormatter` 使用：仅当传入值还不是 bcrypt 哈希时才对其哈希，
      * 已哈希的值直接透传（避免二次哈希）。用于 `secret` 类配置项（如密码）的持久化存储。
      */
     fun encodeFormatter(raw: String): String =
         if (isEncoded(raw)) raw else encode(raw)
 
     /**
-     * 可作为 [SystemItemInfo.formatter] 使用：对配置展示值做脱敏，统一返回 `******`。
+     * 可作为配置项的 `formatter` 使用：对配置展示值做脱敏，统一返回 `******`。
      */
     fun maskFormatter(value: String): String = "******"
 }
