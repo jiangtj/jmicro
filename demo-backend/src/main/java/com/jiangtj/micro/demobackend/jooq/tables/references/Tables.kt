@@ -7,6 +7,7 @@ package com.jiangtj.micro.demobackend.jooq.tables.references
 
 import com.jiangtj.micro.demobackend.jooq.tables.Book
 import com.jiangtj.micro.demobackend.jooq.tables.FlywaySchemaHistory
+import com.jiangtj.micro.demobackend.jooq.tables.SysConfig
 import com.jiangtj.micro.demobackend.jooq.tables.SysPermission
 import com.jiangtj.micro.demobackend.jooq.tables.SysRole
 import com.jiangtj.micro.demobackend.jooq.tables.SysRolePermission
@@ -24,6 +25,11 @@ val BOOK: Book = Book.BOOK
  * The table <code>flyway_schema_history</code>.
  */
 val FLYWAY_SCHEMA_HISTORY: FlywaySchemaHistory = FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY
+
+/**
+ * The table <code>sys_config</code>.
+ */
+val SYS_CONFIG: SysConfig = SysConfig.SYS_CONFIG
 
 /**
  * The table <code>sys_permission</code>.

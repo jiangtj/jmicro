@@ -1,5 +1,7 @@
 package com.jiangtj.micro.business.config
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.jiangtj.micro.common.schema.JsonSchema
 import java.lang.reflect.Type
 import java.util.function.Function
@@ -16,8 +18,23 @@ data class SystemItemInfo(
     var type: String = SystemItemType.TEXT.name,
     var provider: List<Pair<String, String>> = listOf(),
     var order: Int = 999,
+
+    /**
+     * 仅用于生成展示值的格式化函数，不参与 JSON 序列化
+     */
+    @get:JsonIgnore
     var formatter: Function<String, String>? = null,
+
+    /**
+     * 仅用于写入值校验/规范化的函数，不参与 JSON 序列化
+     */
+    @get:JsonIgnore
     var valueFormatter: Function<String, String>? = null,
+
+    /**
+     * 是否存在持久化的覆盖值（前端据此展示「已修改」标记与「恢复默认」按钮）
+     */
+    @get:JsonProperty("isModified")
     var isModified: Boolean = false,
     var tag: List<String> = listOf(),
 
@@ -27,6 +44,7 @@ data class SystemItemInfo(
      * - 写入时用于校验值能否反序列化为该类型
      * - 读取时可通过 [schema] 拿到前端渲染所需的结构描述
      */
+    @get:JsonIgnore
     var jsonType: Type? = null,
 
     /**

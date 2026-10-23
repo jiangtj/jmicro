@@ -7,6 +7,7 @@ package com.jiangtj.micro.demobackend.jooq.keys
 
 import com.jiangtj.micro.demobackend.jooq.tables.Book
 import com.jiangtj.micro.demobackend.jooq.tables.FlywaySchemaHistory
+import com.jiangtj.micro.demobackend.jooq.tables.SysConfig
 import com.jiangtj.micro.demobackend.jooq.tables.SysPermission
 import com.jiangtj.micro.demobackend.jooq.tables.SysRole
 import com.jiangtj.micro.demobackend.jooq.tables.SysRolePermission
@@ -14,6 +15,7 @@ import com.jiangtj.micro.demobackend.jooq.tables.SysUser
 import com.jiangtj.micro.demobackend.jooq.tables.SysUserRole
 import com.jiangtj.micro.demobackend.jooq.tables.records.BookRecord
 import com.jiangtj.micro.demobackend.jooq.tables.records.FlywaySchemaHistoryRecord
+import com.jiangtj.micro.demobackend.jooq.tables.records.SysConfigRecord
 import com.jiangtj.micro.demobackend.jooq.tables.records.SysPermissionRecord
 import com.jiangtj.micro.demobackend.jooq.tables.records.SysRolePermissionRecord
 import com.jiangtj.micro.demobackend.jooq.tables.records.SysRoleRecord
@@ -34,6 +36,7 @@ import org.jooq.impl.QOM.ForeignKeyRule
 
 val CONSTRAINT_2: UniqueKey<BookRecord> = Internal.createUniqueKey(Book.BOOK, DSL.name("CONSTRAINT_2"), arrayOf(Book.BOOK.ID), true)
 val FLYWAY_SCHEMA_HISTORY_PK: UniqueKey<FlywaySchemaHistoryRecord> = Internal.createUniqueKey(FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY, DSL.name("flyway_schema_history_pk"), arrayOf(FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY.INSTALLED_RANK), true)
+val CONSTRAINT_CC: UniqueKey<SysConfigRecord> = Internal.createUniqueKey(SysConfig.SYS_CONFIG, DSL.name("CONSTRAINT_CC"), arrayOf(SysConfig.SYS_CONFIG.CONFIG_KEY), true)
 val CONSTRAINT_C: UniqueKey<SysPermissionRecord> = Internal.createUniqueKey(SysPermission.SYS_PERMISSION, DSL.name("CONSTRAINT_C"), arrayOf(SysPermission.SYS_PERMISSION.ID), true)
 val UK_SYS_PERMISSION_CODE: UniqueKey<SysPermissionRecord> = Internal.createUniqueKey(SysPermission.SYS_PERMISSION, DSL.name("uk_sys_permission_code"), arrayOf(SysPermission.SYS_PERMISSION.CODE), true)
 val CONSTRAINT_74: UniqueKey<SysRoleRecord> = Internal.createUniqueKey(SysRole.SYS_ROLE, DSL.name("CONSTRAINT_74"), arrayOf(SysRole.SYS_ROLE.ID), true)
