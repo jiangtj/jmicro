@@ -1,116 +1,96 @@
-package com.jiangtj.micro.test;
+package com.jiangtj.micro.test
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ProblemDetail;
-import org.springframework.test.web.servlet.client.RestTestClient;
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatusCode
+import org.springframework.http.ProblemDetail
+import org.springframework.test.web.servlet.client.RestTestClient
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+class ProblemDetailMvcConsumer internal constructor(code: HttpStatusCode) {
 
-public class ProblemDetailMvcConsumer {
+    private val problemDetail: ProblemDetail = ProblemDetail.forStatus(code)
 
-    private final ProblemDetail detail;
+    fun title(title: String): ProblemDetailMvcConsumer = apply { problemDetail.title = title }
 
-    public static ProblemDetailMvcConsumer unLogin() {
-        return new ProblemDetailMvcConsumer(HttpStatus.UNAUTHORIZED)
-            .title("No Login")
-            .detail("You have to take a token for this request.");
-    }
+    fun detail(detail: String): ProblemDetailMvcConsumer = apply { problemDetail.detail = detail }
 
-    // {"type":"about:blank","title":"Invalid Token","status":403,"detail":"不支持的
-    // Auth Context","instance":"/actuator"}
-    public static ProblemDetailMvcConsumer unInvalid(String msg) {
-        return new ProblemDetailMvcConsumer(HttpStatus.FORBIDDEN)
-            .title("Invalid Token")
-            .detail(msg);
-    }
-
-    // {"type":"about:blank","title":"No Role","status":403,"detail":"Don't have
-    // role<roletest2>.","instance":"/role-test-2"}
-    public static ProblemDetailMvcConsumer unRole(String role) {
-        return new ProblemDetailMvcConsumer(HttpStatus.FORBIDDEN)
-            .title("No Role")
-            .detail(String.format("Don't have role<%s>.", role));
-    }
-
-    // {"type":"about:blank","title":"No Permission","status":403,"detail":"Don't
-    // have permission<system:user:write>","instance":"/user"}
-    public static ProblemDetailMvcConsumer unPermission(String permissionName) {
-        return new ProblemDetailMvcConsumer(HttpStatus.FORBIDDEN)
-            .title("No Permission")
-            .detail(String.format("Don't have permission<%s>.", permissionName));
-    }
-
-    public static ProblemDetailMvcConsumer forStatus(HttpStatus status) {
-        return new ProblemDetailMvcConsumer(status)
-            .title(status.getReasonPhrase());
-    }
-
-    ProblemDetailMvcConsumer(HttpStatusCode code) {
-        detail = ProblemDetail.forStatus(code);
-    }
-
-    public ProblemDetailMvcConsumer title(String title) {
-        this.detail.setTitle(title);
-        return this;
-    }
-
-    public ProblemDetailMvcConsumer detail(String detail) {
-        this.detail.setDetail(detail);
-        return this;
-    }
-
-    public RestTestClient.ResponseSpec.ResponseSpecConsumer expect() {
-        return responseSpec -> {
-
-            responseSpec.expectStatus().is4xxClientError();
-            responseSpec.expectStatus().isEqualTo(detail.getStatus());
-            RestTestClient.BodyContentSpec expectBody = responseSpec.expectBody();
+    fun expect(): RestTestClient.ResponseSpec.ResponseSpecConsumer =
+        RestTestClient.ResponseSpec.ResponseSpecConsumer { responseSpec ->
+            responseSpec.expectStatus().is4xxClientError()
+            responseSpec.expectStatus().isEqualTo(problemDetail.status)
+            val expectBody = responseSpec.expectBody()
             expectBody
-                .jsonPath("status").isEqualTo(detail.getStatus())
-                .jsonPath("instance").exists();
-            String title = detail.getTitle();
-            if (title != null) {
-                expectBody.jsonPath("title").isEqualTo(title);
-            }
-            String detailS = detail.getDetail();
-            if (detailS != null) {
-                expectBody.jsonPath("detail").isEqualTo(detailS);
-            }
-        };
-    }
+                .jsonPath("status").isEqualTo(problemDetail.status)
+                .jsonPath("instance").exists()
+            problemDetail.title?.let { expectBody.jsonPath("title").isEqualTo(it) }
+            problemDetail.detail?.let { expectBody.jsonPath("detail").isEqualTo(it) }
+        }
 
-    // {"type":"about:blank","title":"Validation
-    // failure","status":400,"detail":"手机号格式不正确"}
-    public static RestTestClient.ResponseSpec.ResponseSpecConsumer unValidation(String... failures) {
-        return responseSpec -> {
-            responseSpec.expectStatus().is4xxClientError();
-            responseSpec.expectStatus().isEqualTo(HttpStatus.BAD_REQUEST);
-            responseSpec.expectBody()
-                .jsonPath("status").isEqualTo(HttpStatus.BAD_REQUEST.value())
-                .jsonPath("title").isEqualTo("Validation failure")
-                .jsonPath("detail").value(String.class, d -> {
-                    for (String failure : failures) {
-                        assertTrue(d.contains(failure));
+    companion object {
+
+        @JvmStatic
+        fun unLogin(): ProblemDetailMvcConsumer =
+            ProblemDetailMvcConsumer(HttpStatus.UNAUTHORIZED)
+                .title("No Login")
+                .detail("You have to take a token for this request.")
+
+        // {"type":"about:blank","title":"Invalid Token","status":403,"detail":"不支持的
+        // Auth Context","instance":"/actuator"}
+        @JvmStatic
+        fun unInvalid(msg: String): ProblemDetailMvcConsumer =
+            ProblemDetailMvcConsumer(HttpStatus.FORBIDDEN)
+                .title("Invalid Token")
+                .detail(msg)
+
+        // {"type":"about:blank","title":"No Role","status":403,"detail":"Don't have
+        // role<roletest2>.","instance":"/role-test-2"}
+        @JvmStatic
+        fun unRole(role: String): ProblemDetailMvcConsumer =
+            ProblemDetailMvcConsumer(HttpStatus.FORBIDDEN)
+                .title("No Role")
+                .detail("Don't have role<$role>.")
+
+        // {"type":"about:blank","title":"No Permission","status":403,"detail":"Don't
+        // have permission<system:user:write>","instance":"/user"}
+        @JvmStatic
+        fun unPermission(permissionName: String): ProblemDetailMvcConsumer =
+            ProblemDetailMvcConsumer(HttpStatus.FORBIDDEN)
+                .title("No Permission")
+                .detail("Don't have permission<$permissionName>.")
+
+        @JvmStatic
+        fun forStatus(status: HttpStatus): ProblemDetailMvcConsumer =
+            ProblemDetailMvcConsumer(status).title(status.reasonPhrase)
+
+        // {"type":"about:blank","title":"Validation
+        // failure","status":400,"detail":"手机号格式不正确"}
+        @JvmStatic
+        fun unValidation(vararg failures: String): RestTestClient.ResponseSpec.ResponseSpecConsumer =
+            RestTestClient.ResponseSpec.ResponseSpecConsumer { responseSpec ->
+                responseSpec.expectStatus().is4xxClientError()
+                responseSpec.expectStatus().isEqualTo(HttpStatus.BAD_REQUEST)
+                responseSpec.expectBody()
+                    .jsonPath("status").isEqualTo(HttpStatus.BAD_REQUEST.value())
+                    .jsonPath("title").isEqualTo("Validation failure")
+                    .jsonPath("detail").value(String::class.java) { detail ->
+                        failures.forEach { assertTrue(detail.contains(it)) }
                     }
-                })
-                .jsonPath("instance").exists();
-        };
-    }
+                    .jsonPath("instance").exists()
+            }
 
-    // {"detail":"Invalid request content.","instance":"/food/create","status":400,"title":"Bad Request"}
-    public static RestTestClient.ResponseSpec.ResponseSpecConsumer badRequest(String failure) {
-        return responseSpec -> {
-            responseSpec.expectStatus().is4xxClientError();
-            responseSpec.expectStatus().isEqualTo(HttpStatus.BAD_REQUEST);
-            responseSpec.expectBody()
-                .jsonPath("status").isEqualTo(HttpStatus.BAD_REQUEST.value())
-                .jsonPath("title").isEqualTo("Bad Request")
-                .jsonPath("detail").value(String.class, d -> {
-                    assertTrue(d.contains(failure));
-                })
-                .jsonPath("instance").exists();
-        };
+        // {"detail":"Invalid request content.","instance":"/food/create","status":400,"title":"Bad Request"}
+        @JvmStatic
+        fun badRequest(failure: String): RestTestClient.ResponseSpec.ResponseSpecConsumer =
+            RestTestClient.ResponseSpec.ResponseSpecConsumer { responseSpec ->
+                responseSpec.expectStatus().is4xxClientError()
+                responseSpec.expectStatus().isEqualTo(HttpStatus.BAD_REQUEST)
+                responseSpec.expectBody()
+                    .jsonPath("status").isEqualTo(HttpStatus.BAD_REQUEST.value())
+                    .jsonPath("title").isEqualTo("Bad Request")
+                    .jsonPath("detail").value(String::class.java) { detail ->
+                        assertTrue(detail.contains(failure))
+                    }
+                    .jsonPath("instance").exists()
+            }
     }
-
 }

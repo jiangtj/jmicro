@@ -1,11 +1,12 @@
-package com.jiangtj.micro.test;
+package com.jiangtj.micro.test
 
-import com.jiangtj.micro.auth.context.AuthContext;
-import org.springframework.context.ApplicationContext;
+import com.jiangtj.micro.auth.context.AuthContext
+import org.springframework.context.ApplicationContext
+import java.lang.reflect.Method
 
-import java.lang.reflect.Method;
+interface TestAuthHandler {
 
-public interface TestAuthHandler {
-    AuthContext convert(Method testMethod, ApplicationContext context);
-    AuthContext convert(Class<?> testClass, ApplicationContext context);
+    fun convert(testMethod: Method, context: ApplicationContext): AuthContext
+
+    fun convert(testClass: Class<*>, context: ApplicationContext): AuthContext
 }

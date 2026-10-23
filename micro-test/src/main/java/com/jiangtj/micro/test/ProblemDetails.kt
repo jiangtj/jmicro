@@ -1,19 +1,20 @@
-package com.jiangtj.micro.test;
+package com.jiangtj.micro.test
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ProblemDetail;
+import org.springframework.http.HttpStatus
+import org.springframework.http.ProblemDetail
+import java.net.URI
 
-import java.net.URI;
+interface ProblemDetails {
 
-public interface ProblemDetails {
+    companion object {
 
-    static ProblemDetail unLogin(String uri) {
-        ProblemDetail detail = ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);
-        detail.setTitle(HttpStatus.UNAUTHORIZED.getReasonPhrase());
-        detail.setTitle("未登录");
-        detail.setDetail("缺少认证信息，请在header中携带token");
-        detail.setInstance(URI.create(uri));
-        return detail;
+        @JvmStatic
+        fun unLogin(uri: String): ProblemDetail {
+            val detail = ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED)
+            detail.title = "未登录"
+            detail.detail = "缺少认证信息，请在header中携带token"
+            detail.instance = URI.create(uri)
+            return detail
+        }
     }
-
 }

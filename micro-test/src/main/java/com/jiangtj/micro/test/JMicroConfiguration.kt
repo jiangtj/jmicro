@@ -1,22 +1,17 @@
-package com.jiangtj.micro.test;
+package com.jiangtj.micro.test
 
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
+import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.context.annotation.Bean
+import org.springframework.core.Ordered
+import org.springframework.core.annotation.Order
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @TestConfiguration(proxyBeanMethods = false)
-public class JMicroConfiguration {
+class JMicroConfiguration {
 
     @Bean
-    public TestAuthContextConverter testAuthContextConverter() {
-        return new TestAuthContextConverter();
-    }
+    fun testAuthContextConverter(): TestAuthContextConverter = TestAuthContextConverter()
 
     @Bean
-    public DefaultTestAuthHandler defaultTestAuthHandler() {
-        return new DefaultTestAuthHandler();
-    }
-
+    fun defaultTestAuthHandler(): DefaultTestAuthHandler = DefaultTestAuthHandler()
 }

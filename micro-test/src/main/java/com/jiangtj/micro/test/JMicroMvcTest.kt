@@ -1,16 +1,14 @@
-package com.jiangtj.micro.test;
+package com.jiangtj.micro.test
 
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
+import org.springframework.context.annotation.Import
+import java.lang.annotation.Inherited
 
-import java.lang.annotation.*;
-
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
+@Target(AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.RUNTIME)
+@MustBeDocumented
 @Inherited
 @JMicroTest
 @AutoConfigureMockMvc
-@Import({JMicroRestTestClientMvcConfiguration.class})
-public @interface JMicroMvcTest {
-}
+@Import(JMicroRestTestClientMvcConfiguration::class)
+annotation class JMicroMvcTest

@@ -1,30 +1,18 @@
-package com.jiangtj.micro.test;
+package com.jiangtj.micro.test
 
-import org.junit.jupiter.api.extension.*;
-import org.springframework.context.ApplicationContext;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.junit.jupiter.api.extension.AfterTestExecutionCallback
+import org.junit.jupiter.api.extension.BeforeTestExecutionCallback
+import org.junit.jupiter.api.extension.ExtensionContext
+import org.springframework.test.context.junit.jupiter.SpringExtension
 
-public class JMicroExtension implements BeforeEachCallback,
-        BeforeTestExecutionCallback,
-        AfterTestExecutionCallback,
-        AfterEachCallback {
+class JMicroExtension : BeforeTestExecutionCallback, AfterTestExecutionCallback {
 
-    @Override
-    public void beforeEach(ExtensionContext context) throws Exception {
+    override fun beforeTestExecution(extensionContext: ExtensionContext) {
+        val applicationContext = SpringExtension.getApplicationContext(extensionContext)
+        TestAnnotationConverterFactory.setAuthContext(extensionContext, applicationContext)
     }
 
-    @Override
-    public void beforeTestExecution(ExtensionContext extensionContext) throws Exception {
-        ApplicationContext applicationContext = SpringExtension.getApplicationContext(extensionContext);
-        TestAnnotationConverterFactory.setAuthContext(extensionContext, applicationContext);
-    }
-
-    @Override
-    public void afterTestExecution(ExtensionContext extensionContext) throws Exception {
-        TestAuthContextHolder.clearAuthContext();
-    }
-
-    @Override
-    public void afterEach(ExtensionContext context) throws Exception {
+    override fun afterTestExecution(extensionContext: ExtensionContext) {
+        TestAuthContextHolder.clearAuthContext()
     }
 }

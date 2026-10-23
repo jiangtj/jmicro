@@ -1,19 +1,17 @@
-package com.jiangtj.micro.test;
+package com.jiangtj.micro.test
 
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
+import org.junit.jupiter.api.extension.ExtendWith
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.Import
+import org.springframework.test.context.ActiveProfiles
+import java.lang.annotation.Inherited
 
-import java.lang.annotation.*;
-
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
+@Target(AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.RUNTIME)
+@MustBeDocumented
 @Inherited
-@ExtendWith(JMicroExtension.class)
+@ExtendWith(JMicroExtension::class)
 @SpringBootTest
-@Import({JMicroConfiguration.class})
+@Import(JMicroConfiguration::class)
 @ActiveProfiles("testcase")
-public @interface JMicroTest {
-}
+annotation class JMicroTest

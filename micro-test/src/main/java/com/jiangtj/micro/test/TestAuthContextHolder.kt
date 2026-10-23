@@ -1,20 +1,21 @@
-package com.jiangtj.micro.test;
+package com.jiangtj.micro.test
 
-import com.jiangtj.micro.auth.context.AuthContext;
+import com.jiangtj.micro.auth.context.AuthContext
 
-public class TestAuthContextHolder {
+object TestAuthContextHolder {
 
-    private static AuthContext ctx = null;
+    private var ctx: AuthContext? = null
 
-    public static void setAuthContext(AuthContext context) {
-        ctx = context;
+    @JvmStatic
+    fun setAuthContext(context: AuthContext?) {
+        ctx = context
     }
 
-    public static AuthContext getAuthContext() {
-        return ctx;
-    }
+    @JvmStatic
+    fun getAuthContext(): AuthContext? = ctx
 
-    public static void clearAuthContext() {
-        ctx = null;
+    @JvmStatic
+    fun clearAuthContext() {
+        ctx = null
     }
 }

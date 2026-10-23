@@ -1,140 +1,99 @@
-package com.jiangtj.micro.test;
+package com.jiangtj.micro.test
 
-import com.jiangtj.micro.auth.context.AuthRequest;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.server.RequestPath;
-import org.springframework.lang.NonNull;
+import com.jiangtj.micro.auth.context.AuthRequest
+import org.springframework.http.HttpMethod
+import org.springframework.http.server.RequestPath
+import java.net.URI
+import java.net.URISyntaxException
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.*;
+class MockAuthRequest private constructor(
+    private val uri: URI,
+    private val httpMethod: HttpMethod,
+    private val headers: MutableMap<String, MutableList<String>>,
+    private val queryParams: MutableMap<String, MutableList<String>>,
+    private val attributes: MutableMap<String, Any>,
+) : AuthRequest {
 
-public class MockAuthRequest implements AuthRequest {
-    private final RequestPath path;
-    private final URI uri;
-    private final HttpMethod method;
-    private final Map<String, List<String>> headers;
-    private final Map<String, List<String>> queryParams;
-    private final Map<String, Object> attributes;
+    private val requestPath: RequestPath = RequestPath.parse(uri, null)
 
-    private MockAuthRequest(Builder builder) {
-        this.uri = builder.uri;
-        this.path = RequestPath.parse(this.uri, null);
-        this.method = builder.method;
-        this.headers = builder.headers;
-        this.queryParams = builder.queryParams;
-        this.attributes = builder.attributes;
-
-        String query = uri.getQuery();
-        if (query != null && !query.isEmpty()) {
-            String[] pairs = query.split("&");
-            for (String pair : pairs) {
-                int idx = pair.indexOf("=");
-                String key = idx > 0 ? pair.substring(0, idx) : pair;
-                String value = idx > 0 && idx < pair.length() - 1 ? pair.substring(idx + 1) : "";
-                addQueryParam(key, value);
+    init {
+        val query = uri.query
+        if (!query.isNullOrEmpty()) {
+            for (pair in query.split("&")) {
+                val idx = pair.indexOf('=')
+                val key = if (idx > 0) pair.substring(0, idx) else pair
+                val value = if (idx > 0 && idx < pair.length - 1) pair.substring(idx + 1) else ""
+                addQueryParam(key, value)
             }
         }
     }
 
-    public void contextPath(String path) {
-        this.path.modifyContextPath(path);
+    fun contextPath(path: String) {
+        requestPath.modifyContextPath(path)
     }
 
-    public void addHeader(String name, String value) {
-        headers.computeIfAbsent(name, k -> new ArrayList<>()).add(value);
+    fun addHeader(name: String, value: String) {
+        headers.computeIfAbsent(name) { ArrayList() }.add(value)
     }
 
-    public void addQueryParam(String name, String value) {
-        queryParams.computeIfAbsent(name, k -> new ArrayList<>()).add(value);
+    fun addQueryParam(name: String, value: String) {
+        queryParams.computeIfAbsent(name) { ArrayList() }.add(value)
     }
 
-    @NonNull
-    @Override
-    public String getPath() {
-        return path.pathWithinApplication().value();
+    override fun getPath(): String = requestPath.pathWithinApplication().value()
+
+    override fun getURI(): URI = uri
+
+    override fun getMethod(): HttpMethod = httpMethod
+
+    override fun getQueryParams(name: String): List<String> = queryParams[name] ?: emptyList()
+
+    override fun getHeaders(name: String): List<String> = headers[name] ?: emptyList()
+
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : Any> getSessionAttribute(name: String): T? = attributes[name] as T?
+
+    companion object {
+
+        @JvmStatic
+        fun get(urlString: String): Builder = Builder(HttpMethod.GET, urlString)
+
+        @JvmStatic
+        fun post(urlString: String): Builder = Builder(HttpMethod.POST, urlString)
+
+        @JvmStatic
+        fun put(urlString: String): Builder = Builder(HttpMethod.PUT, urlString)
+
+        @JvmStatic
+        fun delete(urlString: String): Builder = Builder(HttpMethod.DELETE, urlString)
     }
 
-    @NonNull
-    @Override
-    public URI getURI() {
-        return uri;
-    }
+    class Builder internal constructor(private val method: HttpMethod, urlString: String) {
 
-    @NonNull
-    @Override
-    public HttpMethod getMethod() {
-        return method;
-    }
+        private val uri: URI = try {
+            URI(urlString)
+        } catch (e: URISyntaxException) {
+            throw RuntimeException(e)
+        }
+        private val headers: MutableMap<String, MutableList<String>> = HashMap()
+        private val queryParams: MutableMap<String, MutableList<String>> = HashMap()
+        private val attributes: MutableMap<String, Any> = HashMap()
 
-    @NonNull
-    @Override
-    public List<String> getQueryParams(@NonNull String name) {
-        return queryParams.getOrDefault(name, Collections.emptyList());
-    }
-
-    @NonNull
-    @Override
-    public List<String> getHeaders(@NonNull String name) {
-        return headers.getOrDefault(name, Collections.emptyList());
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T> T getSessionAttribute(@NonNull String name) {
-        return (T)attributes.get(name);
-    }
-
-
-    public static Builder get(String urlString) {
-        return new Builder(HttpMethod.GET, urlString);
-    }
-
-    public static Builder post(String urlString) {
-        return new Builder(HttpMethod.POST, urlString);
-    }
-
-    public static Builder put(String urlString) {
-        return new Builder(HttpMethod.PUT, urlString);
-    }
-
-    public static Builder delete(String urlString) {
-        return new Builder(HttpMethod.DELETE, urlString);
-    }
-
-    public static class Builder {
-        private final URI uri;
-        private final HttpMethod method;
-        private final Map<String, List<String>> headers = new HashMap<>();
-        private final Map<String, List<String>> queryParams = new HashMap<>();
-        private final Map<String, Object> attributes = new HashMap<>();
-
-        private Builder(HttpMethod method, String urlString) {
-            try {
-                this.uri = new URI(urlString);
-                this.method = method;
-            } catch (URISyntaxException e) {
-                throw new RuntimeException(e);
-            }
+        fun header(name: String, value: String): Builder {
+            headers.computeIfAbsent(name) { ArrayList() }.add(value)
+            return this
         }
 
-        public Builder header(String name, String value) {
-            headers.computeIfAbsent(name, k -> new ArrayList<>()).add(value);
-            return this;
+        fun queryParam(name: String, value: String): Builder {
+            queryParams.computeIfAbsent(name) { ArrayList() }.add(value)
+            return this
         }
 
-        public Builder queryParam(String name, String value) {
-            queryParams.computeIfAbsent(name, k -> new ArrayList<>()).add(value);
-            return this;
+        fun attribute(name: String, value: Any): Builder {
+            attributes[name] = value
+            return this
         }
 
-        public Builder attribute(String name, Object value) {
-            attributes.put(name, value);
-            return this;
-        }
-
-        public MockAuthRequest build() {
-            return new MockAuthRequest(this);
-        }
+        fun build(): MockAuthRequest = MockAuthRequest(uri, method, headers, queryParams, attributes)
     }
 }

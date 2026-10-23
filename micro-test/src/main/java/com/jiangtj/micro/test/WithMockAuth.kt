@@ -1,11 +1,10 @@
-package com.jiangtj.micro.test;
+package com.jiangtj.micro.test
 
-import java.lang.annotation.*;
+import java.lang.annotation.Inherited
+import kotlin.reflect.KClass
 
-@Target(ElementType.ANNOTATION_TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
+@Target(AnnotationTarget.ANNOTATION_CLASS)
+@Retention(AnnotationRetention.RUNTIME)
+@MustBeDocumented
 @Inherited
-public @interface WithMockAuth {
-    Class<? extends TestAuthHandler> value();
-}
+annotation class WithMockAuth(val value: KClass<out TestAuthHandler>)

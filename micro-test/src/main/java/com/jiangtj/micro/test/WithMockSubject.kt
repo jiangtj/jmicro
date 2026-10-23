@@ -1,16 +1,16 @@
-package com.jiangtj.micro.test;
+package com.jiangtj.micro.test
 
-import java.lang.annotation.*;
+import java.lang.annotation.Inherited
 
-@Target({ElementType.TYPE, ElementType.METHOD})
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+@MustBeDocumented
 @Inherited
-@WithMockAuth(DefaultTestAuthHandler.class)
-public @interface WithMockSubject {
-    String id();
-    String name() default "";
-    String displayName() default "";
-    String type() default "";
-    String issuer() default "";
-}
+@WithMockAuth(DefaultTestAuthHandler::class)
+annotation class WithMockSubject(
+    val id: String,
+    val name: String = "",
+    val displayName: String = "",
+    val type: String = "",
+    val issuer: String = "",
+)
