@@ -10,6 +10,7 @@ plugins {
 dependencies {
     implementation(project(":micro-auth"))
     implementation(project(":micro-business"))
+    implementation(project(":micro-sql-jooq"))
     implementation("com.github.ben-manes.caffeine:caffeine")
     implementation("io.github.oshai:kotlin-logging-jvm:8.0.4")
 
@@ -22,6 +23,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-cache")
 
     testImplementation(project(":micro-test"))
+    testImplementation("org.jooq:jooq-codegen")
     testImplementation("org.springframework.boot:spring-boot-webmvc-test")
     testImplementation("org.springframework.boot:spring-boot-starter-restclient-test")
     runtimeOnly("com.h2database:h2")
