@@ -1,91 +1,106 @@
-package com.jiangtj.micro.business.pic.upload.ali;
+package com.jiangtj.micro.business.pic.upload.ali
 
-import com.aliyun.oss.*;
-import com.aliyun.oss.common.auth.CredentialsProvider;
-import com.aliyun.oss.common.auth.CredentialsProviderFactory;
-import com.aliyun.oss.common.comm.SignVersion;
-import com.aliyun.oss.model.PutObjectRequest;
-import com.aliyun.oss.model.PutObjectResult;
-import com.jiangtj.micro.business.pic.upload.*;
-import com.jiangtj.micro.business.pic.upload.ex.PicUploadInternalException;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.multipart.MultipartFile;
+import com.aliyun.oss.ClientBuilderConfiguration
+import com.aliyun.oss.ClientException
+import com.aliyun.oss.OSS
+import com.aliyun.oss.OSSClientBuilder
+import com.aliyun.oss.OSSException
+import com.aliyun.oss.common.auth.CredentialsProvider
+import com.aliyun.oss.common.auth.CredentialsProviderFactory
+import com.aliyun.oss.common.comm.SignVersion
+import com.aliyun.oss.model.PutObjectRequest
+import com.aliyuncs.exceptions.ClientException as CredentialsClientException
+import com.jiangtj.micro.business.config.SystemConfigService
+import com.jiangtj.micro.business.pic.upload.PicUploadProperties
+import com.jiangtj.micro.business.pic.upload.PicUploadProvider
+import com.jiangtj.micro.business.pic.upload.PicUploadResult
+import com.jiangtj.micro.business.pic.upload.PicUploadType
+import com.jiangtj.micro.business.pic.upload.PicUploadUtils
+import com.jiangtj.micro.business.pic.upload.ex.PicUploadInternalException
+import org.slf4j.LoggerFactory
+import org.springframework.web.multipart.MultipartFile
+import java.io.IOException
+import java.io.InputStream
 
-import java.io.IOException;
-import java.io.InputStream;
-
-@Slf4j
 @PicUploadType("ali")
-public class AliOSSService implements PicUploadProvider {
+class AliOSSService(
+    private val systemConfigService: SystemConfigService,
+) : PicUploadProvider {
 
-    private final AliOSSProperties properties;
-    ClientBuilderConfiguration clientBuilderConfiguration;
-    CredentialsProvider credentialsProvider;
-//    private final OSS ossClient;
-
-    public AliOSSService(AliOSSProperties properties) {
-        this.properties = properties;
-        try {
-            if (properties.getAccessKeyId() != null && properties.getSecretAccessKey() != null) {
-                credentialsProvider = CredentialsProviderFactory.newDefaultCredentialProvider(properties.getAccessKeyId(), properties.getSecretAccessKey());
-            } else {
-                credentialsProvider = CredentialsProviderFactory.newEnvironmentVariableCredentialsProvider();
+    override fun upload(dir: PicUploadProperties.Dir, file: MultipartFile): PicUploadResult {
+        val name = PicUploadUtils.generateNewFileName(file)
+        val url = try {
+            file.inputStream.use { input ->
+                upload(AliOSSSettings.from(systemConfigService), dir.resolve(name), input)
             }
-        } catch (com.aliyuncs.exceptions.ClientException e) {
-            log.error("初始化阿里云OSS失败 CredentialsProvider 初始化失败", e);
-            throw new RuntimeException(e);
+        } catch (e: IOException) {
+            log.error("获取图片失败", e)
+            throw PicUploadInternalException("获取图片失败！", e)
         }
-
-        clientBuilderConfiguration = new ClientBuilderConfiguration();
-        clientBuilderConfiguration.setSignatureVersion(SignVersion.V4);
+        return PicUploadResult.builder()
+            .fileName(name)
+            .fileUrl(url)
+            .build()
     }
 
+    fun upload(settings: AliOSSSettings, key: String, input: InputStream): String {
+        val ossClient = buildClient(settings)
+        try {
+            val putObjectRequest = PutObjectRequest(settings.bucketName, key, input)
+            val result = ossClient.putObject(putObjectRequest)
+            log.debug("阿里云 OSS 上传成功: {}", result.requestId)
+            return settings.url + "/" + key
+        } catch (oe: OSSException) {
+            log.error(
+                "Caught an OSSException, which means your request made it to OSS, "
+                    + "but was rejected with an error response for some reason."
+            )
+            log.error("Error Message:{}", oe.errorMessage)
+            log.error("Error Code:{}", oe.errorCode)
+            log.error("Request ID:{}", oe.requestId)
+            log.error("Host ID:{}", oe.hostId)
+            throw PicUploadInternalException("AliOSS Client call fail!", oe)
+        } catch (ce: ClientException) {
+            log.error(
+                "Caught an ClientException, which means the client encountered "
+                    + "a serious internal problem while trying to communicate with OSS, "
+                    + "such as not being able to access the network."
+            )
+            log.error("Error Message:{}", ce.message)
+            throw PicUploadInternalException("AliOSS Client error!", ce)
+        } finally {
+            ossClient.shutdown()
+        }
+    }
 
-    public String upload(String key, InputStream input) {
-        OSS ossClient = OSSClientBuilder.create()
-            .endpoint(properties.getEndpoint())
+    private fun buildClient(settings: AliOSSSettings): OSS {
+        val credentialsProvider: CredentialsProvider = try {
+            if (settings.accessKeyId != null && settings.secretAccessKey != null) {
+                CredentialsProviderFactory.newDefaultCredentialProvider(
+                    settings.accessKeyId,
+                    settings.secretAccessKey,
+                )
+            } else {
+                CredentialsProviderFactory.newEnvironmentVariableCredentialsProvider()
+            }
+        } catch (e: CredentialsClientException) {
+            log.error("初始化阿里云OSS失败 CredentialsProvider 初始化失败", e)
+            throw PicUploadInternalException("阿里云OSS CredentialsProvider 初始化失败！", e)
+        }
+
+        val clientBuilderConfiguration = ClientBuilderConfiguration().apply {
+            setSignatureVersion(SignVersion.V4)
+        }
+
+        return OSSClientBuilder.create()
+            .endpoint(settings.endpoint)
             .credentialsProvider(credentialsProvider)
             .clientConfiguration(clientBuilderConfiguration)
-            .region(properties.getRegion())
-            .build();
-
-        try {
-            // 创建PutObjectRequest对象。
-            PutObjectRequest putObjectRequest = new PutObjectRequest(properties.getBucketName(), key, input);
-            // 创建PutObject请求。
-            PutObjectResult result = ossClient.putObject(putObjectRequest);
-            return properties.getUrl() + "/" + key;
-        } catch (OSSException oe) {
-            log.error("Caught an OSSException, which means your request made it to OSS, "
-                + "but was rejected with an error response for some reason.");
-            log.error("Error Message:{}", oe.getErrorMessage());
-            log.error("Error Code:{}", oe.getErrorCode());
-            log.error("Request ID:{}", oe.getRequestId());
-            log.error("Host ID:{}", oe.getHostId());
-            throw new PicUploadInternalException("AliOSS Client call fail!", oe);
-        } catch (ClientException ce) {
-            log.error("Caught an ClientException, which means the client encountered "
-                + "a serious internal problem while trying to communicate with OSS, "
-                + "such as not being able to access the network.");
-            log.error("Error Message:{}", ce.getMessage());
-            throw new PicUploadInternalException("AliOSS Client error!", ce);
-        } finally {
-            ossClient.shutdown();
-        }
+            .region(settings.region)
+            .build()
     }
 
-    @Override
-    public PicUploadResult upload(PicUploadProperties.Dir dir, MultipartFile file) {
-        String name = PicUploadUtils.generateNewFileName(file);
-        try {
-            String url = upload(dir.resolve(name), file.getInputStream());
-            return PicUploadResult.builder()
-                .fileName(name)
-                .fileUrl(url)
-                .build();
-        } catch (IOException e) {
-            log.error("获取图片失败", e);
-            throw new PicUploadInternalException("获取图片失败！", e);
-        }
+    companion object {
+        private val log = LoggerFactory.getLogger(AliOSSService::class.java)
     }
 }

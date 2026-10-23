@@ -232,7 +232,7 @@ jmicro.pic.upload.dirs.target-name.path=/common
 | Provider | 命名空间 | 说明 |
 | --- | --- | --- |
 | `local` | `jmicro.pic.upload.dirs.*` | 本地磁盘上传，无需额外 SDK |
-| `ali` | `ali.oss.*` | 阿里云 OSS |
+| `ali` | 系统配置项 `ali.oss.*` | 阿里云 OSS（需开启 `jmicro.system.config.enabled=true`） |
 | `hw` | `hw.obs.*` | 华为云 OBS |
 | `minio` | `minio.*` | 兼容 S3 的 MinIO |
 | `easyimages` | `easyimages.api.*` | EasyImages 2.0（纯 HTTP API，无需 SDK） |
@@ -266,14 +266,18 @@ minio.bucket=bucket
 </dependency>
 ```
 
+阿里云 OSS 的配置项由**系统配置（SystemConfig）**提供，需先开启 `jmicro.system.config.enabled=true`；未开启时不会注册 `ali` 上传服务。配置项定义见 `AliOSSConfigItem`，可通过配置文件 kv 提供默认值，也可在运行期通过 `SystemConfigService.updateConfig(key, value)` 动态修改（每次上传时读取最新配置）：
+
 ```properties
-ali.oss.endpoint=https://oss-cn-hangzhou.aliyuncs.com
-ali.oss.region=cn-hangzhou
-ali.oss.bucket-name=bucket-name
-ali.oss.url=https://bucket-name.oss-cn-hangzhou.aliyuncs.com
-# 你需要配置密钥，也可以从系统环境中读取
-#ali.oss.access-key-id=access-key-id
-#ali.oss.secret-access-key=secret-access-key
+# 开启系统配置（阿里云 OSS 配置项的载体）
+jmicro.system.config.enabled=true
+jmicro.system.config.kv.ali.oss.endpoint=https://oss-cn-hangzhou.aliyuncs.com
+jmicro.system.config.kv.ali.oss.region=cn-hangzhou
+jmicro.system.config.kv.ali.oss.bucket-name=bucket-name
+jmicro.system.config.kv.ali.oss.url=https://bucket-name.oss-cn-hangzhou.aliyuncs.com
+# 你需要配置密钥，也可以从系统环境中读取（不配置时使用 SDK 的默认环境变量凭证）
+#jmicro.system.config.kv.ali.oss.access-key-id=access-key-id
+#jmicro.system.config.kv.ali.oss.secret-access-key=secret-access-key
 ```
 
 ##### Huawei OBS

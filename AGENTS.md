@@ -14,7 +14,7 @@
 - Shared JSON behavior is initialized in auto-config (`micro-web/src/main/java/com/jiangtj/micro/web/JMicroCommonAutoConfiguration.java` -> `JsonUtils.init(mapper)`).
 
 ## Config and Integration Hotspots
-- Property namespaces are module-specific and important: `jmicro.auth.*`, `jmicro.jwt.*`, `jmicro.flyway.*`, `jmicro.pic.upload.*` (picture upload, lives in `micro-business`), plus provider namespaces (`minio.*`, `ali.oss.*`, `hw.obs.*`, `easyimages.api.*`).
+- Property namespaces are module-specific and important: `jmicro.auth.*`, `jmicro.jwt.*`, `jmicro.flyway.*`, `jmicro.pic.upload.*` (picture upload, lives in `micro-business`), plus provider namespaces (`minio.*`, `hw.obs.*`, `easyimages.api.*`). Ali OSS 配置已改为系统配置项（键 `ali.oss.*`，需 `jmicro.system.config.enabled=true`，见 `micro-business/.../pic/upload/ali/AliOSSConfigLoader.kt`）。
 - OIDC/JWT support is in `micro-auth` (package `com.jiangtj.micro.auth.oidc`); the optional OIDC server (Cas) support is in `micro-business` (package `com.jiangtj.micro.business.oidc.cas`) and is opt-in.
 - Demo auth integration depends on Casdoor (`docker-compose.yml` and root `README.md` Casdoor setup).
 
