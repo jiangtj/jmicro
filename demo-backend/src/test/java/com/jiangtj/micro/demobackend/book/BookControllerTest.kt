@@ -1,6 +1,6 @@
 package com.jiangtj.micro.demobackend.book
 
-import com.jiangtj.micro.demobackend.auth.LoginController
+import com.jiangtj.micro.demobackend.controller.LoginController
 import com.jiangtj.micro.test.JMicroRestTestClientMvcConfiguration
 import com.jiangtj.micro.test.ProblemDetailMvcConsumer
 import org.assertj.core.api.Assertions.assertThat

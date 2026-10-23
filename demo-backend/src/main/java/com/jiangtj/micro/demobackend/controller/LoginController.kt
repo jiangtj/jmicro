@@ -1,7 +1,9 @@
-package com.jiangtj.micro.demobackend.auth
+package com.jiangtj.micro.demobackend.controller
 
 import com.jiangtj.micro.auth.annotations.HasLogin
 import com.jiangtj.micro.auth.core.AuthService
+import com.jiangtj.micro.demobackend.auth.DemoJwtService
+import com.jiangtj.micro.demobackend.auth.DemoUserStore
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
 import org.springframework.web.bind.annotation.GetMapping

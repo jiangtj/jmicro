@@ -1,5 +1,6 @@
 package com.jiangtj.micro.demobackend
 
+import com.jiangtj.micro.demobackend.controller.FoodController
 import com.jiangtj.micro.test.JMicroMvcTest
 import com.jiangtj.micro.test.ProblemDetailMvcConsumer
 import org.junit.jupiter.api.Test

@@ -1,4 +1,4 @@
-package com.jiangtj.micro.demobackend
+package com.jiangtj.micro.demobackend.controller
 
 import com.jiangtj.micro.business.pic.upload.PicUploadResult
 import com.jiangtj.micro.business.pic.upload.PicUploadService

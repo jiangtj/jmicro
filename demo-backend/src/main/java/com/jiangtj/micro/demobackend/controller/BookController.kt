@@ -1,7 +1,9 @@
-package com.jiangtj.micro.demobackend.book
+package com.jiangtj.micro.demobackend.controller
 
 import com.jiangtj.micro.auth.annotations.HasPermission
 import com.jiangtj.micro.auth.annotations.HasRole
+import com.jiangtj.micro.demobackend.book.BookForm
+import com.jiangtj.micro.demobackend.book.BookService
 import com.jiangtj.micro.demobackend.jooq.tables.pojos.Book
 import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.DeleteMapping

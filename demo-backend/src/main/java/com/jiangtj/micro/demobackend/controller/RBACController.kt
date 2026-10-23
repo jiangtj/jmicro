@@ -1,4 +1,4 @@
-package com.jiangtj.micro.demobackend
+package com.jiangtj.micro.demobackend.controller
 
 import com.jiangtj.micro.auth.annotations.HasLogin
 import com.jiangtj.micro.auth.annotations.HasPermission
