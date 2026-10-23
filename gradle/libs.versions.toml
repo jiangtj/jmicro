@@ -13,6 +13,8 @@ mavenPublish = "0.37.0"
 # Libraries
 jspecify = "1.0.1"
 jsr305 = "3.0.2"
+# 需高于 kotlin-stdlib 传递的 13.0（该版本没有 UnknownNullability 等类型注解）
+jetbrainsAnnotations = "26.0.2"
 libphonenumber = "9.0.36"
 casdoor = "1.15.0"
 jjwt = "0.13.0"
@@ -35,6 +37,7 @@ kotlin-logging-jvm = { module = "io.github.oshai:kotlin-logging-jvm", version.re
 # Nullness
 jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
 jsr305 = { module = "com.google.code.findbugs:jsr305", version.ref = "jsr305" }
+jetbrains-annotations = { module = "org.jetbrains:annotations", version.ref = "jetbrainsAnnotations" }
 
 # Tools
 libphonenumber = { module = "com.googlecode.libphonenumber:libphonenumber", version.ref = "libphonenumber" }
