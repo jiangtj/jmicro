@@ -1,4 +1,4 @@
-package com.jiangtj.micro.demobackend
+package com.jiangtj.micro.demobackend.common
 
 import com.jiangtj.micro.web.toProblemDetail
 import org.springframework.http.ProblemDetail
@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 
 @ControllerAdvice
-class ExControllerAdvice : ResponseEntityExceptionHandler() {
+class CustomControllerAdvice : ResponseEntityExceptionHandler() {
 
     @ExceptionHandler(RuntimeException::class)
     fun handleRuntimeException(e: RuntimeException): ProblemDetail {
