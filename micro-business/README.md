@@ -258,31 +258,24 @@ jmicro.oidc.server.clients[0].callback-uri[0]=http://localhost:17001/callback
 
 #### 通用配置
 
-在 `application.properties` 或 `application.yml` 中添加配置，决定文件的上传位置：
-
-```properties
-# 上传提供者，可选值：local, ali, hw, minio, easyimages, rustfs
-jmicro.pic.upload.provider=minio
-# 默认允许的文件类型
-jmicro.pic.upload.allowed-extensions=jpg,jpeg,png,gif,webp
-# 最大文件大小（支持 10MB、1KB 或字节数）
-jmicro.pic.upload.max-file-size=5242880
-# 上传路径（必填）。target-name 可替换为任意名称，同时支持覆盖默认配置
-jmicro.pic.upload.dirs.target-name.path=/common
-# jmicro.pic.upload.dirs.target-name.provider=ali
-```
-
-以上配置同时会注册为系统配置项（由 `PicUploadConfigLoader` 提供，需开启 `jmicro.system.config.enabled=true`），可在运行期覆盖，未配置时回退到上面的启动绑定值：
-
-| 配置项 | 类型 | 说明 |
-| --- | --- | --- |
-| `jmicro.pic.upload.provider` | 文本 | 默认上传服务商 |
-| `jmicro.pic.upload.allowed-extensions` | 文本 | 默认允许的文件类型，逗号分隔 |
-| `jmicro.pic.upload.max-file-size` | 文本 | 默认最大文件大小，支持 `10MB`、`1KB` 或字节数 |
-| `jmicro.pic.upload.dirs` | `JSON` | 目录映射 `Map<String, Dir>` |
+图片上传只有一个启动配置 `jmicro.pic.upload.enable`（默认 `true`），用于开关上传能力；其余配置统一由系统配置项提供，使用前需开启 `jmicro.system.config.enabled=true`：
 
 ```properties
 jmicro.system.config.enabled=true
+# 关闭图片上传能力（默认 true）
+jmicro.pic.upload.enable=true
+```
+
+通用配置项（由 `PicUploadConfigLoader` 在启动时注册）：
+
+| 配置项 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `jmicro.pic.upload.provider` | 文本 | `local` | 默认上传服务商，可选：local, ali, hw, minio, easyimages, rustfs |
+| `jmicro.pic.upload.allowed-extensions` | 文本 | `jpg,jpeg,png,gif,webp,bmp,svg,avif` | 默认允许的文件类型，逗号分隔 |
+| `jmicro.pic.upload.max-file-size` | 文本 | `10MB` | 默认最大文件大小，支持 `10MB`、`1KB` 或字节数 |
+| `jmicro.pic.upload.dirs` | `JSON` | `{}` | 目录映射 `Map<String, Dir>`，其中 `path` 必填 |
+
+```properties
 jmicro.system.config.kv.jmicro.pic.upload.provider=minio
 jmicro.system.config.kv.jmicro.pic.upload.max-file-size=5MB
 jmicro.system.config.kv.jmicro.pic.upload.dirs={"target-name":{"path":"/common","provider":"ali","maxFileSize":10485760}}
@@ -404,13 +397,13 @@ jmicro.system.config.kv.jmicro.rustfs.is-allow-get-object=false
 
 ```properties
 jmicro.system.config.enabled=true
-jmicro.pic.upload.provider=local
+jmicro.system.config.kv.jmicro.pic.upload.provider=local
 # 本地存储根路径（系统配置项默认值为系统临时目录）
 jmicro.system.config.kv.jmicro.pic.upload.local.upload-path=/data/uploads
 # 上传文件的可访问 URL 前缀（由你的静态资源映射暴露）
 jmicro.system.config.kv.jmicro.pic.upload.local.url=/files
-# 目录映射（可用 jmicro.pic.upload.dirs.* 或系统配置项 jmicro.pic.upload.dirs 的 JSON 配置）
-jmicro.pic.upload.dirs.target-name.path=/uploads
+# 目录映射（系统配置项 jmicro.pic.upload.dirs 的 JSON 配置）
+jmicro.system.config.kv.jmicro.pic.upload.dirs={"target-name":{"path":"/uploads"}}
 ```
 
 #### 在代码中使用

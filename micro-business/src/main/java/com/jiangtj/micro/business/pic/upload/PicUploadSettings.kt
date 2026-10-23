@@ -25,15 +25,6 @@ data class PicUploadSettings(
     companion object {
 
         /**
-         * 使用启动绑定值（未开启系统配置时的回退值）
-         */
-        fun from(properties: PicUploadProperties): PicUploadSettings = PicUploadSettings(
-            provider = properties.provider,
-            allowedExtensions = properties.allowedExtensions.toList(),
-            maxFileSize = properties.maxFileSize,
-        )
-
-        /**
          * 从系统配置读取，未配置时回退到配置项默认值
          */
         fun from(systemConfigService: SystemConfigService): PicUploadSettings = PicUploadSettings(

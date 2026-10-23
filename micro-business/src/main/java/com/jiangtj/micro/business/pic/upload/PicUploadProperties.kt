@@ -11,32 +11,20 @@ import tools.jackson.databind.annotation.JsonSerialize
 /**
  * 图片上传配置属性
  *
- * `provider` / `allowedExtensions` / `maxFileSize` / `dirs` 的值既可通过
- * `jmicro.pic.upload.*` 启动绑定，也会由 [PicUploadConfigLoader] 注册为系统配置项
- * （键名分别为 [PicUploadBaseConfigItem.PROVIDER]、[PicUploadBaseConfigItem.ALLOWED_EXTENSIONS]、
- * [PicUploadBaseConfigItem.MAX_FILE_SIZE] 与 [PicUploadConfigLoader.KEY]），开启系统配置后可在运行期覆盖。
+ * 只保留功能开关，上传服务商、允许的文件类型、文件大小与目录映射等统一由系统配置项提供，
+ * 见 [PicUploadConfigLoader]。
  */
 @ConfigurationProperties(prefix = "jmicro.pic.upload")
 class PicUploadProperties {
 
     /**
-     * 默认的文件上传提供者
+     * 是否启用图片上传
      */
-    var provider: String = PicUploadBaseConfigItem.PROVIDER.defaultValue
+    var enable: Boolean = true
 
     /**
-     * 默认允许的文件类型
+     * 上传目录定义，作为系统配置项 `jmicro.pic.upload.dirs`（JSON）的值类型
      */
-    var allowedExtensions: Array<String> =
-        PicUploadBaseConfigItem.ALLOWED_EXTENSIONS.defaultValue.split(",").toTypedArray()
-
-    /**
-     * 默认最大文件大小 10mb
-     */
-    var maxFileSize: DataSize = DataSize.parse(PicUploadBaseConfigItem.MAX_FILE_SIZE.defaultValue)
-
-    var dirs: MutableMap<String, Dir> = HashMap()
-
     @JsonInclude(JsonInclude.Include.NON_NULL)
     class Dir {
 

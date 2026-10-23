@@ -5,9 +5,11 @@ import com.jiangtj.micro.business.config.SystemConfigProperties
 import com.jiangtj.micro.business.config.SystemConfigSaver
 import com.jiangtj.micro.business.config.SystemConfigService
 import com.jiangtj.micro.business.config.SystemItemInfo
+import com.jiangtj.micro.business.config.SystemItemType
 import com.jiangtj.micro.business.pic.upload.ex.PicUploadCheckException
 import com.jiangtj.micro.business.pic.upload.local.LocalPicUploadConfigItem
 import com.jiangtj.micro.business.pic.upload.local.LocalPicUploadService
+import com.jiangtj.micro.common.JsonUtils
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -26,13 +28,14 @@ class LocalPicUploadServiceTest {
     @TempDir
     lateinit var tempDir: Path
 
-    private lateinit var dir: PicUploadProperties.Dir
+    private lateinit var systemConfigService: SystemConfigService
     private lateinit var picUploadService: PicUploadService
 
     @BeforeEach
     fun setUp() {
-        val systemConfigService = SystemConfigService(
+        systemConfigService = SystemConfigService(
             listOf(
+                PicUploadConfigLoader(),
                 object : SystemConfigLoader {
                     override fun load(): List<SystemItemInfo> = listOf(
                         SystemItemInfo(
@@ -45,6 +48,17 @@ class LocalPicUploadServiceTest {
                             name = "访问地址",
                             value = "http://localhost:8080",
                         ),
+                        SystemItemInfo(
+                            key = PicUploadConfigLoader.KEY,
+                            name = "上传目录映射",
+                            value = """{"test":{"path":"test"}}""",
+                            type = SystemItemType.JSON.name,
+                            jsonType = JsonUtils.jsonMapper.typeFactory.constructMapType(
+                                LinkedHashMap::class.java,
+                                String::class.java,
+                                PicUploadProperties.Dir::class.java,
+                            ),
+                        ),
                     )
                 },
             ),
@@ -53,14 +67,7 @@ class LocalPicUploadServiceTest {
             mock<SystemConfigSaver>(),
         )
 
-        val properties = PicUploadProperties()
-        val dirs = HashMap<String, PicUploadProperties.Dir>()
-        dir = PicUploadProperties.Dir()
-        dir.path = "test"
-        dirs["test"] = dir
-        properties.dirs = dirs
-
-        picUploadService = PicUploadService(properties, listOf(LocalPicUploadService(systemConfigService)))
+        picUploadService = PicUploadService(listOf(LocalPicUploadService(systemConfigService)), systemConfigService)
     }
 
     @Test
@@ -88,8 +95,8 @@ class LocalPicUploadServiceTest {
 
     @Test
     fun `test upload exceed max size`() {
-        // 设置最大文件大小为 1kb
-        dir.maxFileSize = DataSize.ofKilobytes(1)
+        // 运行期修改默认最大文件大小为 1kb
+        systemConfigService.updateConfig(PicUploadBaseConfigItem.MAX_FILE_SIZE.key, "1KB")
 
         val file = MockMultipartFile("test-image", "test-image.jpg", "image/jpeg", ByteArray(2000))
 

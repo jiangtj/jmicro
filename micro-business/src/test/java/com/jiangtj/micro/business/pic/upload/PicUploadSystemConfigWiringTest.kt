@@ -23,7 +23,6 @@ class PicUploadSystemConfigWiringTest {
             AutoConfigurations.of(
                 SystemConfigAutoConfiguration::class.java,
                 PicUploadAutoConfiguration::class.java,
-                PicUploadConfigAutoConfiguration::class.java,
                 LocalPicUploadAutoConfiguration::class.java,
                 EasyImagesAutoConfiguration::class.java,
             )
@@ -34,6 +33,7 @@ class PicUploadSystemConfigWiringTest {
         runner.withPropertyValues("jmicro.system.config.enabled=true")
             .run { context ->
                 assertNotNull(context.getBean(SystemConfigService::class.java))
+                assertNotNull(context.getBean(PicUploadConfigLoader::class.java))
                 assertNotNull(context.getBean(LocalPicUploadService::class.java))
                 assertNotNull(context.getBean(EasyImagesService::class.java))
                 assertEquals(3, context.getBeansOfType(SystemConfigLoader::class.java).size)
@@ -42,11 +42,20 @@ class PicUploadSystemConfigWiringTest {
     }
 
     @Test
-    fun `providers are absent when system config disabled`() {
+    fun `config loader is loaded at startup while providers are absent when system config disabled`() {
         runner.run { context ->
-            assertEquals(0, context.getBeansOfType(SystemConfigLoader::class.java).size)
+            assertEquals(1, context.getBeansOfType(SystemConfigLoader::class.java).size)
             assertEquals(0, context.getBeansOfType(PicUploadProvider::class.java).size)
             assertNotNull(context.getBean(PicUploadService::class.java))
         }
+    }
+
+    @Test
+    fun `pic upload is disabled when enable is false`() {
+        runner.withPropertyValues("jmicro.pic.upload.enable=false")
+            .run { context ->
+                assertEquals(0, context.getBeansOfType(PicUploadConfigLoader::class.java).size)
+                assertEquals(0, context.getBeansOfType(PicUploadService::class.java).size)
+            }
     }
 }

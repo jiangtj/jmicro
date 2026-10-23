@@ -11,13 +11,12 @@ import org.springframework.web.multipart.MultipartFile
 /**
  * 图片上传服务
  *
- * 通用配置（服务商 / 允许的文件类型 / 最大文件大小）与上传目录映射优先读取系统配置项，
- * 未配置时回退到 `jmicro.pic.upload.*` 的启动绑定值。
+ * 通用配置（服务商 / 允许的文件类型 / 最大文件大小）与上传目录映射均来自系统配置项，
+ * 未配置时回退到配置项默认值。
  */
-class PicUploadService @JvmOverloads constructor(
-    private val properties: PicUploadProperties,
+class PicUploadService(
     providers: List<PicUploadProvider>,
-    private val systemConfigService: SystemConfigService? = null,
+    private val systemConfigService: SystemConfigService?,
 ) {
 
     private val providers: Map<String, PicUploadProvider> = providers.associateBy { provider ->
@@ -88,23 +87,19 @@ class PicUploadService @JvmOverloads constructor(
     }
 
     /**
-     * 目录映射来源：系统配置优先，未配置时回退到启动绑定值。
+     * 目录映射来源：系统配置项 `jmicro.pic.upload.dirs`。
      */
-    private fun resolveDirs(): Map<String, PicUploadProperties.Dir> {
-        systemConfigService?.let { service ->
-            val configured = service.getMap(PicUploadConfigLoader.KEY, PicUploadProperties.Dir::class.java)
-            if (configured.isNotEmpty()) {
-                return configured
-            }
-        }
-        return properties.dirs
-    }
+    private fun resolveDirs(): Map<String, PicUploadProperties.Dir> =
+        systemConfigService?.getMap(PicUploadConfigLoader.KEY, PicUploadProperties.Dir::class.java) ?: emptyMap()
 
     /**
-     * 通用配置来源：系统配置优先，未配置（或未开启）时回退到启动绑定值。
+     * 通用配置来源：系统配置项 [PicUploadBaseConfigItem]。
      */
-    private fun resolveSettings(): PicUploadSettings =
-        systemConfigService?.let { PicUploadSettings.from(it) } ?: PicUploadSettings.from(properties)
+    private fun resolveSettings(): PicUploadSettings {
+        val service = systemConfigService
+            ?: throw PicUploadCheckException("未开启系统配置，请设置 jmicro.system.config.enabled=true")
+        return PicUploadSettings.from(service)
+    }
 
     private fun applyDefaults(dir: PicUploadProperties.Dir) {
         val settings = resolveSettings()
