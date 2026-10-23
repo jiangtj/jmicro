@@ -6,18 +6,16 @@ import org.springframework.stereotype.Component;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * demo 账户存储（内存实现，重启后失效）
+ * <p>
+ * 只保存账号信息，登录态由 {@link DemoJwtService} 签发的 JWT 承载。
  */
 @Component
 public class DemoUserStore {
 
     private final Map<String, DemoUser> users = new LinkedHashMap<>();
-    private final Map<String, DemoUser> tokens = new ConcurrentHashMap<>();
 
     public DemoUserStore() {
         // 管理员：拥有全部图书权限
@@ -39,18 +37,5 @@ public class DemoUserStore {
             throw BaseExceptionUtils.unauthorized("用户名或密码错误");
         }
         return user;
-    }
-
-    /**
-     * 登录成功后签发 token（demo 直接使用随机字符串）
-     */
-    public String createToken(DemoUser user) {
-        String token = UUID.randomUUID().toString().replace("-", "");
-        tokens.put(token, user);
-        return token;
-    }
-
-    public Optional<DemoUser> findByToken(String token) {
-        return Optional.ofNullable(tokens.get(token));
     }
 }

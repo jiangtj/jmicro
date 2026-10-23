@@ -24,12 +24,15 @@ public class LoginController {
     private DemoUserStore userStore;
 
     @Resource
+    private DemoJwtService jwtService;
+
+    @Resource
     private AuthService authService;
 
     @PostMapping("/login")
     public LoginResult login(@Valid @RequestBody LoginRequest request) {
         DemoUser user = userStore.login(request.username(), request.password());
-        String token = userStore.createToken(user);
+        String token = jwtService.createToken(user);
         return new LoginResult(token, user.username(), user.nickname(), user.roles(), user.permissions());
     }
 
