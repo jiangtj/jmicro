@@ -7,9 +7,6 @@ package com.jiangtj.micro.demobackend.jooq.tables.references
 
 import com.jiangtj.micro.demobackend.jooq.tables.Book
 import com.jiangtj.micro.demobackend.jooq.tables.FlywaySchemaHistory
-import com.jiangtj.micro.demobackend.jooq.tables.SystemOperateRecord
-import com.jiangtj.micro.demobackend.jooq.tables.SystemUser
-import com.jiangtj.micro.demobackend.jooq.tables.SystemUserRole
 
 
 
@@ -22,18 +19,3 @@ val BOOK: Book = Book.BOOK
  * The table <code>flyway_schema_history</code>.
  */
 val FLYWAY_SCHEMA_HISTORY: FlywaySchemaHistory = FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY
-
-/**
- * The table <code>system_operate_record</code>.
- */
-val SYSTEM_OPERATE_RECORD: SystemOperateRecord = SystemOperateRecord.SYSTEM_OPERATE_RECORD
-
-/**
- * The table <code>system_user</code>.
- */
-val SYSTEM_USER: SystemUser = SystemUser.SYSTEM_USER
-
-/**
- * The table <code>system_user_role</code>.
- */
-val SYSTEM_USER_ROLE: SystemUserRole = SystemUserRole.SYSTEM_USER_ROLE

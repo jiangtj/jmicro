@@ -6,7 +6,6 @@ package com.jiangtj.micro.demobackend.jooq.indexes
 
 
 import com.jiangtj.micro.demobackend.jooq.tables.FlywaySchemaHistory
-import com.jiangtj.micro.demobackend.jooq.tables.SystemOperateRecord
 
 import org.jooq.Index
 import org.jooq.impl.DSL
@@ -19,4 +18,3 @@ import org.jooq.impl.Internal
 // -------------------------------------------------------------------------
 
 val FLYWAY_SCHEMA_HISTORY_S_IDX: Index = Internal.createIndex(DSL.name("flyway_schema_history_s_idx"), FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY, arrayOf(FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY.SUCCESS), false)
-val IDX_OPERATOR: Index = Internal.createIndex(DSL.name("idx_operator"), SystemOperateRecord.SYSTEM_OPERATE_RECORD, arrayOf(SystemOperateRecord.SYSTEM_OPERATE_RECORD.OPERATOR), false)

@@ -1,30 +1,19 @@
--- 测试库建表脚本
--- 由 DBGenerateTest 在 H2（MODE=MySQL）内存库中执行，用于生成 JOOQ 代码
--- 语句同样兼容 MySQL 8（引擎与字符集使用数据库默认值）
+-- 图书管理 demo 建表脚本
+-- 兼容 H2（MODE=MySQL）与 MySQL 8
 
--- system_user
-CREATE TABLE system_user (
-    id         BIGINT      NOT NULL AUTO_INCREMENT,
-    username   VARCHAR(32) NOT NULL,
-    password   VARCHAR(32) NOT NULL,
-    is_deleted TINYINT     NOT NULL DEFAULT 0,
+-- book
+CREATE TABLE book (
+    id          BIGINT         NOT NULL AUTO_INCREMENT,
+    title       VARCHAR(128)   NOT NULL,
+    author      VARCHAR(64)    NOT NULL,
+    isbn        VARCHAR(32),
+    price       DECIMAL(10, 2) NOT NULL DEFAULT 0,
+    stock       INT            NOT NULL DEFAULT 0,
+    create_time DATETIME       NOT NULL,
     PRIMARY KEY (id)
 );
 
--- system_user_role（复合主键）
-CREATE TABLE system_user_role (
-    user_id BIGINT      NOT NULL,
-    role    VARCHAR(32) NOT NULL,
-    PRIMARY KEY (user_id, role)
-);
-
--- system_operate_record（含 idx_operator 索引）
-CREATE TABLE system_operate_record (
-    id          BIGINT       NOT NULL AUTO_INCREMENT,
-    create_time DATETIME     NOT NULL,
-    operator    BIGINT       NOT NULL,
-    content     VARCHAR(256) NOT NULL,
-    PRIMARY KEY (id)
-);
-
-CREATE INDEX idx_operator ON system_operate_record (operator);
+INSERT INTO book (title, author, isbn, price, stock, create_time)
+VALUES ('深入理解 Java 虚拟机', '周志明', '9787111641247', 129.00, 10, CURRENT_TIMESTAMP),
+       ('Spring Boot 编程思想', '小马哥', '9787121359569', 99.00, 5, CURRENT_TIMESTAMP),
+       ('代码整洁之道', 'Robert C. Martin', '9787115216878', 59.00, 8, CURRENT_TIMESTAMP);
