@@ -7,6 +7,11 @@ package com.jiangtj.micro.demobackend.jooq.tables.references
 
 import com.jiangtj.micro.demobackend.jooq.tables.Book
 import com.jiangtj.micro.demobackend.jooq.tables.FlywaySchemaHistory
+import com.jiangtj.micro.demobackend.jooq.tables.SysPermission
+import com.jiangtj.micro.demobackend.jooq.tables.SysRole
+import com.jiangtj.micro.demobackend.jooq.tables.SysRolePermission
+import com.jiangtj.micro.demobackend.jooq.tables.SysUser
+import com.jiangtj.micro.demobackend.jooq.tables.SysUserRole
 
 
 
@@ -19,3 +24,28 @@ val BOOK: Book = Book.BOOK
  * The table <code>flyway_schema_history</code>.
  */
 val FLYWAY_SCHEMA_HISTORY: FlywaySchemaHistory = FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY
+
+/**
+ * The table <code>sys_permission</code>.
+ */
+val SYS_PERMISSION: SysPermission = SysPermission.SYS_PERMISSION
+
+/**
+ * The table <code>sys_role</code>.
+ */
+val SYS_ROLE: SysRole = SysRole.SYS_ROLE
+
+/**
+ * The table <code>sys_role_permission</code>.
+ */
+val SYS_ROLE_PERMISSION: SysRolePermission = SysRolePermission.SYS_ROLE_PERMISSION
+
+/**
+ * The table <code>sys_user</code>.
+ */
+val SYS_USER: SysUser = SysUser.SYS_USER
+
+/**
+ * The table <code>sys_user_role</code>.
+ */
+val SYS_USER_ROLE: SysUserRole = SysUserRole.SYS_USER_ROLE
