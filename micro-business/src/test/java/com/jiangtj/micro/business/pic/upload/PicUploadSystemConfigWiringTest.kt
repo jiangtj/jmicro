@@ -23,6 +23,7 @@ class PicUploadSystemConfigWiringTest {
             AutoConfigurations.of(
                 SystemConfigAutoConfiguration::class.java,
                 PicUploadAutoConfiguration::class.java,
+                PicUploadDirsAutoConfiguration::class.java,
                 LocalPicUploadAutoConfiguration::class.java,
                 EasyImagesAutoConfiguration::class.java,
             )
@@ -35,7 +36,7 @@ class PicUploadSystemConfigWiringTest {
                 assertNotNull(context.getBean(SystemConfigService::class.java))
                 assertNotNull(context.getBean(LocalPicUploadService::class.java))
                 assertNotNull(context.getBean(EasyImagesService::class.java))
-                assertEquals(2, context.getBeansOfType(SystemConfigLoader::class.java).size)
+                assertEquals(3, context.getBeansOfType(SystemConfigLoader::class.java).size)
                 assertNotNull(context.getBean(PicUploadService::class.java))
             }
     }

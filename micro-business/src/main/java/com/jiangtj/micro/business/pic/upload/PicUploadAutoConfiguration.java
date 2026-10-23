@@ -1,5 +1,7 @@
 package com.jiangtj.micro.business.pic.upload;
 
+import com.jiangtj.micro.business.config.SystemConfigService;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -22,7 +24,8 @@ public class PicUploadAutoConfiguration {
      * 注册图片上传服务
      */
     @Bean
-    public PicUploadService picUploadService(PicUploadProperties properties, List<PicUploadProvider> providers) {
-        return new PicUploadService(properties, providers);
+    public PicUploadService picUploadService(PicUploadProperties properties, List<PicUploadProvider> providers,
+                                             ObjectProvider<SystemConfigService> systemConfigServiceProvider) {
+        return new PicUploadService(properties, providers, systemConfigServiceProvider.getIfAvailable());
     }
 }

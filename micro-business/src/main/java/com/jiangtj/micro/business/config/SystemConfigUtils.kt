@@ -1,5 +1,10 @@
 package com.jiangtj.micro.business.config
 
+/**
+ * 敏感配置的脱敏占位符
+ */
+const val MASKED_VALUE = "******"
+
 fun String.trimKey() = this.replace("-", "")
     .replace("_", "")
     .replace(" ", "")

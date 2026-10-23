@@ -1,9 +1,11 @@
 package com.jiangtj.micro.business.pic.upload;
 
+import com.jiangtj.micro.business.config.SystemConfigService;
 import com.jiangtj.micro.business.pic.upload.ex.PicUploadCheckException;
 import com.jiangtj.micro.common.utils.FileNameUtils;
 import com.jiangtj.micro.web.AnnotationUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,6 +17,9 @@ import java.util.stream.Collectors;
 
 /**
  * 图片上传服务
+ *
+ * 上传目录映射优先读取系统配置项 {@code jmicro.pic.upload.dirs}（JSON），
+ * 未配置时回退到 {@code jmicro.pic.upload.dirs.*} 的启动绑定值。
  */
 @Slf4j
 public class PicUploadService {
@@ -22,25 +27,23 @@ public class PicUploadService {
     private final PicUploadProperties properties;
     private final Map<String, PicUploadProvider> providers;
 
+    @Nullable
+    private final SystemConfigService systemConfigService;
+
     public PicUploadService(PicUploadProperties properties, List<PicUploadProvider> providers) {
+        this(properties, providers, null);
+    }
+
+    public PicUploadService(PicUploadProperties properties, List<PicUploadProvider> providers,
+                            @Nullable SystemConfigService systemConfigService) {
         this.properties = properties;
+        this.systemConfigService = systemConfigService;
         this.providers = providers.stream()
             .collect(Collectors.toMap(provider ->
                     AnnotationUtils.findAnnotation(provider.getClass(), PicUploadType.class)
                         .map(PicUploadType::value)
                         .orElse(provider.getClass().getName()),
                 Function.identity()));
-        this.properties.getDirs().forEach((target, dir) -> {
-            if (!StringUtils.hasText(dir.getProvider())) {
-                dir.setProvider(properties.getProvider());
-            }
-            if (dir.getMaxFileSize() == null) {
-                dir.setMaxFileSize(properties.getMaxFileSize());
-            }
-            if (dir.getAllowedExtensions() == null  || dir.getAllowedExtensions().length == 0) {
-                dir.setAllowedExtensions(properties.getAllowedExtensions());
-            }
-        });
     }
 
     /**
@@ -96,10 +99,37 @@ public class PicUploadService {
         if (!StringUtils.hasText(target)) {
             throw new PicUploadCheckException("请提供上传目标");
         }
-        PicUploadProperties.Dir dir = properties.getDirs().get(target);
+        PicUploadProperties.Dir dir = resolveDirs().get(target);
         if (dir == null) {
-            throw new PicUploadCheckException("不存在上传的目标定义，请在配置文件中添加: jmicro.pic.upload." + target);
+            throw new PicUploadCheckException("不存在上传的目标定义，请在配置中添加: jmicro.pic.upload.dirs." + target);
         }
+        applyDefaults(dir);
         return dir;
+    }
+
+    /**
+     * 目录映射来源：系统配置优先，未配置时回退到启动绑定值。
+     */
+    private Map<String, PicUploadProperties.Dir> resolveDirs() {
+        if (systemConfigService != null) {
+            Map<String, PicUploadProperties.Dir> configured = systemConfigService.getMap(
+                PicUploadDirsConfigLoader.KEY, PicUploadProperties.Dir.class);
+            if (!configured.isEmpty()) {
+                return configured;
+            }
+        }
+        return properties.getDirs();
+    }
+
+    private void applyDefaults(PicUploadProperties.Dir dir) {
+        if (!StringUtils.hasText(dir.getProvider())) {
+            dir.setProvider(properties.getProvider());
+        }
+        if (dir.getMaxFileSize() == null) {
+            dir.setMaxFileSize(properties.getMaxFileSize());
+        }
+        if (dir.getAllowedExtensions() == null || dir.getAllowedExtensions().length == 0) {
+            dir.setAllowedExtensions(properties.getAllowedExtensions());
+        }
     }
 }

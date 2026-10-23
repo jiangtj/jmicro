@@ -20,6 +20,7 @@ import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Positive
 import jakarta.validation.constraints.PositiveOrZero
 import jakarta.validation.constraints.Size
+import tools.jackson.databind.JavaType
 import tools.jackson.module.kotlin.isKotlinClass
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
@@ -65,6 +66,11 @@ object JsonSchemaGenerator {
     val cache: MutableMap<Class<*>, JsonSchema> = ConcurrentHashMap()
 
     /**
+     * 泛型类型的 schema 缓存，key 为 [Type]（`JavaType` 实现了该接口）
+     */
+    private val typeCache: MutableMap<Type, JsonSchema> = ConcurrentHashMap()
+
+    /**
      * 基于泛型类型生成 JSON Schema 的便捷方法。
      */
     inline fun <reified T> generate(): JsonSchema = generate(T::class.java)
@@ -81,6 +87,24 @@ object JsonSchemaGenerator {
         schema.schema = DRAFT_2020_12
         if (schema.title == null) {
             schema.title = clazz.simpleName
+        }
+        schema
+    }
+
+    /**
+     * 根据任意泛型类型生成 JSON Schema，支持 `Map<String, X>`、`List<X>` 等嵌套结构。
+     *
+     * 与 [generate] 相同，结果会被缓存。
+     *
+     * @param type 目标类型，通常来自 `ObjectMapper.typeFactory.constructType(...)`
+     *   或 `TypeReference.type`。
+     */
+    @JvmStatic
+    fun generate(type: Type): JsonSchema = typeCache.getOrPut(type) {
+        val schema = schemaOf(type, mutableSetOf())
+        schema.schema = DRAFT_2020_12
+        if (schema.title == null && type is Class<*>) {
+            schema.title = type.simpleName
         }
         schema
     }
@@ -119,6 +143,10 @@ object JsonSchemaGenerator {
     }
 
     private fun schemaOf(javaType: Type, visiting: MutableSet<Class<*>>): JsonSchema {
+        // Jackson 的 JavaType 不实现 ParameterizedType，需要单独展开
+        if (javaType is JavaType) {
+            return schemaOfJavaType(javaType, visiting)
+        }
         if (javaType is ParameterizedType) {
             val rawType = javaType.rawType as? Class<*> ?: return JsonSchema()
             if (Collection::class.java.isAssignableFrom(rawType)) {
@@ -133,6 +161,18 @@ object JsonSchemaGenerator {
         }
         val clazz = javaType as? Class<*> ?: return JsonSchema()
         return schemaOf(clazz, visiting)
+    }
+
+    private fun schemaOfJavaType(javaType: JavaType, visiting: MutableSet<Class<*>>): JsonSchema {
+        if (javaType.isCollectionLikeType || javaType.isArrayType) {
+            val itemType = javaType.contentType ?: return JsonSchema(type = "array")
+            return JsonSchema(type = "array", items = schemaOfJavaType(itemType, visiting))
+        }
+        if (javaType.isMapLikeType) {
+            val valueType = javaType.contentType ?: return JsonSchema(type = "object")
+            return JsonSchema(type = "object", additionalProperties = schemaOfJavaType(valueType, visiting))
+        }
+        return schemaOf(javaType.rawClass, visiting)
     }
 
     private fun unwrap(javaType: Type): Type =

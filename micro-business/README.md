@@ -75,6 +75,50 @@ jmicro:
 - **bcrypt 支持（通过 formatter 实现）**：使用 `BCryptUtils.encodeFormatter` 写入明文时若非 bcrypt 哈希则哈希后持久化，已是哈希则透传，避免二次哈希。读取校验明文可用 `BCryptUtils.matches(raw, stored)`。（`BCryptUtils` 位于 `micro-auth`，包 `com.jiangtj.micro.auth`）
 - `getConfigByTag(tag)` 可按标签筛选配置项。
 
+#### 结构化配置（JSON 类型）
+
+`SystemItemType.JSON` 用于表达对象、集合、`Map` 等嵌套结构。持久化仍是单个 `key -> String`，值为 JSON 文本；写入时会校验并规范化成紧凑单行，因此可以直接写在 `jmicro.system.config.kv.*` 中。
+
+```kotlin
+class MyConfigLoader : SystemConfigLoader {
+    override fun load() = listOf(
+        SystemItemInfo(
+            key = "my.site.dirs",
+            name = "目录映射",
+            type = SystemItemType.JSON.name,
+            value = """{"a":{"path":"/a"}}""",
+            // 声明目标类型：写入校验 + 生成前端 schema
+            jsonType = JsonUtils.jsonMapper.typeFactory
+                .constructMapType(LinkedHashMap::class.java, String::class.java, Dir::class.java),
+            // 可选：只脱敏 JSON 内的指定字段
+            secretPaths = listOf("a.accessKey"),
+        )
+    )
+}
+```
+
+读取：
+
+| 方法 | 说明 |
+| --- | --- |
+| `getObject(key, Class)` | 反序列化为单个对象 |
+| `getList(key, Class)` | 反序列化为集合 |
+| `getMap(key, Class)` | 反序列化为 `Map<String, V>` |
+| `getJson(key)` | 返回 JSON 树，供接口层直接透传 |
+| `getConfigField(key, "a.b")` | 按路径读取子字段，支持 `a.b` 与 JSON Pointer `/a/b` |
+
+写入（字段级，底层是读取-修改-写回整项；多实例部署需由 `SystemConfigSaver` 提供版本号/锁来避免并发覆盖）：
+
+| 方法 | 说明 |
+| --- | --- |
+| `updateConfigField(key, path, value)` | 更新任意路径字段 |
+| `updateMapEntry` / `removeMapEntry` | 维护 `Map` 结构 |
+| `addListElement` / `updateListElement` / `removeListElement` | 维护数组结构 |
+
+- 写入时会用 `jsonType` 校验值能否反序列化为目标类型，不合法抛 `MicroConfigException`。
+- `getAllConfig()` 会通过 `JsonSchemaGenerator` 为 `jsonType` 生成 `schema`（`Map` 生成 `additionalProperties`、集合生成 `items`），前端可据此渲染表单或 key-value/数组编辑器。
+- `secretPaths` 非空时按路径把值替换为 `******`（此时不再整体脱敏）；写入时值为 `******` 的字段会用旧值回填，避免把掩码写进持久化存储。
+
 #### 扩展指南
 
 - 实现 `SystemConfigLoader` 并注册为 Bean，可在启动时贡献一组默认配置项（含名称、分组、类型、表单渲染信息等）。
@@ -228,6 +272,18 @@ jmicro.pic.upload.dirs.target-name.path=/common
 # jmicro.pic.upload.dirs.target-name.provider=ali
 ```
 
+目录映射也可以作为系统配置项 `jmicro.pic.upload.dirs`（`JSON` 类型，`Map<String, Dir>`）在运行期覆盖，开启系统配置后生效，未配置时回退到上面的启动绑定值：
+
+```properties
+jmicro.system.config.enabled=true
+jmicro.system.config.kv.jmicro.pic.upload.dirs={"target-name":{"path":"/common","provider":"ali","maxFileSize":10485760}}
+```
+
+```kotlin
+// 运行期修改（立即生效，无需重启）
+systemConfigService.updateMapEntry("jmicro.pic.upload.dirs", "avatar", mapOf("path" to "/avatar"))
+```
+
 各服务商（`local` / `ali` / `hw` / `minio` / `easyimages` / `rustfs`）的配置项统一由**系统配置（SystemConfig）**提供，使用前需开启 `jmicro.system.config.enabled=true`；未开启时对应服务商的上传服务不会注册。配置项定义在各自的 `*ConfigItem` 枚举中（`systemConfigService.getValue(key)` 读取），可通过 `jmicro.system.config.kv.*` 提供值，也可在运行期通过 `SystemConfigService.updateConfig(key, value)` 动态修改（上传时实时读取）。各服务商并可能需要引入对应 SDK：
 
 | Provider | 配置来源 | 说明 |
@@ -343,7 +399,7 @@ jmicro.pic.upload.provider=local
 jmicro.system.config.kv.jmicro.pic.upload.local.upload-path=/data/uploads
 # 上传文件的可访问 URL 前缀（由你的静态资源映射暴露）
 jmicro.system.config.kv.jmicro.pic.upload.local.url=/files
-# 目录映射（仍由 jmicro.pic.upload.dirs.* 决定）
+# 目录映射（可用 jmicro.pic.upload.dirs.* 或系统配置项 jmicro.pic.upload.dirs 的 JSON 配置）
 jmicro.pic.upload.dirs.target-name.path=/uploads
 ```
 
