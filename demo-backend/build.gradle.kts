@@ -33,3 +33,11 @@ dependencies {
 tasks.named<Jar>("jar") {
     enabled = false
 }
+
+tasks.withType<Test> {
+    useJUnitPlatform {
+        if (project.hasProperty("ai")) {
+            excludeTags("db-generate")
+        }
+    }
+}
