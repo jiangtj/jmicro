@@ -1,0 +1,1143 @@
+# demo-backend OpenAPI 3.0 文档
+#
+# 依据模块内的 controller 编写（src/main/java/com/jiangtj/micro/demobackend/controller）：
+#   LoginController.kt        -> POST /login、GET /me
+#   BookController.kt         -> /books、/books/{id}、/books/form-schema
+#   PicUploadController.kt    -> POST /pic/upload
+#   SystemConfigController.kt -> /system/configs/**
+#
+# 查看 / 校验：
+#   1. 导入 https://editor.swagger.io 或 VS Code 的 OpenAPI (Swagger) Editor 插件
+#   2. npx @redocly/cli lint demo-backend/openapi/openapi.yaml
+#
+# 约定：
+#   - 认证使用请求头 `Authorization: Bearer <JWT>`，token 由 POST /login 获取
+#   - 错误响应统一为 RFC 7807 ProblemDetail（application/problem+json）
+#   - 全局 spring.jackson.default-property-inclusion=NON_NULL，值为 null 的字段不会出现在响应中
+#   - 未标注 @HasLogin / @HasRole / @HasPermission 的接口为公开接口（如 /login、/books/form-schema、/pic/upload）
+
+openapi: 3.0.3
+
+info:
+  title: demo-backend API
+  version: 1.0.0
+  description: |
+    jmicro 的 Servlet 栈演示服务，用于展示 micro-auth（登录/鉴权）、micro-business（图片上传、系统配置）
+    与 micro-sql-jooq（数据访问）的能力。
+
+    内置演示账号（见 `db/migration/V1.1.0.sql`）：
+    - `admin` / `admin123`：角色 `admin`，权限 `book:*`
+    - `reader` / `reader123`：角色 `reader`，权限 `book:read`
+
+    鉴权规则：
+    - `book:read`：查看图书
+    - `book:write`：新增/修改图书
+    - `admin` 角色：删除图书、管理系统配置
+    - 权限匹配方式为 ant-style（`jmicro.auth.permission-match=ant`）
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+
+servers:
+  - url: http://localhost:17001
+    description: 本地开发（server.port=17001）
+
+tags:
+  - name: Auth
+    description: 登录与当前用户信息（LoginController）
+  - name: Books
+    description: 图书增删改查与表单 Schema（BookController）
+  - name: PicUpload
+    description: 图片上传（PicUploadController）
+  - name: SystemConfig
+    description: 系统配置项管理（SystemConfigController），仅 admin 角色可访问
+
+paths:
+  # ------------------------------------------------------------------
+  # LoginController
+  # ------------------------------------------------------------------
+  /login:
+    post:
+      tags: [Auth]
+      summary: 登录并签发 JWT
+      description: |
+        校验 `sys_user` 表中的账号与 bcrypt 密码，成功后用 HS256 签发 JWT
+        （有效期由 `jmicro.demo.jwt.ttl` 控制，默认 2h）。
+
+        该接口为公开接口，无需携带 token。
+      operationId: login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            example:
+              username: admin
+              password: admin123
+      responses:
+        '200':
+          description: 登录成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResult'
+              example:
+                token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiJ9.demo-signature
+                username: admin
+                nickname: 管理员
+                roles: [admin]
+                permissions: ['book:*']
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          description: 用户名或密码错误（含用户不存在、被禁用、密码不匹配）
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              example:
+                type: 'about:blank'
+                title: Unauthorized
+                status: 401
+                detail: 用户名或密码错误
+                instance: /login
+
+  /me:
+    get:
+      tags: [Auth]
+      summary: 获取当前登录用户
+      description: 需要登录（`@HasLogin`），返回 token 中的主体信息与角色、权限。
+      operationId: getCurrentUser
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 当前登录用户
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeResult'
+              example:
+                username: reader
+                nickname: 读者
+                roles: [reader]
+                permissions: ['book:read']
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ------------------------------------------------------------------
+  # BookController
+  # ------------------------------------------------------------------
+  /books:
+    get:
+      tags: [Books]
+      summary: 查询图书列表
+      description: 需要权限 `book:read`。
+      operationId: listBooks
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 图书列表（无数据时为空数组）
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Book'
+              example:
+                - id: 1
+                  title: 测试驱动开发
+                  author: Kent Beck
+                  isbn: '9787111639428'
+                  price: 69.00
+                  stock: 2
+                  createTime: '2026-10-24T10:00:00'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [Books]
+      summary: 新增图书
+      description: 需要权限 `book:write`。返回插入后的完整记录（含数据库生成的主键与创建时间）。
+      operationId: createBook
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookForm'
+            example:
+              title: 测试驱动开发
+              author: Kent Beck
+              isbn: '9787111639428'
+              price: 69.00
+              stock: 2
+      responses:
+        '200':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+              example:
+                id: 1
+                title: 测试驱动开发
+                author: Kent Beck
+                isbn: '9787111639428'
+                price: 69.00
+                stock: 2
+                createTime: '2026-10-24T10:00:00'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /books/form-schema:
+    get:
+      tags: [Books]
+      summary: 获取图书表单 JSON Schema
+      description: |
+        返回 `BookForm` 的 JSON Schema（draft 2020-12），供前端动态生成表单。
+        无需认证。
+      operationId: getBookFormSchema
+      security: []
+      responses:
+        '200':
+          description: JSON Schema
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JsonSchema'
+              example:
+                $schema: 'https://json-schema.org/draft/2020-12/schema'
+                title: BookForm
+                type: object
+                properties:
+                  title:
+                    type: string
+                    maxLength: 128
+                  author:
+                    type: string
+                    maxLength: 64
+                  isbn:
+                    type: string
+                    maxLength: 32
+                  price:
+                    type: number
+                    minimum: 0
+                  stock:
+                    type: integer
+                    minimum: 0
+                required: [title, author, price, stock]
+
+  /books/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: 图书主键
+        schema:
+          type: integer
+          format: int64
+          minimum: 1
+        example: 1
+    get:
+      tags: [Books]
+      summary: 查询单本图书
+      description: 需要权限 `book:read`。
+      operationId: getBook
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 图书详情
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/BookNotFound'
+    put:
+      tags: [Books]
+      summary: 修改图书
+      description: 需要权限 `book:write`。全量覆盖 `title`、`author`、`isbn`、`price`、`stock`。
+      operationId: updateBook
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookForm'
+            example:
+              title: 测试驱动开发（第2版）
+              author: Kent Beck
+              isbn: '9787111639428'
+              price: 79.00
+              stock: 5
+      responses:
+        '200':
+          description: 修改后的图书
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/BookNotFound'
+    delete:
+      tags: [Books]
+      summary: 删除图书
+      description: 需要 `admin` 角色。删除前会先校验记录是否存在。
+      operationId: deleteBook
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 删除成功（无响应体）
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: 缺少 admin 角色
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              example:
+                type: 'about:blank'
+                title: No Role
+                status: 403
+                detail: "Don't have role<admin>."
+                instance: /books/1
+        '404':
+          $ref: '#/components/responses/BookNotFound'
+
+  # ------------------------------------------------------------------
+  # PicUploadController
+  # ------------------------------------------------------------------
+  /pic/upload:
+    post:
+      tags: [PicUpload]
+      summary: 上传图片
+      description: |
+        上传到指定目录，实际存储服务商、允许的扩展名、大小限制与目录映射均来自系统配置项
+        （`jmicro.pic.upload.*`，需 `jmicro.system.config.enabled=true`）。
+
+        该接口当前未添加鉴权注解，属于公开接口，部署时请自行在网关或反向代理层保护。
+      operationId: uploadPic
+      security: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [target, file]
+              properties:
+                target:
+                  type: string
+                  description: 上传目录标识，需存在于 `jmicro.pic.upload.dirs` 配置中
+                  example: cover
+                file:
+                  type: string
+                  format: binary
+                  description: 图片文件，扩展名必须在允许列表内，且不能超过大小限制
+            encoding:
+              file:
+                contentType: application/octet-stream
+      responses:
+        '200':
+          description: 上传成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PicUploadResult'
+              example:
+                originalFileName: logo.png
+                fileName: 3f2a9c1e8b7d4a6f9e0c.png
+                fileUrl: https://cdn.example.com/cover/3f2a9c1e8b7d4a6f9e0c.png
+                thumbnailUrl: https://cdn.example.com/cover/3f2a9c1e8b7d4a6f9e0c_thumb.png
+        '400':
+          description: 参数校验错误（未提供 target、target 未配置、文件为空、超出大小、类型不支持）
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              examples:
+                targetMissing:
+                  value:
+                    type: 'about:blank'
+                    title: 参数校验错误
+                    status: 400
+                    detail: 请提供上传目标
+                    instance: /pic/upload
+                targetNotConfigured:
+                  value:
+                    type: 'about:blank'
+                    title: 参数校验错误
+                    status: 400
+                    detail: '不存在上传的目标定义，请在配置中添加: jmicro.pic.upload.dirs.cover'
+                    instance: /pic/upload
+                unsupportedType:
+                  value:
+                    type: 'about:blank'
+                    title: 参数校验错误
+                    status: 400
+                    detail: 不支持的文件类型
+                    instance: /pic/upload
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # ------------------------------------------------------------------
+  # SystemConfigController（类级别 @HasRole("admin")）
+  # ------------------------------------------------------------------
+  /system/configs:
+    get:
+      tags: [SystemConfig]
+      summary: 查询系统配置项列表
+      description: |
+        仅 `admin` 角色可访问。返回按 group.order、order 排序的配置项；
+        `secret` 项的值已整体脱敏，`secretPaths` 指定的字段已局部脱敏。
+      operationId: listSystemConfigs
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: tag
+          in: query
+          required: false
+          description: 按 tag 过滤（trim 后忽略大小写，匹配配置项 tag 列表中的任意一项）；为空则返回全部
+          schema:
+            type: string
+          example: pic
+      responses:
+        '200':
+          description: 配置项列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SystemItemInfo'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: 缺少 admin 角色
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              example:
+                type: 'about:blank'
+                title: No Role
+                status: 403
+                detail: "Don't have role<admin>."
+                instance: /system/configs
+
+  /system/configs/refresh:
+    post:
+      tags: [SystemConfig]
+      summary: 刷新系统配置缓存
+      description: 清空配置缓存并发布配置刷新事件，仅 `admin` 角色可访问。
+      operationId: refreshSystemConfig
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 刷新成功（无响应体）
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: 缺少 admin 角色
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              example:
+                type: 'about:blank'
+                title: No Role
+                status: 403
+                detail: "Don't have role<admin>."
+                instance: /system/configs/refresh
+
+  /system/configs/{key}:
+    parameters:
+      - name: key
+        in: path
+        required: true
+        description: 配置项 key（比较时会 trim），如 `demo.site.name`
+        schema:
+          type: string
+        example: demo.site.name
+    get:
+      tags: [SystemConfig]
+      summary: 查询单个配置项
+      description: 仅 `admin` 角色可访问。返回值包含默认值、当前值、是否被覆盖以及前端渲染用的 `schema`。
+      operationId: getSystemConfig
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 配置项详情
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemItemInfo'
+              example:
+                key: demo.site.name
+                name: 站点名称
+                description: 展示在页面标题与导航栏上的名称
+                value: JMicro Demo
+                secret: false
+                needRefresh: false
+                group:
+                  name: 演示站点
+                  order: 10
+                type: TEXT
+                provider: []
+                order: 0
+                isModified: false
+                tag: []
+                secretPaths: []
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: 缺少 admin 角色
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              example:
+                type: 'about:blank'
+                title: No Role
+                status: 403
+                detail: "Don't have role<admin>."
+                instance: /system/configs/demo.site.name
+        '404':
+          $ref: '#/components/responses/ConfigNotFound'
+    put:
+      tags: [SystemConfig]
+      summary: 写入配置项覆盖值
+      description: |
+        仅 `admin` 角色可访问。值会按配置项类型校验/规范化后持久化到 `sys_config`
+        （JSON 类型会规范化为紧凑单行 JSON），随后返回最新的配置项。
+
+        校验失败（如 SWITCH 类型写入非 `true`/`false`）或 key 不存在时返回 500。
+      operationId: updateSystemConfig
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SystemConfigForm'
+            example:
+              value: 我的站点
+      responses:
+        '200':
+          description: 写入后的配置项
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemItemInfo'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: 缺少 admin 角色
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              example:
+                type: 'about:blank'
+                title: No Role
+                status: 403
+                detail: "Don't have role<admin>."
+                instance: /system/configs/demo.site.maintenance
+        '500':
+          description: 配置项不存在或值校验失败
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              examples:
+                invalidValue:
+                  value:
+                    type: 'about:blank'
+                    title: 配置错误
+                    status: 500
+                    detail: 仅支持 true / false
+                    instance: /system/configs/demo.site.maintenance
+                unknownKey:
+                  value:
+                    type: 'about:blank'
+                    title: 配置错误
+                    status: 500
+                    detail: 配置项不存在
+                    instance: /system/configs/not.exists
+    delete:
+      tags: [SystemConfig]
+      summary: 删除配置项覆盖值（恢复默认）
+      description: 仅 `admin` 角色可访问。删除 `sys_config` 中的覆盖值并发布刷新事件，返回恢复默认值后的配置项。
+      operationId: resetSystemConfig
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 恢复默认后的配置项
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemItemInfo'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: 缺少 admin 角色
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              example:
+                type: 'about:blank'
+                title: No Role
+                status: 403
+                detail: "Don't have role<admin>."
+                instance: /system/configs/demo.site.name
+        '404':
+          $ref: '#/components/responses/ConfigNotFound'
+
+  /system/configs/{key}/properties:
+    parameters:
+      - name: key
+        in: path
+        required: true
+        description: 配置项 key（比较时会 trim）
+        schema:
+          type: string
+        example: demo.site.name
+    get:
+      tags: [SystemConfig]
+      summary: 生成可粘贴到 application.properties 的配置行
+      description: |
+        仅 `admin` 角色可访问。返回 `jmicro.system.config.kv.<key>=<value>` 形式的纯文本，
+        供前端「复制配置」使用；key 中的 `_` 会转换为 `-` 并转小写。
+      operationId: getSystemConfigProperties
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 配置行
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: jmicro.system.config.kv.demo.site.name=我的站点
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: 缺少 admin 角色
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              example:
+                type: 'about:blank'
+                title: No Role
+                status: 403
+                detail: "Don't have role<admin>."
+                instance: /system/configs/demo.site.name/properties
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        `POST /login` 返回的 JWT，请求头格式：`Authorization: Bearer <token>`。
+        签名、issuer 或有效期校验失败时按未登录处理（401）。
+
+  responses:
+    BadRequest:
+      description: 请求体格式错误或字段校验失败
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+          example:
+            type: 'about:blank'
+            title: Bad Request
+            status: 400
+            detail: Invalid request content.
+            instance: /books
+    Unauthorized:
+      description: 未登录或 token 无效
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+          example:
+            type: 'about:blank'
+            title: No Login
+            status: 401
+            detail: You have to take a token for this request.
+            instance: /books
+    Forbidden:
+      description: 已登录但缺少所需权限
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+          example:
+            type: 'about:blank'
+            title: No Permission
+            status: 403
+            detail: "Don't have permission<book:write>."
+            instance: /books
+    BookNotFound:
+      description: 图书不存在
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+          example:
+            type: 'about:blank'
+            title: Not Found
+            status: 404
+            detail: 图书不存在：1
+            instance: /books/1
+    ConfigNotFound:
+      description: 配置项不存在
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+          example:
+            type: 'about:blank'
+            title: Not Found
+            status: 404
+            detail: 配置项不存在：not.exists
+            instance: /system/configs/not.exists
+    InternalServerError:
+      description: 服务端异常
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+          example:
+            type: 'about:blank'
+            title: Internal Server Error
+            status: 500
+            detail: 服务端异常
+            instance: /pic/upload
+
+  schemas:
+    ProblemDetail:
+      type: object
+      description: RFC 7807 错误响应（Spring `ProblemDetail`）
+      properties:
+        type:
+          type: string
+          description: 问题类型 URI，内置异常固定为 `about:blank`
+          example: 'about:blank'
+        title:
+          type: string
+          description: 简短标题，如 `No Login`、`No Permission`、`No Role`、`Not Found`
+          example: No Login
+        status:
+          type: integer
+          format: int32
+          description: HTTP 状态码
+          example: 401
+        detail:
+          type: string
+          description: 具体错误说明
+          example: You have to take a token for this request.
+        instance:
+          type: string
+          description: 触发错误的请求路径
+          example: /books
+
+    LoginRequest:
+      type: object
+      description: 登录表单
+      required: [username, password]
+      properties:
+        username:
+          type: string
+          minLength: 1
+          description: 用户名（`@NotBlank`）
+          example: admin
+        password:
+          type: string
+          minLength: 1
+          description: 明文密码，服务端使用 bcrypt 与库中哈希比对（`@NotBlank`）
+          example: admin123
+
+    LoginResult:
+      type: object
+      description: 登录结果
+      required: [token, username, nickname, roles, permissions]
+      properties:
+        token:
+          type: string
+          description: 'HS256 签名的 JWT，后续请求放入 `Authorization: Bearer <token>`'
+        username:
+          type: string
+          description: 用户名（JWT subject）
+          example: admin
+        nickname:
+          type: string
+          description: 昵称
+          example: 管理员
+        roles:
+          type: array
+          description: 角色编码列表
+          items:
+            type: string
+          example: [admin]
+        permissions:
+          type: array
+          description: 权限编码列表（角色间接拥有）
+          items:
+            type: string
+          example: ['book:*']
+
+    MeResult:
+      type: object
+      description: 当前登录用户信息
+      required: [username, nickname, roles, permissions]
+      properties:
+        username:
+          type: string
+          description: 用户名
+          example: reader
+        nickname:
+          type: string
+          description: 显示名（`$me` 取 token 的 `name` claim，缺省为用户名）
+          example: 读者
+        roles:
+          type: array
+          description: 角色编码列表
+          items:
+            type: string
+        permissions:
+          type: array
+          description: 权限编码列表
+          items:
+            type: string
+
+    Book:
+      type: object
+      description: 图书（jOOQ 生成的 pojo，`null` 字段不会出现在响应中）
+      required: [title, author, createTime]
+      properties:
+        id:
+          type: integer
+          format: int64
+          nullable: true
+          description: 主键，创建前为 null，由数据库自增生成
+          example: 1
+        title:
+          type: string
+          maxLength: 128
+          description: 书名
+          example: 测试驱动开发
+        author:
+          type: string
+          maxLength: 64
+          description: 作者
+          example: Kent Beck
+        isbn:
+          type: string
+          maxLength: 32
+          nullable: true
+          description: ISBN
+          example: '9787111639428'
+        price:
+          type: number
+          description: 价格（BigDecimal）
+          example: 69.00
+        stock:
+          type: integer
+          format: int32
+          description: 库存
+          example: 2
+        createTime:
+          type: string
+          format: date-time
+          description: 创建时间（服务端 `LocalDateTime.now()`）
+          example: '2026-10-24T10:00:00'
+
+    BookForm:
+      type: object
+      description: 图书新增/修改请求体
+      required: [title, author, price, stock]
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 128
+          description: 书名（`@NotBlank @Size(max = 128)`）
+          example: 测试驱动开发
+        author:
+          type: string
+          minLength: 1
+          maxLength: 64
+          description: 作者（`@NotBlank @Size(max = 64)`）
+          example: Kent Beck
+        isbn:
+          type: string
+          maxLength: 32
+          nullable: true
+          description: ISBN，可选（`@Size(max = 32)`）
+          example: '9787111639428'
+        price:
+          type: number
+          minimum: 0
+          description: 价格，不小于 0（`@NotNull @DecimalMin("0")`）
+          example: 69.00
+        stock:
+          type: integer
+          format: int32
+          minimum: 0
+          description: 库存，不小于 0（`@NotNull @Min(0)`）
+          example: 2
+
+    JsonSchema:
+      type: object
+      description: |
+        JSON Schema（draft 2020-12）常用关键字子集，由 `JsonSchemaGenerator` 生成；
+        值为 null 的字段不会出现在响应中，`properties` / `items` / `additionalProperties`
+        递归使用本结构。
+      properties:
+        $schema:
+          type: string
+          description: JSON Schema 版本标识
+          example: 'https://json-schema.org/draft/2020-12/schema'
+        title:
+          type: string
+          description: 标题，默认取类名
+          example: BookForm
+        description:
+          type: string
+          description: 描述
+        type:
+          type: string
+          description: 数据类型，如 `object`、`string`、`number`、`integer`、`boolean`
+          example: object
+        format:
+          type: string
+          description: 格式，如 `date-time`、`uuid`
+        properties:
+          type: object
+          description: 对象属性定义
+          additionalProperties:
+            $ref: '#/components/schemas/JsonSchema'
+        required:
+          type: array
+          description: 必填属性名列表
+          items:
+            type: string
+        items:
+          $ref: '#/components/schemas/JsonSchema'
+        additionalProperties:
+          $ref: '#/components/schemas/JsonSchema'
+        enum:
+          type: array
+          description: 可选值列表
+          items: {}
+        default:
+          description: 默认值
+        deprecated:
+          type: boolean
+          description: 是否已废弃
+        minimum:
+          type: number
+          description: 最小值（含）
+        maximum:
+          type: number
+          description: 最大值（含）
+        exclusiveMinimum:
+          type: number
+          description: 最小值（不含）
+        exclusiveMaximum:
+          type: number
+          description: 最大值（不含）
+        multipleOf:
+          type: number
+          description: 数值倍数
+        minLength:
+          type: integer
+          format: int32
+          description: 字符串最小长度
+        maxLength:
+          type: integer
+          format: int32
+          description: 字符串最大长度
+        minItems:
+          type: integer
+          format: int32
+          description: 数组最小长度
+        maxItems:
+          type: integer
+          format: int32
+          description: 数组最大长度
+        pattern:
+          type: string
+          description: 正则表达式
+
+    PicUploadResult:
+      type: object
+      description: 图片上传结果（字段可能为 null，null 字段会被省略）
+      properties:
+        originalFileName:
+          type: string
+          nullable: true
+          description: 原始文件名
+          example: logo.png
+        fileName:
+          type: string
+          nullable: true
+          description: 服务端生成的新文件名
+          example: 3f2a9c1e8b7d4a6f9e0c.png
+        fileUrl:
+          type: string
+          nullable: true
+          description: 文件访问地址
+          example: https://cdn.example.com/cover/3f2a9c1e8b7d4a6f9e0c.png
+        thumbnailUrl:
+          type: string
+          nullable: true
+          description: 缩略图地址（服务商生成时才有）
+          example: https://cdn.example.com/cover/3f2a9c1e8b7d4a6f9e0c_thumb.png
+
+    SystemItemInfo:
+      type: object
+      description: 系统配置项信息（由 `SystemConfigLoader` 注册，覆盖值持久化在 `sys_config` 表）
+      required: [key, name, description, value, secret, needRefresh, group, type, provider, order, isModified, tag, secretPaths]
+      properties:
+        key:
+          type: string
+          description: 配置项 key
+          example: demo.site.name
+        name:
+          type: string
+          description: 显示名称
+          example: 站点名称
+        description:
+          type: string
+          description: 说明
+          example: 展示在页面标题与导航栏上的名称
+        value:
+          type: string
+          description: 当前值；`secret` 项在此处已脱敏
+          example: JMicro Demo
+        formatedValue:
+          type: string
+          nullable: true
+          description: 格式化后的展示值（注意字段名为历史拼写 `formatedValue`）
+        secret:
+          type: boolean
+          description: 是否为敏感项（整体脱敏）
+          example: false
+        needRefresh:
+          type: boolean
+          description: 修改后是否需要刷新配置缓存
+          example: false
+        group:
+          $ref: '#/components/schemas/SystemGroup'
+        type:
+          $ref: '#/components/schemas/SystemItemType'
+        provider:
+          type: array
+          description: 可选值列表，元素为 Kotlin `Pair<String, String>` 序列化后的 `{first, second}` 对象
+          items:
+            $ref: '#/components/schemas/ProviderEntry'
+        order:
+          type: integer
+          format: int32
+          description: 同组内排序号（升序）
+          example: 0
+        isModified:
+          type: boolean
+          description: 是否存在持久化的覆盖值（序列化字段名为 `isModified`）
+          example: false
+        tag:
+          type: array
+          description: 分类标签，供 `GET /system/configs?tag=` 过滤
+          items:
+            type: string
+        secretPaths:
+          type: array
+          description: JSON 类型下需要局部脱敏的字段路径，如 `a.b.c` 或 `/a/b/c`
+          items:
+            type: string
+        schema:
+          description: JSON 类型配置项的结构描述，供前端渲染；非 JSON 类型时为 null（字段省略）
+          type: object
+          nullable: true
+          allOf:
+            - $ref: '#/components/schemas/JsonSchema'
+
+    SystemGroup:
+      type: object
+      description: 配置项分组
+      required: [name, order]
+      properties:
+        name:
+          type: string
+          description: 分组名称
+          example: 演示站点
+        order:
+          type: integer
+          format: int32
+          description: 分组排序号（升序）
+          example: 10
+
+    SystemItemType:
+      type: string
+      description: 前端渲染类型
+      enum: [TEXT, TEXTAREA, SWITCH, SELECT, MULTI_SELECT, JSON]
+
+    ProviderEntry:
+      type: object
+      description: 可选值，`first` 为值、`second` 为显示文本
+      required: [first, second]
+      properties:
+        first:
+          type: string
+          example: light
+        second:
+          type: string
+          example: 浅色
+
+    SystemConfigForm:
+      type: object
+      description: 配置项写入表单
+      properties:
+        value:
+          type: string
+          default: ''
+          description: |
+            新值。SWITCH 类型仅接受 `true` / `false`；JSON 类型会校验并规范化为紧凑 JSON；
+            敏感项中值为 `******` 的字段会回填旧值。
+          example: 我的站点
