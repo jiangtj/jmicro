@@ -13,7 +13,7 @@ import java.time.LocalDateTime
  * 新增/更新使用 `ON DUPLICATE KEY UPDATE`（H2 MySQL 模式与 MySQL 8 均支持）。
  */
 @Repository
-class JooqJMicroConfigSaver(
+class DemoConfigSaver(
     private val dsl: DSLContext,
 ) : JMicroConfigSaver {
 

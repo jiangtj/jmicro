@@ -15,7 +15,7 @@ import java.util.function.Function
  * 这里的 [SystemItemInfo.value] 是默认值，运行期通过接口修改后的值持久化在 `sys_config` 表。
  */
 @Component
-class DemoJMicroConfigLoader : JMicroConfigLoader {
+class DemoConfigLoader : JMicroConfigLoader {
 
     private val socialLinksType = JsonUtils.jsonMapper.typeFactory
         .constructMapType(LinkedHashMap::class.java, String::class.java, String::class.java)
