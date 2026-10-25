@@ -10,6 +10,5 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "jmicro.config")
 public class JMicroConfigProperties {
     private Boolean enabled = false;
-    private String filePath = "upload";
     private Map<String, String> kv = new HashMap<>();
 }
