@@ -1,8 +1,8 @@
 package com.jiangtj.micro.business.config
 
-class SystemConfigRefreshEvent
+class JMicroConfigRefreshEvent
 
-data class SystemConfigUpdateEvent(
+data class JMicroConfigUpdateEvent(
     val key: String,
     val oldV: String,
     val newV: String

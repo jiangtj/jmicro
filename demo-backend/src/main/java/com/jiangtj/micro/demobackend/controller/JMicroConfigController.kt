@@ -2,7 +2,7 @@ package com.jiangtj.micro.demobackend.controller
 
 import com.jiangtj.micro.auth.annotations.HasRole
 import com.jiangtj.micro.business.config.PUBLIC_TAG
-import com.jiangtj.micro.business.config.SystemConfigService
+import com.jiangtj.micro.business.config.JMicroConfigService
 import com.jiangtj.micro.business.config.SystemItem
 import com.jiangtj.micro.business.config.SystemItemInfo
 import com.jiangtj.micro.business.config.trimKey
@@ -30,13 +30,13 @@ import org.springframework.web.bind.annotation.RestController
 @HasRole("admin")
 @RestController
 @RequestMapping("/system/configs")
-class SystemConfigController(
-    private val systemConfigService: SystemConfigService,
+class JMicroConfigController(
+    private val jmicroConfigService: JMicroConfigService,
 ) {
 
     @GetMapping
     fun list(@RequestParam(required = false) tag: String?): List<SystemItemInfo> {
-        val configs = systemConfigService.getAllConfig()
+        val configs = jmicroConfigService.getAllConfig()
         if (tag.isNullOrBlank()) {
             return configs
         }
@@ -48,14 +48,14 @@ class SystemConfigController(
     fun get(@PathVariable key: String): SystemItemInfo = findItem(key)
 
     @PutMapping("/{key}")
-    fun update(@PathVariable key: String, @RequestBody form: SystemConfigForm): SystemItemInfo {
-        systemConfigService.updateConfig(key, form.value)
+    fun update(@PathVariable key: String, @RequestBody form: JMicroConfigForm): SystemItemInfo {
+        jmicroConfigService.updateConfig(key, form.value)
         return findItem(key)
     }
 
     @DeleteMapping("/{key}")
     fun reset(@PathVariable key: String): SystemItemInfo {
-        systemConfigService.deleteConfig(key)
+        jmicroConfigService.deleteConfig(key)
         return findItem(key)
     }
 
@@ -64,15 +64,15 @@ class SystemConfigController(
      */
     @GetMapping("/{key}/properties")
     fun properties(@PathVariable key: String): String =
-        systemConfigService.generateConfig(key, systemConfigService.getValue(key))
+        jmicroConfigService.generateConfig(key, jmicroConfigService.getValue(key))
 
     @PostMapping("/refresh")
     fun refresh() {
-        systemConfigService.refreshConfig()
+        jmicroConfigService.refreshConfig()
     }
 
     private fun findItem(key: String): SystemItemInfo =
-        systemConfigService.getAllConfig()
+        jmicroConfigService.getAllConfig()
             .firstOrNull { it.key.trimKey() == key.trimKey() }
             ?: throw BaseExceptionUtils.notFound("配置项不存在：$key")
 }
@@ -82,21 +82,21 @@ class SystemConfigController(
  *
  * - `GET /system/configs/public`：返回 `tag` 含 [PUBLIC_TAG] 的配置项，供前端读取站点名称等展示信息
  *
- * 配置项是否公开由其 `tag` 决定（见 `DemoSystemConfigLoader`），敏感项不会标记为 `public`。
+ * 配置项是否公开由其 `tag` 决定（见 `DemoJMicroConfigLoader`），敏感项不会标记为 `public`。
  */
 @RestController
 @RequestMapping("/system/configs/public")
-class PublicSystemConfigController(
-    private val systemConfigService: SystemConfigService,
+class PublicJMicroConfigController(
+    private val jmicroConfigService: JMicroConfigService,
 ) {
 
     @GetMapping
-    fun list(): List<SystemItem> = systemConfigService.getConfigByTag(PUBLIC_TAG)
+    fun list(): List<SystemItem> = jmicroConfigService.getConfigByTag(PUBLIC_TAG)
 }
 
 /**
  * 配置项写入表单
  */
-data class SystemConfigForm(
+data class JMicroConfigForm(
     var value: String = "",
 )

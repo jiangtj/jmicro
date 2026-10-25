@@ -1,6 +1,6 @@
 package com.jiangtj.micro.business.config
 
-interface SystemConfigSaver {
+interface JMicroConfigSaver {
 
     fun fetchOneByConfigKey(key: String): String?
 

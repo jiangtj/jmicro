@@ -7,19 +7,19 @@ import org.mockito.ArgumentCaptor
 import org.mockito.kotlin.*
 import java.util.function.Function
 
-class SystemConfigServiceTest {
+class JMicroConfigServiceTest {
 
-    private lateinit var saver: SystemConfigSaver
+    private lateinit var saver: JMicroConfigSaver
     private lateinit var publisher: org.springframework.context.ApplicationEventPublisher
-    private lateinit var properties: SystemConfigProperties
-    private lateinit var loader: SystemConfigLoader
-    private lateinit var service: SystemConfigService
+    private lateinit var properties: JMicroConfigProperties
+    private lateinit var loader: JMicroConfigLoader
+    private lateinit var service: JMicroConfigService
 
     @BeforeEach
     fun setup() {
         saver = mock()
         publisher = mock()
-        properties = SystemConfigProperties()
+        properties = JMicroConfigProperties()
         loader = mock()
     }
 
@@ -44,9 +44,9 @@ class SystemConfigServiceTest {
         tag = tag,
     )
 
-    private fun buildService(vararg items: SystemItemInfo): SystemConfigService {
+    private fun buildService(vararg items: SystemItemInfo): JMicroConfigService {
         whenever(loader.load()).thenReturn(items.toList())
-        return SystemConfigService(
+        return JMicroConfigService(
             listOf(loader),
             publisher,
             properties,
@@ -271,7 +271,7 @@ class SystemConfigServiceTest {
         service.updateConfig("k", "new")
 
         verify(saver).save(eq("k"), eq("new"))
-        verify(publisher).publishEvent(any<SystemConfigUpdateEvent>())
+        verify(publisher).publishEvent(any<JMicroConfigUpdateEvent>())
         assertEquals("new", service.getValue("k"))
     }
 
@@ -329,7 +329,7 @@ class SystemConfigServiceTest {
 
         service.deleteConfig("k")
         verify(saver).delete(eq("k"))
-        verify(publisher, times(2)).publishEvent(any<SystemConfigUpdateEvent>())
+        verify(publisher, times(2)).publishEvent(any<JMicroConfigUpdateEvent>())
         assertEquals("default", service.getValue("k"))
     }
 
@@ -344,7 +344,7 @@ class SystemConfigServiceTest {
         // 事件的新值应为默认值
         val captor = ArgumentCaptor.forClass(Any::class.java)
         verify(publisher, times(2)).publishEvent(captor.capture())
-        val updateEvents = captor.allValues.filterIsInstance<SystemConfigUpdateEvent>()
+        val updateEvents = captor.allValues.filterIsInstance<JMicroConfigUpdateEvent>()
         assertEquals(2, updateEvents.size)
         assertEquals("k", updateEvents[1].key)
         assertEquals("default", updateEvents[1].newV)
@@ -364,7 +364,7 @@ class SystemConfigServiceTest {
         assertEquals("saved", service.getValue("k"))
 
         service.refreshConfig()
-        verify(publisher).publishEvent(any<SystemConfigRefreshEvent>())
+        verify(publisher).publishEvent(any<JMicroConfigRefreshEvent>())
         assertEquals("saved2", service.getValue("k"))
     }
 

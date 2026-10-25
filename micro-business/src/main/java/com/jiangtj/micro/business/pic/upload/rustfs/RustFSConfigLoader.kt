@@ -1,11 +1,11 @@
 package com.jiangtj.micro.business.pic.upload.rustfs
 
-import com.jiangtj.micro.business.config.SystemConfigLoader
+import com.jiangtj.micro.business.config.JMicroConfigLoader
 import com.jiangtj.micro.business.config.SystemGroup
 import com.jiangtj.micro.business.config.SystemItemInfo
 import com.jiangtj.micro.business.config.SystemItemType
 import com.jiangtj.micro.business.pic.upload.PicUploadConfigItem
-import com.jiangtj.micro.business.pic.upload.toSystemConfigItems
+import com.jiangtj.micro.business.pic.upload.toJMicroConfigItems
 
 /**
  * RustFS 配置项定义
@@ -43,7 +43,7 @@ const val RUSTFS_TAG = "rustfs"
 /**
  * 将 RustFS 配置注册为系统配置项默认值
  */
-class RustFSConfigLoader : SystemConfigLoader {
+class RustFSConfigLoader : JMicroConfigLoader {
 
-    override fun load(): List<SystemItemInfo> = RustFSConfigItem.entries.toSystemConfigItems(rustFSGroup, RUSTFS_TAG)
+    override fun load(): List<SystemItemInfo> = RustFSConfigItem.entries.toJMicroConfigItems(rustFSGroup, RUSTFS_TAG)
 }

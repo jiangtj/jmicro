@@ -4,7 +4,7 @@
 #   LoginController.kt        -> POST /login、GET /me
 #   BookController.kt         -> /books、/books/{id}、/books/form-schema
 #   PicUploadController.kt    -> POST /pic/upload
-#   SystemConfigController.kt -> /system/configs/**
+#   JMicroConfigController.kt -> /system/configs/**
 #
 # 查看 / 校验：
 #   1. 导入 https://editor.swagger.io 或 VS Code 的 OpenAPI (Swagger) Editor 插件
@@ -50,8 +50,8 @@ tags:
     description: 图书增删改查与表单 Schema（BookController）
   - name: PicUpload
     description: 图片上传（PicUploadController）
-  - name: SystemConfig
-    description: 系统配置项管理（SystemConfigController），仅 admin 角色可访问
+  - name: JMicroConfig
+    description: 系统配置项管理（JMicroConfigController），仅 admin 角色可访问
 
 paths:
   # ------------------------------------------------------------------
@@ -408,16 +408,16 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
   # ------------------------------------------------------------------
-  # SystemConfigController（类级别 @HasRole("admin")）
+  # JMicroConfigController（类级别 @HasRole("admin")）
   # ------------------------------------------------------------------
   /system/configs:
     get:
-      tags: [SystemConfig]
+      tags: [JMicroConfig]
       summary: 查询系统配置项列表
       description: |
         仅 `admin` 角色可访问。返回按 group.order、order 排序的配置项；
         `secret` 项的值已整体脱敏，`secretPaths` 指定的字段已局部脱敏。
-      operationId: listSystemConfigs
+      operationId: listJMicroConfigs
       security:
         - bearerAuth: []
       parameters:
@@ -454,10 +454,10 @@ paths:
 
   /system/configs/refresh:
     post:
-      tags: [SystemConfig]
+      tags: [JMicroConfig]
       summary: 刷新系统配置缓存
       description: 清空配置缓存并发布配置刷新事件，仅 `admin` 角色可访问。
-      operationId: refreshSystemConfig
+      operationId: refreshJMicroConfig
       security:
         - bearerAuth: []
       responses:
@@ -479,16 +479,16 @@ paths:
                 instance: /system/configs/refresh
 
   # ------------------------------------------------------------------
-  # PublicSystemConfigController（公开接口，无需鉴权）
+  # PublicJMicroConfigController（公开接口，无需鉴权）
   # ------------------------------------------------------------------
   /system/configs/public:
     get:
-      tags: [SystemConfig]
+      tags: [JMicroConfig]
       summary: 查询公开配置项
       description: |
         公开接口，无需登录与权限。返回 `tag` 含 `public` 的配置项（如站点名称、站点描述、主题），
         供前端在未登录时渲染页面基础信息。敏感配置项不会标记为 `public`。
-      operationId: listPublicSystemConfigs
+      operationId: listPublicJMicroConfigs
       security: []
       responses:
         '200':
@@ -498,7 +498,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/SystemConfigItem'
+                  $ref: '#/components/schemas/JMicroConfigItem'
               example:
                 - key: demo.site.name
                   name: 站点名称
@@ -523,10 +523,10 @@ paths:
           type: string
         example: demo.site.name
     get:
-      tags: [SystemConfig]
+      tags: [JMicroConfig]
       summary: 查询单个配置项
       description: 仅 `admin` 角色可访问。返回值包含默认值、当前值、是否被覆盖以及前端渲染用的 `schema`。
-      operationId: getSystemConfig
+      operationId: getJMicroConfig
       security:
         - bearerAuth: []
       responses:
@@ -569,14 +569,14 @@ paths:
         '404':
           $ref: '#/components/responses/ConfigNotFound'
     put:
-      tags: [SystemConfig]
+      tags: [JMicroConfig]
       summary: 写入配置项覆盖值
       description: |
         仅 `admin` 角色可访问。值会按配置项类型校验/规范化后持久化到 `sys_config`
         （JSON 类型会规范化为紧凑单行 JSON），随后返回最新的配置项。
 
         校验失败（如 SWITCH 类型写入非 `true`/`false`）或 key 不存在时返回 500。
-      operationId: updateSystemConfig
+      operationId: updateJMicroConfig
       security:
         - bearerAuth: []
       requestBody:
@@ -584,7 +584,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SystemConfigForm'
+              $ref: '#/components/schemas/JMicroConfigForm'
             example:
               value: 我的站点
       responses:
@@ -630,10 +630,10 @@ paths:
                     detail: 配置项不存在
                     instance: /system/configs/not.exists
     delete:
-      tags: [SystemConfig]
+      tags: [JMicroConfig]
       summary: 删除配置项覆盖值（恢复默认）
       description: 仅 `admin` 角色可访问。删除 `sys_config` 中的覆盖值并发布刷新事件，返回恢复默认值后的配置项。
-      operationId: resetSystemConfig
+      operationId: resetJMicroConfig
       security:
         - bearerAuth: []
       responses:
@@ -670,12 +670,12 @@ paths:
           type: string
         example: demo.site.name
     get:
-      tags: [SystemConfig]
+      tags: [JMicroConfig]
       summary: 生成可粘贴到 application.properties 的配置行
       description: |
         仅 `admin` 角色可访问。返回 `jmicro.config.kv.<key>=<value>` 形式的纯文本，
         供前端「复制配置」使用；key 中的 `_` 会转换为 `-` 并转小写。
-      operationId: getSystemConfigProperties
+      operationId: getJMicroConfigProperties
       security:
         - bearerAuth: []
       responses:
@@ -1068,7 +1068,7 @@ components:
 
     SystemItemInfo:
       type: object
-      description: 系统配置项信息（由 `SystemConfigLoader` 注册，覆盖值持久化在 `sys_config` 表）
+      description: 系统配置项信息（由 `JMicroConfigLoader` 注册，覆盖值持久化在 `sys_config` 表）
       required: [key, name, description, value, secret, needRefresh, group, type, provider, order, isModified, tag, secretPaths]
       properties:
         key:
@@ -1169,7 +1169,7 @@ components:
           type: string
           example: 浅色
 
-    SystemConfigItem:
+    JMicroConfigItem:
       type: object
       description: 公开配置项（`SystemItem`），仅包含 key / name / value
       required: [key, name, value]
@@ -1187,7 +1187,7 @@ components:
           description: 当前值；JSON 类型配置项为 JSON 文本
           example: JMicro Demo
 
-    SystemConfigForm:
+    JMicroConfigForm:
       type: object
       description: 配置项写入表单
       properties:

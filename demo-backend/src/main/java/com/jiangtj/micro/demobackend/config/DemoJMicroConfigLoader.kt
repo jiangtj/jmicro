@@ -1,7 +1,7 @@
 package com.jiangtj.micro.demobackend.config
 
 import com.jiangtj.micro.business.config.PUBLIC_TAG
-import com.jiangtj.micro.business.config.SystemConfigLoader
+import com.jiangtj.micro.business.config.JMicroConfigLoader
 import com.jiangtj.micro.business.config.SystemGroup
 import com.jiangtj.micro.business.config.SystemItemInfo
 import com.jiangtj.micro.business.config.SystemItemType
@@ -15,7 +15,7 @@ import java.util.function.Function
  * 这里的 [SystemItemInfo.value] 是默认值，运行期通过接口修改后的值持久化在 `sys_config` 表。
  */
 @Component
-class DemoSystemConfigLoader : SystemConfigLoader {
+class DemoJMicroConfigLoader : JMicroConfigLoader {
 
     private val socialLinksType = JsonUtils.jsonMapper.typeFactory
         .constructMapType(LinkedHashMap::class.java, String::class.java, String::class.java)

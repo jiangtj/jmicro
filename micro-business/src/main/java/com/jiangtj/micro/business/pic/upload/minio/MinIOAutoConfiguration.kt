@@ -1,7 +1,7 @@
 package com.jiangtj.micro.business.pic.upload.minio
 
-import com.jiangtj.micro.business.config.SystemConfigAutoConfiguration
-import com.jiangtj.micro.business.config.SystemConfigService
+import com.jiangtj.micro.business.config.JMicroConfigAutoConfiguration
+import com.jiangtj.micro.business.config.JMicroConfigService
 import io.minio.MinioClient
 import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
@@ -12,9 +12,9 @@ import org.springframework.context.annotation.Bean
 /**
  * MinIO 自动配置，配置项来自系统配置（需开启 `jmicro.config.enabled=true`）
  */
-@AutoConfiguration(after = [SystemConfigAutoConfiguration::class])
+@AutoConfiguration(after = [JMicroConfigAutoConfiguration::class])
 @ConditionalOnClass(MinioClient::class)
-@ConditionalOnBean(SystemConfigService::class)
+@ConditionalOnBean(JMicroConfigService::class)
 class MinIOAutoConfiguration {
 
     /**
@@ -28,7 +28,7 @@ class MinIOAutoConfiguration {
      * 注册 MinIOService 服务
      */
     @Bean
-    fun minioService(systemConfigService: SystemConfigService): MinIOService {
-        return MinIOService(systemConfigService)
+    fun minioService(jmicroConfigService: JMicroConfigService): MinIOService {
+        return MinIOService(jmicroConfigService)
     }
 }

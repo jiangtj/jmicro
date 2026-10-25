@@ -3,14 +3,14 @@
 ![doc](https://img.shields.io/badge/document-grey.svg?logo=readme)
 [![dokka](https://img.shields.io/badge/dokka-grey.svg?logo=kotlin)](https://jiangtj.com/jmicro/micro-business/api)
 
-jmicro 的业务能力聚合模块，用于承载通用的业务侧自动配置与扩展能力。当前内置了系统配置（SystemConfig）、对 Flyway 的轻量级扩展，以及可选的 OpenID Connect 服务器（Cas）能力。
+jmicro 的业务能力聚合模块，用于承载通用的业务侧自动配置与扩展能力。当前内置了系统配置（JMicroConfig）、对 Flyway 的轻量级扩展，以及可选的 OpenID Connect 服务器（Cas）能力。
 
 ## 目录
 
 - [模块特性](#模块特性)
 - [使用方法](#使用方法)
   - [添加依赖](#添加依赖)
-  - [系统配置 SystemConfig（可选）](#系统配置-systemconfig可选)
+  - [系统配置 JMicroConfig（可选）](#系统配置-jmicroconfig可选)
   - [Flyway 扩展（可选）](#flyway-扩展可选)
   - [OpenID Connect 服务器（可选，默认关闭）](#openid-connect-服务器可选默认关闭)
   - [图片上传（合并自 micro-pic-upload-starter）](#图片上传合并自-micro-pic-upload-starter)
@@ -19,10 +19,10 @@ jmicro 的业务能力聚合模块，用于承载通用的业务侧自动配置�
 ## 模块特性
 
 - 继承 Spring Boot 默认自动配置体系，通过 `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports` 注册。
-- 内置 **系统配置（SystemConfig）能力**（可选，默认关闭，见下文），提供以键值对方式管理、持久化与动态刷新系统运行配置的能力，支持默认值加载、类型化表单（TEXT/SWITCH/SELECT 等）、配置变更事件与基于 Caffeine 的缓存。
+- 内置 **系统配置（JMicroConfig）能力**（可选，默认关闭，见下文），提供以键值对方式管理、持久化与动态刷新系统运行配置的能力，支持默认值加载、类型化表单（TEXT/SWITCH/SELECT 等）、配置变更事件与基于 Caffeine 的缓存。
 - 内置 **Flyway 扩展**（可选依赖，见下文），在校验失败时提供可选的自动清理能力，适合开发、测试环境的快速重建。
 - 内置 **OpenID Connect 服务器（Cas）能力**（可选，默认关闭，见下文），提供 JWKS、Well-known 配置与授权/令牌端点，复用 `micro-auth` 的 OIDC 基础能力（`com.jiangtj.micro.auth.oidc`）。
-- 内置 **图片上传能力**（合并自原 `micro-pic-upload-starter`，见下文），位于包 `com.jiangtj.micro.business.pic`，提供本地 / 阿里云 OSS / 华为云 OBS / MinIO / EasyImages 2.0 / RustFS 等多种上传方式，各服务商配置统一由系统配置（SystemConfig）提供。
+- 内置 **图片上传能力**（合并自原 `micro-pic-upload-starter`，见下文），位于包 `com.jiangtj.micro.business.pic`，提供本地 / 阿里云 OSS / 华为云 OBS / MinIO / EasyImages 2.0 / RustFS 等多种上传方式，各服务商配置统一由系统配置（JMicroConfig）提供。
 
 ## 使用方法
 
@@ -37,11 +37,11 @@ jmicro 的业务能力聚合模块，用于承载通用的业务侧自动配置�
 
 > 建议配合 `micro-dependencies` BOM 使用，省略版本号（见[根 README](../README.md)）。
 
-### 系统配置 SystemConfig（可选）
+### 系统配置 JMicroConfig（可选）
 
-系统配置能力位于包 `com.jiangtj.micro.business.config`，**默认不开启**，需显式配置 `jmicro.config.enabled=true` 才生效。它通过 `SystemConfigService` 集中管理配置项，支持从 `SystemConfigLoader` 加载默认值、通过 `SystemConfigSaver` 持久化覆盖值，并在变更时发布 `SystemConfigUpdateEvent` / `SystemConfigRefreshEvent` 事件。
+系统配置能力位于包 `com.jiangtj.micro.business.config`，**默认不开启**，需显式配置 `jmicro.config.enabled=true` 才生效。它通过 `JMicroConfigService` 集中管理配置项，支持从 `JMicroConfigLoader` 加载默认值、通过 `JMicroConfigSaver` 持久化覆盖值，并在变更时发布 `JMicroConfigUpdateEvent` / `JMicroConfigRefreshEvent` 事件。
 
-默认实现提供了 `InMemorySystemConfigSaver`（基于 `ConcurrentHashMap` 的内存存储），并通过 `@ConditionalOnMissingBean` 注册，使用者可自定义 `SystemConfigSaver` Bean 接入数据库等持久化方案。
+默认实现提供了 `InMemoryJMicroConfigSaver`（基于 `ConcurrentHashMap` 的内存存储），并通过 `@ConditionalOnMissingBean` 注册，使用者可自定义 `JMicroConfigSaver` Bean 接入数据库等持久化方案。
 
 #### 配置属性
 
@@ -68,9 +68,9 @@ jmicro:
 
 #### 工作机制
 
-- 启动时 `SystemConfigService` 收集所有 `SystemConfigLoader` 提供的 `SystemItemInfo` 作为默认配置，再应用 `jmicro.config.kv` 中的覆盖值。
-- 取值：`getValue(key)` / `isTrue(key)` 优先读取 `SystemConfigSaver` 中的覆盖值，未命中则回退到默认值；结果经 Caffeine 缓存加速，可通过 `refreshConfig()` 主动失效缓存。
-- 写值：`updateConfig(key, value)` 会做值格式校验（`valueFormatter`），保存到 `SystemConfigSaver` 并发布 `SystemConfigUpdateEvent`；`deleteConfig(key)` 删除覆盖值并回退默认值，同时发布事件。
+- 启动时 `JMicroConfigService` 收集所有 `JMicroConfigLoader` 提供的 `SystemItemInfo` 作为默认配置，再应用 `jmicro.config.kv` 中的覆盖值。
+- 取值：`getValue(key)` / `isTrue(key)` 优先读取 `JMicroConfigSaver` 中的覆盖值，未命中则回退到默认值；结果经 Caffeine 缓存加速，可通过 `refreshConfig()` 主动失效缓存。
+- 写值：`updateConfig(key, value)` 会做值格式校验（`valueFormatter`），保存到 `JMicroConfigSaver` 并发布 `JMicroConfigUpdateEvent`；`deleteConfig(key)` 删除覆盖值并回退默认值，同时发布事件。
 - `getAllConfig()` 返回排序后的配置视图（按分组 `group.order` 与 `order`），并对 `secret=true` 的项做脱敏（`******`），对带 `formatter` 的项生成 `formatedValue`。
 - **bcrypt 支持（通过 formatter 实现）**：使用 `BCryptUtils.encodeFormatter` 写入明文时若非 bcrypt 哈希则哈希后持久化，已是哈希则透传，避免二次哈希。读取校验明文可用 `BCryptUtils.matches(raw, stored)`。（`BCryptUtils` 位于 `micro-auth`，包 `com.jiangtj.micro.auth`）
 - `getConfigByTag(tag)` 可按标签筛选配置项。
@@ -80,7 +80,7 @@ jmicro:
 `SystemItemType.JSON` 用于表达对象、集合、`Map` 等嵌套结构。持久化仍是单个 `key -> String`，值为 JSON 文本；写入时会校验并规范化成紧凑单行，因此可以直接写在 `jmicro.config.kv.*` 中。
 
 ```kotlin
-class MyConfigLoader : SystemConfigLoader {
+class MyConfigLoader : JMicroConfigLoader {
     override fun load() = listOf(
         SystemItemInfo(
             key = "my.site.dirs",
@@ -107,7 +107,7 @@ class MyConfigLoader : SystemConfigLoader {
 | `getJson(key)` | 返回 JSON 树，供接口层直接透传 |
 | `getConfigField(key, "a.b")` | 按路径读取子字段，支持 `a.b` 与 JSON Pointer `/a/b` |
 
-写入（字段级，底层是读取-修改-写回整项；多实例部署需由 `SystemConfigSaver` 提供版本号/锁来避免并发覆盖）：
+写入（字段级，底层是读取-修改-写回整项；多实例部署需由 `JMicroConfigSaver` 提供版本号/锁来避免并发覆盖）：
 
 | 方法 | 说明 |
 | --- | --- |
@@ -121,9 +121,9 @@ class MyConfigLoader : SystemConfigLoader {
 
 #### 扩展指南
 
-- 实现 `SystemConfigLoader` 并注册为 Bean，可在启动时贡献一组默认配置项（含名称、分组、类型、表单渲染信息等）。
-- 实现 `SystemConfigSaver` 并注册为 Bean（覆盖默认的内存实现），可将覆盖值持久化到数据库、配置中心等。
-- 监听 `SystemConfigUpdateEvent` / `SystemConfigRefreshEvent` 可感知配置变化并做相应处理。
+- 实现 `JMicroConfigLoader` 并注册为 Bean，可在启动时贡献一组默认配置项（含名称、分组、类型、表单渲染信息等）。
+- 实现 `JMicroConfigSaver` 并注册为 Bean（覆盖默认的内存实现），可将覆盖值持久化到数据库、配置中心等。
+- 监听 `JMicroConfigUpdateEvent` / `JMicroConfigRefreshEvent` 可感知配置变化并做相应处理。
 
 ### Flyway 扩展（可选）
 
@@ -283,11 +283,11 @@ jmicro.config.kv.jmicro.pic.upload.dirs={"target-name":{"path":"/common","provid
 
 ```kotlin
 // 运行期修改（立即生效，无需重启）
-systemConfigService.updateConfig("jmicro.pic.upload.provider", "local")
-systemConfigService.updateMapEntry("jmicro.pic.upload.dirs", "avatar", mapOf("path" to "/avatar"))
+jmicroConfigService.updateConfig("jmicro.pic.upload.provider", "local")
+jmicroConfigService.updateMapEntry("jmicro.pic.upload.dirs", "avatar", mapOf("path" to "/avatar"))
 ```
 
-各服务商（`local` / `ali` / `hw` / `minio` / `easyimages` / `rustfs`）的配置项统一由**系统配置（SystemConfig）**提供，使用前需开启 `jmicro.config.enabled=true`；未开启时对应服务商的上传服务不会注册。配置项定义在各自的 `*ConfigItem` 枚举中（`systemConfigService.getValue(key)` 读取），可通过 `jmicro.config.kv.*` 提供值，也可在运行期通过 `SystemConfigService.updateConfig(key, value)` 动态修改（上传时实时读取）。各服务商并可能需要引入对应 SDK：
+各服务商（`local` / `ali` / `hw` / `minio` / `easyimages` / `rustfs`）的配置项统一由**系统配置（JMicroConfig）**提供，使用前需开启 `jmicro.config.enabled=true`；未开启时对应服务商的上传服务不会注册。配置项定义在各自的 `*ConfigItem` 枚举中（`jmicroConfigService.getValue(key)` 读取），可通过 `jmicro.config.kv.*` 提供值，也可在运行期通过 `JMicroConfigService.updateConfig(key, value)` 动态修改（上传时实时读取）。各服务商并可能需要引入对应 SDK：
 
 | Provider | 配置来源 | 说明 |
 | --- | --- | --- |
@@ -330,7 +330,7 @@ jmicro.config.kv.minio.is-allow-get-object=false
 </dependency>
 ```
 
-阿里云 OSS 的配置项由**系统配置（SystemConfig）**提供，需先开启 `jmicro.config.enabled=true`；未开启时不会注册 `ali` 上传服务。配置项定义见 `AliOSSConfigItem`，可通过配置文件 kv 提供默认值，也可在运行期通过 `SystemConfigService.updateConfig(key, value)` 动态修改（每次上传时读取最新配置）：
+阿里云 OSS 的配置项由**系统配置（JMicroConfig）**提供，需先开启 `jmicro.config.enabled=true`；未开启时不会注册 `ali` 上传服务。配置项定义见 `AliOSSConfigItem`，可通过配置文件 kv 提供默认值，也可在运行期通过 `JMicroConfigService.updateConfig(key, value)` 动态修改（每次上传时读取最新配置）：
 
 ```properties
 # 开启系统配置（阿里云 OSS 配置项的载体）
@@ -444,6 +444,6 @@ public class UploadController {
 - 可选能力使用 `compileOnly` + `runtimeOnly` 声明依赖，避免强制传递给使用者
 - 当前已注册能力的子包：
   - `flyway`：Flyway 自动清理扩展（`MicroFlywayAutoConfiguration`）
-  - `config`：系统配置能力（`SystemConfigAutoConfiguration`）
+  - `config`：系统配置能力（`JMicroConfigAutoConfiguration`）
   - `cas`：OpenID Connect 服务器能力（`OidcServerAutoConfiguration`、`OidcServerServletAutoConfiguration`）
   - `pic`：图片上传能力（`PicUploadAutoConfiguration` 及 `ali` / `hw` / `minio` / `easyimages` / `local` 子包）

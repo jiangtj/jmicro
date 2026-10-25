@@ -8,7 +8,7 @@ import java.util.Map;
 
 @Data
 @ConfigurationProperties(prefix = "jmicro.config")
-public class SystemConfigProperties {
+public class JMicroConfigProperties {
     private Boolean enabled = false;
     private String filePath = "upload";
     private Map<String, String> kv = new HashMap<>();

@@ -1,6 +1,6 @@
 package com.jiangtj.micro.business.pic.upload.hw
 
-import com.jiangtj.micro.business.config.SystemConfigService
+import com.jiangtj.micro.business.config.JMicroConfigService
 import com.jiangtj.micro.business.pic.upload.PicUploadProperties
 import com.jiangtj.micro.business.pic.upload.PicUploadProvider
 import com.jiangtj.micro.business.pic.upload.PicUploadResult
@@ -16,14 +16,14 @@ import java.io.InputStream
 
 @PicUploadType("hw")
 class ObsService(
-    private val systemConfigService: SystemConfigService,
+    private val jmicroConfigService: JMicroConfigService,
 ) : PicUploadProvider {
 
     override fun upload(dir: PicUploadProperties.Dir, file: MultipartFile): PicUploadResult {
         val name = PicUploadUtils.generateNewFileName(file)
         val url = try {
             file.inputStream.use { input ->
-                putObject(ObsSettings.from(systemConfigService), dir.resolve(name), input)
+                putObject(ObsSettings.from(jmicroConfigService), dir.resolve(name), input)
             }
         } catch (e: IOException) {
             log.error("获取图片失败", e)

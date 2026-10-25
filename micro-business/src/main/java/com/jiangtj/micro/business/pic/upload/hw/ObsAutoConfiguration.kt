@@ -1,7 +1,7 @@
 package com.jiangtj.micro.business.pic.upload.hw
 
-import com.jiangtj.micro.business.config.SystemConfigAutoConfiguration
-import com.jiangtj.micro.business.config.SystemConfigService
+import com.jiangtj.micro.business.config.JMicroConfigAutoConfiguration
+import com.jiangtj.micro.business.config.JMicroConfigService
 import com.obs.services.ObsClient
 import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
@@ -12,9 +12,9 @@ import org.springframework.context.annotation.Bean
 /**
  * 华为云 OBS 自动配置，配置项来自系统配置（需开启 `jmicro.config.enabled=true`）
  */
-@AutoConfiguration(after = [SystemConfigAutoConfiguration::class])
+@AutoConfiguration(after = [JMicroConfigAutoConfiguration::class])
 @ConditionalOnClass(ObsClient::class)
-@ConditionalOnBean(SystemConfigService::class)
+@ConditionalOnBean(JMicroConfigService::class)
 class ObsAutoConfiguration {
 
     /**
@@ -28,7 +28,7 @@ class ObsAutoConfiguration {
      * 注册 hwcloud obs 服务
      */
     @Bean
-    fun obsService(systemConfigService: SystemConfigService): ObsService {
-        return ObsService(systemConfigService)
+    fun obsService(jmicroConfigService: JMicroConfigService): ObsService {
+        return ObsService(jmicroConfigService)
     }
 }

@@ -1,4 +1,4 @@
--- 系统配置项持久化表：保存 SystemConfigService 写入的覆盖值（未配置时回退到默认值）
+-- 系统配置项持久化表：保存 JMicroConfigService 写入的覆盖值（未配置时回退到默认值）
 -- 兼容 H2（MODE=MySQL）与 MySQL 8
 
 CREATE TABLE sys_config (

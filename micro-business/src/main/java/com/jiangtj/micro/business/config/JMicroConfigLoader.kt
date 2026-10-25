@@ -1,6 +1,6 @@
 package com.jiangtj.micro.business.config
 
-interface SystemConfigLoader {
+interface JMicroConfigLoader {
 
     fun load(): List<SystemItemInfo>
 

@@ -1,11 +1,11 @@
 package com.jiangtj.micro.business.pic.upload.minio
 
-import com.jiangtj.micro.business.config.SystemConfigLoader
+import com.jiangtj.micro.business.config.JMicroConfigLoader
 import com.jiangtj.micro.business.config.SystemGroup
 import com.jiangtj.micro.business.config.SystemItemInfo
 import com.jiangtj.micro.business.config.SystemItemType
 import com.jiangtj.micro.business.pic.upload.PicUploadConfigItem
-import com.jiangtj.micro.business.pic.upload.toSystemConfigItems
+import com.jiangtj.micro.business.pic.upload.toJMicroConfigItems
 
 /**
  * MinIO 配置项定义
@@ -42,7 +42,7 @@ const val MINIO_TAG = "minio"
 /**
  * 将 MinIO 配置注册为系统配置项默认值
  */
-class MinIOConfigLoader : SystemConfigLoader {
+class MinIOConfigLoader : JMicroConfigLoader {
 
-    override fun load(): List<SystemItemInfo> = MinIOConfigItem.entries.toSystemConfigItems(minioGroup, MINIO_TAG)
+    override fun load(): List<SystemItemInfo> = MinIOConfigItem.entries.toJMicroConfigItems(minioGroup, MINIO_TAG)
 }

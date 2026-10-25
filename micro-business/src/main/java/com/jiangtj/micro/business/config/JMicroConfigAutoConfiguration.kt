@@ -8,23 +8,23 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.annotation.Bean
 
 @AutoConfiguration
-@EnableConfigurationProperties(SystemConfigProperties::class)
+@EnableConfigurationProperties(JMicroConfigProperties::class)
 @ConditionalOnBooleanProperty(prefix = "jmicro.config", name = ["enabled"], havingValue = true)
-class SystemConfigAutoConfiguration {
+class JMicroConfigAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    fun systemConfigSaver(): SystemConfigSaver {
-        return InMemorySystemConfigSaver()
+    fun jmicroConfigSaver(): JMicroConfigSaver {
+        return InMemoryJMicroConfigSaver()
     }
 
     @Bean
-    fun systemConfigService(
-        loaders: List<SystemConfigLoader>,
+    fun jmicroConfigService(
+        loaders: List<JMicroConfigLoader>,
         applicationEventPublisher: ApplicationEventPublisher,
-        systemConfigProperties: SystemConfigProperties,
-        systemConfigSaver: SystemConfigSaver,
-    ): SystemConfigService {
-        return SystemConfigService(loaders, applicationEventPublisher, systemConfigProperties, systemConfigSaver)
+        jmicroConfigProperties: JMicroConfigProperties,
+        jmicroConfigSaver: JMicroConfigSaver,
+    ): JMicroConfigService {
+        return JMicroConfigService(loaders, applicationEventPublisher, jmicroConfigProperties, jmicroConfigSaver)
     }
 }

@@ -1,6 +1,6 @@
 package com.jiangtj.micro.business.pic.upload
 
-import com.jiangtj.micro.business.config.SystemConfigLoader
+import com.jiangtj.micro.business.config.JMicroConfigLoader
 import com.jiangtj.micro.business.config.SystemGroup
 import com.jiangtj.micro.business.config.SystemItemInfo
 import com.jiangtj.micro.business.config.SystemItemType
@@ -58,7 +58,7 @@ enum class PicUploadBaseConfigItem(
  *
  * 运行期读取见 [PicUploadService]。
  */
-class PicUploadConfigLoader : SystemConfigLoader {
+class PicUploadConfigLoader : JMicroConfigLoader {
 
     private val dirsType = JsonUtils.jsonMapper.typeFactory
         .constructMapType(LinkedHashMap::class.java, String::class.java, PicUploadProperties.Dir::class.java)

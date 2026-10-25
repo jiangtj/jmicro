@@ -1,6 +1,6 @@
 package com.jiangtj.micro.business.pic.upload.minio
 
-import com.jiangtj.micro.business.config.SystemConfigService
+import com.jiangtj.micro.business.config.JMicroConfigService
 import com.jiangtj.micro.business.pic.upload.PicUploadProperties
 import com.jiangtj.micro.business.pic.upload.PicUploadProvider
 import com.jiangtj.micro.business.pic.upload.PicUploadResult
@@ -20,13 +20,13 @@ import java.net.URI
 
 @PicUploadType("minio")
 class MinIOService(
-    private val systemConfigService: SystemConfigService,
+    private val jmicroConfigService: JMicroConfigService,
 ) : PicUploadProvider {
 
     private var isSetBucketPolicy = true
 
     override fun upload(dir: PicUploadProperties.Dir, file: MultipartFile): PicUploadResult {
-        val settings = MinIOSettings.from(systemConfigService)
+        val settings = MinIOSettings.from(jmicroConfigService)
         try {
             file.inputStream.use { inputStream ->
                 val name = PicUploadUtils.generateNewFileName(file)

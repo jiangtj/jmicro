@@ -1,6 +1,6 @@
 package com.jiangtj.micro.business.pic.upload.easyimages
 
-import com.jiangtj.micro.business.config.SystemConfigService
+import com.jiangtj.micro.business.config.JMicroConfigService
 
 /**
  * EasyImages 运行时配置，由系统配置项 [EasyImagesConfigItem] 解析而来
@@ -18,9 +18,9 @@ data class EasyImagesSettings(
 
     companion object {
 
-        fun from(systemConfigService: SystemConfigService): EasyImagesSettings = EasyImagesSettings(
-            url = systemConfigService.getValue(EasyImagesConfigItem.URL.key),
-            token = systemConfigService.getValue(EasyImagesConfigItem.TOKEN.key),
+        fun from(jmicroConfigService: JMicroConfigService): EasyImagesSettings = EasyImagesSettings(
+            url = jmicroConfigService.getValue(EasyImagesConfigItem.URL.key),
+            token = jmicroConfigService.getValue(EasyImagesConfigItem.TOKEN.key),
         )
     }
 }

@@ -2,7 +2,7 @@ package com.jiangtj.micro.business.config
 
 import java.util.concurrent.ConcurrentHashMap
 
-class InMemorySystemConfigSaver : SystemConfigSaver {
+class InMemoryJMicroConfigSaver : JMicroConfigSaver {
 
     private val store: MutableMap<String, String> = ConcurrentHashMap()
 

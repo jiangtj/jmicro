@@ -1,10 +1,10 @@
 package com.jiangtj.micro.business.pic.upload.hw
 
-import com.jiangtj.micro.business.config.SystemConfigLoader
+import com.jiangtj.micro.business.config.JMicroConfigLoader
 import com.jiangtj.micro.business.config.SystemGroup
 import com.jiangtj.micro.business.config.SystemItemInfo
 import com.jiangtj.micro.business.pic.upload.PicUploadConfigItem
-import com.jiangtj.micro.business.pic.upload.toSystemConfigItems
+import com.jiangtj.micro.business.pic.upload.toJMicroConfigItems
 
 /**
  * 华为云 OBS 配置项定义
@@ -34,7 +34,7 @@ const val OBS_TAG = "hw-obs"
 /**
  * 将华为云 OBS 配置注册为系统配置项默认值
  */
-class ObsConfigLoader : SystemConfigLoader {
+class ObsConfigLoader : JMicroConfigLoader {
 
-    override fun load(): List<SystemItemInfo> = ObsConfigItem.entries.toSystemConfigItems(obsGroup, OBS_TAG)
+    override fun load(): List<SystemItemInfo> = ObsConfigItem.entries.toJMicroConfigItems(obsGroup, OBS_TAG)
 }

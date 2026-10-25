@@ -1,10 +1,10 @@
 package com.jiangtj.micro.business.pic.upload.easyimages
 
-import com.jiangtj.micro.business.config.SystemConfigLoader
+import com.jiangtj.micro.business.config.JMicroConfigLoader
 import com.jiangtj.micro.business.config.SystemGroup
 import com.jiangtj.micro.business.config.SystemItemInfo
 import com.jiangtj.micro.business.pic.upload.PicUploadConfigItem
-import com.jiangtj.micro.business.pic.upload.toSystemConfigItems
+import com.jiangtj.micro.business.pic.upload.toJMicroConfigItems
 
 /**
  * EasyImages 配置项定义
@@ -32,8 +32,8 @@ const val EASY_IMAGES_TAG = "easyimages"
 /**
  * 将 EasyImages 配置注册为系统配置项默认值
  */
-class EasyImagesConfigLoader : SystemConfigLoader {
+class EasyImagesConfigLoader : JMicroConfigLoader {
 
     override fun load(): List<SystemItemInfo> =
-        EasyImagesConfigItem.entries.toSystemConfigItems(easyImagesGroup, EASY_IMAGES_TAG)
+        EasyImagesConfigItem.entries.toJMicroConfigItems(easyImagesGroup, EASY_IMAGES_TAG)
 }

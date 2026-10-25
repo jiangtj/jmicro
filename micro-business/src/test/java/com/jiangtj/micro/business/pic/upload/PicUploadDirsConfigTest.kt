@@ -1,9 +1,9 @@
 package com.jiangtj.micro.business.pic.upload
 
-import com.jiangtj.micro.business.config.SystemConfigLoader
-import com.jiangtj.micro.business.config.SystemConfigProperties
-import com.jiangtj.micro.business.config.SystemConfigSaver
-import com.jiangtj.micro.business.config.SystemConfigService
+import com.jiangtj.micro.business.config.JMicroConfigLoader
+import com.jiangtj.micro.business.config.JMicroConfigProperties
+import com.jiangtj.micro.business.config.JMicroConfigSaver
+import com.jiangtj.micro.business.config.JMicroConfigService
 import com.jiangtj.micro.business.config.SystemItemInfo
 import com.jiangtj.micro.business.config.SystemItemType
 import com.jiangtj.micro.business.pic.upload.ex.PicUploadCheckException
@@ -26,15 +26,15 @@ class PicUploadDirsConfigTest {
             .constructMapType(LinkedHashMap::class.java, String::class.java, PicUploadProperties.Dir::class.java),
     )
 
-    private fun buildService(vararg items: SystemItemInfo): SystemConfigService {
-        val loader = object : SystemConfigLoader {
+    private fun buildService(vararg items: SystemItemInfo): JMicroConfigService {
+        val loader = object : JMicroConfigLoader {
             override fun load(): List<SystemItemInfo> = items.toList()
         }
-        return SystemConfigService(
+        return JMicroConfigService(
             listOf(loader),
             mock<ApplicationEventPublisher>(),
-            SystemConfigProperties(),
-            mock<SystemConfigSaver>(),
+            JMicroConfigProperties(),
+            mock<JMicroConfigSaver>(),
         )
     }
 

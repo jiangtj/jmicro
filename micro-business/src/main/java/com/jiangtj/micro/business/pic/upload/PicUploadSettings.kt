@@ -1,6 +1,6 @@
 package com.jiangtj.micro.business.pic.upload
 
-import com.jiangtj.micro.business.config.SystemConfigService
+import com.jiangtj.micro.business.config.JMicroConfigService
 import org.springframework.util.StringUtils
 import org.springframework.util.unit.DataSize
 
@@ -27,14 +27,14 @@ data class PicUploadSettings(
         /**
          * 从系统配置读取，未配置时回退到配置项默认值
          */
-        fun from(systemConfigService: SystemConfigService): PicUploadSettings = PicUploadSettings(
-            provider = systemConfigService.getValue(PicUploadBaseConfigItem.PROVIDER.key)
+        fun from(jmicroConfigService: JMicroConfigService): PicUploadSettings = PicUploadSettings(
+            provider = jmicroConfigService.getValue(PicUploadBaseConfigItem.PROVIDER.key)
                 .ifBlank { PicUploadBaseConfigItem.PROVIDER.defaultValue },
             allowedExtensions = parseExtensions(
-                systemConfigService.getValue(PicUploadBaseConfigItem.ALLOWED_EXTENSIONS.key)
+                jmicroConfigService.getValue(PicUploadBaseConfigItem.ALLOWED_EXTENSIONS.key)
             ),
             maxFileSize = parseMaxFileSize(
-                systemConfigService.getValue(PicUploadBaseConfigItem.MAX_FILE_SIZE.key)
+                jmicroConfigService.getValue(PicUploadBaseConfigItem.MAX_FILE_SIZE.key)
             ),
         )
 

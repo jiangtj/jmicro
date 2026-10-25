@@ -1,9 +1,9 @@
 package com.jiangtj.micro.business.pic.upload
 
-import com.jiangtj.micro.business.config.SystemConfigLoader
-import com.jiangtj.micro.business.config.SystemConfigProperties
-import com.jiangtj.micro.business.config.SystemConfigSaver
-import com.jiangtj.micro.business.config.SystemConfigService
+import com.jiangtj.micro.business.config.JMicroConfigLoader
+import com.jiangtj.micro.business.config.JMicroConfigProperties
+import com.jiangtj.micro.business.config.JMicroConfigSaver
+import com.jiangtj.micro.business.config.JMicroConfigService
 import com.jiangtj.micro.business.config.SystemItemInfo
 import com.jiangtj.micro.business.config.SystemItemType
 import com.jiangtj.micro.business.pic.upload.ex.PicUploadCheckException
@@ -28,15 +28,15 @@ class LocalPicUploadServiceTest {
     @TempDir
     lateinit var tempDir: Path
 
-    private lateinit var systemConfigService: SystemConfigService
+    private lateinit var jmicroConfigService: JMicroConfigService
     private lateinit var picUploadService: PicUploadService
 
     @BeforeEach
     fun setUp() {
-        systemConfigService = SystemConfigService(
+        jmicroConfigService = JMicroConfigService(
             listOf(
                 PicUploadConfigLoader(),
-                object : SystemConfigLoader {
+                object : JMicroConfigLoader {
                     override fun load(): List<SystemItemInfo> = listOf(
                         SystemItemInfo(
                             key = LocalPicUploadConfigItem.UPLOAD_PATH.key,
@@ -63,11 +63,11 @@ class LocalPicUploadServiceTest {
                 },
             ),
             mock<ApplicationEventPublisher>(),
-            SystemConfigProperties(),
-            mock<SystemConfigSaver>(),
+            JMicroConfigProperties(),
+            mock<JMicroConfigSaver>(),
         )
 
-        picUploadService = PicUploadService(listOf(LocalPicUploadService(systemConfigService)), systemConfigService)
+        picUploadService = PicUploadService(listOf(LocalPicUploadService(jmicroConfigService)), jmicroConfigService)
     }
 
     @Test
@@ -96,7 +96,7 @@ class LocalPicUploadServiceTest {
     @Test
     fun `test upload exceed max size`() {
         // 运行期修改默认最大文件大小为 1kb
-        systemConfigService.updateConfig(PicUploadBaseConfigItem.MAX_FILE_SIZE.key, "1KB")
+        jmicroConfigService.updateConfig(PicUploadBaseConfigItem.MAX_FILE_SIZE.key, "1KB")
 
         val file = MockMultipartFile("test-image", "test-image.jpg", "image/jpeg", ByteArray(2000))
 

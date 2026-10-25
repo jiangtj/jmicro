@@ -1,15 +1,15 @@
 package com.jiangtj.micro.business.pic.upload.ali
 
-import com.jiangtj.micro.business.config.SystemConfigLoader
+import com.jiangtj.micro.business.config.JMicroConfigLoader
 import com.jiangtj.micro.business.config.SystemGroup
 import com.jiangtj.micro.business.config.SystemItemInfo
 import com.jiangtj.micro.business.pic.upload.PicUploadConfigItem
-import com.jiangtj.micro.business.pic.upload.toSystemConfigItems
+import com.jiangtj.micro.business.pic.upload.toJMicroConfigItems
 
 /**
  * 阿里云 OSS 配置项定义
  *
- * [key] 为系统配置项的键（即原 `ali.oss.*` 属性名），取值需使用 `systemConfigService.getValue(key.key)`。
+ * [key] 为系统配置项的键（即原 `ali.oss.*` 属性名），取值需使用 `jmicroConfigService.getValue(key.key)`。
  */
 enum class AliOSSConfigItem(
     override val key: String,
@@ -31,14 +31,14 @@ enum class AliOSSConfigItem(
 val aliOSSGroup = SystemGroup("阿里云 OSS", 100)
 
 /**
- * 阿里云 OSS 配置项标签，可通过 `SystemConfigService.getConfigByTag(ALI_OSS_TAG)` 过滤
+ * 阿里云 OSS 配置项标签，可通过 `JMicroConfigService.getConfigByTag(ALI_OSS_TAG)` 过滤
  */
 const val ALI_OSS_TAG = "ali-oss"
 
 /**
  * 将阿里云 OSS 配置注册为系统配置项默认值
  */
-class AliOSSConfigLoader : SystemConfigLoader {
+class AliOSSConfigLoader : JMicroConfigLoader {
 
-    override fun load(): List<SystemItemInfo> = AliOSSConfigItem.entries.toSystemConfigItems(aliOSSGroup, ALI_OSS_TAG)
+    override fun load(): List<SystemItemInfo> = AliOSSConfigItem.entries.toJMicroConfigItems(aliOSSGroup, ALI_OSS_TAG)
 }

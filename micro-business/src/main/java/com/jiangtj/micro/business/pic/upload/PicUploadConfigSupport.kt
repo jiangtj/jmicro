@@ -38,7 +38,7 @@ interface PicUploadConfigItem {
 /**
  * 将配置项描述转换为系统配置项默认值
  */
-fun List<PicUploadConfigItem>.toSystemConfigItems(group: SystemGroup, tag: String): List<SystemItemInfo> =
+fun List<PicUploadConfigItem>.toJMicroConfigItems(group: SystemGroup, tag: String): List<SystemItemInfo> =
     mapIndexed { index, item ->
         SystemItemInfo(
             key = item.key,

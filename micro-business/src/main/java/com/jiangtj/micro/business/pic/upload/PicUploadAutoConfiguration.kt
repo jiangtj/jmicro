@@ -1,7 +1,7 @@
 package com.jiangtj.micro.business.pic.upload
 
-import com.jiangtj.micro.business.config.SystemConfigAutoConfiguration
-import com.jiangtj.micro.business.config.SystemConfigService
+import com.jiangtj.micro.business.config.JMicroConfigAutoConfiguration
+import com.jiangtj.micro.business.config.JMicroConfigService
 import org.springframework.beans.factory.ObjectProvider
 import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty
@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Bean
  *
  * 可通过 `jmicro.pic.upload.enable=false` 关闭图片上传能力。
  */
-@AutoConfiguration(after = [SystemConfigAutoConfiguration::class])
+@AutoConfiguration(after = [JMicroConfigAutoConfiguration::class])
 @EnableConfigurationProperties(PicUploadProperties::class)
 @ConditionalOnBooleanProperty(prefix = "jmicro.pic.upload", name = ["enable"], havingValue = true, matchIfMissing = true)
 class PicUploadAutoConfiguration {
@@ -36,6 +36,6 @@ class PicUploadAutoConfiguration {
     @Bean
     fun picUploadService(
         providers: List<PicUploadProvider>,
-        systemConfigServiceProvider: ObjectProvider<SystemConfigService>,
-    ): PicUploadService = PicUploadService(providers, systemConfigServiceProvider.getIfAvailable())
+        jmicroConfigServiceProvider: ObjectProvider<JMicroConfigService>,
+    ): PicUploadService = PicUploadService(providers, jmicroConfigServiceProvider.getIfAvailable())
 }

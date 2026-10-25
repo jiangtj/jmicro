@@ -11,18 +11,18 @@ import tools.jackson.databind.JsonNode
 /**
  * 系统配置服务
  *
- * 配置值统一以 `String` 形式持久化到 [SystemConfigSaver]，因此对象、集合、`Map`
+ * 配置值统一以 `String` 形式持久化到 [JMicroConfigSaver]，因此对象、集合、`Map`
  * 等嵌套结构使用 [SystemItemType.JSON] 类型，值为 JSON 文本。
  *
  * 注意：[updateConfigField]、[updateMapEntry]、[updateListElement] 等字段级写入是
- * 读-改-写语义，多实例部署下存在并发覆盖风险，需要由 `SystemConfigSaver` 提供
+ * 读-改-写语义，多实例部署下存在并发覆盖风险，需要由 `JMicroConfigSaver` 提供
  * 版本号或锁来保证一致性。
  */
-class SystemConfigService(
-    loaders: List<SystemConfigLoader>,
+class JMicroConfigService(
+    loaders: List<JMicroConfigLoader>,
     private val applicationEventPublisher: ApplicationEventPublisher,
-    private val systemConfigProperties: SystemConfigProperties,
-    private val systemConfigSaver: SystemConfigSaver,
+    private val jmicroConfigProperties: JMicroConfigProperties,
+    private val jmicroConfigSaver: JMicroConfigSaver,
 ) {
 
     private val defaultConfig = mutableMapOf<String, SystemItemInfo>()
@@ -34,8 +34,8 @@ class SystemConfigService(
             loader.load().forEach {
                 defaultConfig[it.key.trimKey()] = it
             }
-            if (systemConfigProperties.enabled) {
-                systemConfigProperties.kv.forEach { (k, v) ->
+            if (jmicroConfigProperties.enabled) {
+                jmicroConfigProperties.kv.forEach { (k, v) ->
                     val item = defaultConfig[k.trimKey()]
                     if (item != null) {
                         item.value = v
@@ -51,7 +51,7 @@ class SystemConfigService(
 
     fun getValue(key: String): String {
         return cache.get(key) {
-            val config = systemConfigSaver.fetchOneByConfigKey(key)
+            val config = jmicroConfigSaver.fetchOneByConfigKey(key)
             if (config != null) {
                 return@get config
             } else {
@@ -206,7 +206,7 @@ class SystemConfigService(
         defaultConfig.forEach { (k, v) ->
             map[k] = v.copyTo(SystemItemInfo())
         }
-        systemConfigSaver.findAll().forEach {
+        jmicroConfigSaver.findAll().forEach {
             val c = map[it.first.trimKey()]
             if (c != null) {
                 c.value = it.second
@@ -260,22 +260,22 @@ class SystemConfigService(
         if (item.secretPaths.isNotEmpty()) {
             newV = restoreMaskedValue(item, oldV, newV)
         }
-        systemConfigSaver.save(key, newV)
+        jmicroConfigSaver.save(key, newV)
         cache.put(key, newV)
-        applicationEventPublisher.publishEvent(SystemConfigUpdateEvent(key, oldV, newV))
+        applicationEventPublisher.publishEvent(JMicroConfigUpdateEvent(key, oldV, newV))
     }
 
     fun deleteConfig(key: String) {
         val oldV = getValue(key)
-        systemConfigSaver.delete(key)
+        jmicroConfigSaver.delete(key)
         val newV = defaultConfig[key.trimKey()]?.value ?: ""
         cache.put(key, newV)
-        applicationEventPublisher.publishEvent(SystemConfigUpdateEvent(key, oldV, newV))
+        applicationEventPublisher.publishEvent(JMicroConfigUpdateEvent(key, oldV, newV))
     }
 
     fun refreshConfig() {
         cache.invalidateAll()
-        applicationEventPublisher.publishEvent(SystemConfigRefreshEvent())
+        applicationEventPublisher.publishEvent(JMicroConfigRefreshEvent())
     }
 
     fun getConfigByTag(tag: String): List<SystemItem> {

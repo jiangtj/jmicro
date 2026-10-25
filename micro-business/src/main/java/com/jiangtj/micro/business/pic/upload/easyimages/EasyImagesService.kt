@@ -1,6 +1,6 @@
 package com.jiangtj.micro.business.pic.upload.easyimages
 
-import com.jiangtj.micro.business.config.SystemConfigService
+import com.jiangtj.micro.business.config.JMicroConfigService
 import com.jiangtj.micro.business.pic.upload.PicUploadProperties
 import com.jiangtj.micro.business.pic.upload.PicUploadProvider
 import com.jiangtj.micro.business.pic.upload.PicUploadResult
@@ -14,11 +14,11 @@ import org.springframework.web.multipart.MultipartFile
 
 @PicUploadType("easyimages")
 class EasyImagesService(
-    private val systemConfigService: SystemConfigService,
+    private val jmicroConfigService: JMicroConfigService,
 ) : PicUploadProvider {
 
     fun uploadImage(file: MultipartFile): EasyImagesResponse {
-        val settings = EasyImagesSettings.from(systemConfigService)
+        val settings = EasyImagesSettings.from(jmicroConfigService)
         val parts = LinkedMultiValueMap<String, Any>()
         parts.add("token", settings.token)
         parts.add("image", file.resource)

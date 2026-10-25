@@ -1,6 +1,6 @@
 package com.jiangtj.micro.business.pic.upload.local
 
-import com.jiangtj.micro.business.config.SystemConfigService
+import com.jiangtj.micro.business.config.JMicroConfigService
 import com.jiangtj.micro.business.pic.upload.PicUploadProperties
 import com.jiangtj.micro.business.pic.upload.PicUploadProvider
 import com.jiangtj.micro.business.pic.upload.PicUploadResult
@@ -19,12 +19,12 @@ import java.nio.file.Paths
  */
 @PicUploadType("local")
 class LocalPicUploadService(
-    private val systemConfigService: SystemConfigService,
+    private val jmicroConfigService: JMicroConfigService,
 ) : PicUploadProvider {
 
     override fun upload(dir: PicUploadProperties.Dir, file: MultipartFile): PicUploadResult {
         try {
-            val settings = LocalPicUploadSettings.from(systemConfigService)
+            val settings = LocalPicUploadSettings.from(jmicroConfigService)
 
             // 创建上传目录
             val uploadDir = Paths.get(settings.uploadPath).resolve(dir.path)

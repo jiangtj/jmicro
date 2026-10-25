@@ -1,6 +1,6 @@
 package com.jiangtj.micro.business.pic.upload.local
 
-import com.jiangtj.micro.business.config.SystemConfigService
+import com.jiangtj.micro.business.config.JMicroConfigService
 
 /**
  * 本地上传运行时配置，由系统配置项 [LocalPicUploadConfigItem] 解析而来
@@ -18,9 +18,9 @@ data class LocalPicUploadSettings(
 
     companion object {
 
-        fun from(systemConfigService: SystemConfigService): LocalPicUploadSettings = LocalPicUploadSettings(
-            uploadPath = systemConfigService.getValue(LocalPicUploadConfigItem.UPLOAD_PATH.key),
-            url = systemConfigService.getValue(LocalPicUploadConfigItem.URL.key),
+        fun from(jmicroConfigService: JMicroConfigService): LocalPicUploadSettings = LocalPicUploadSettings(
+            uploadPath = jmicroConfigService.getValue(LocalPicUploadConfigItem.UPLOAD_PATH.key),
+            url = jmicroConfigService.getValue(LocalPicUploadConfigItem.URL.key),
         )
     }
 }

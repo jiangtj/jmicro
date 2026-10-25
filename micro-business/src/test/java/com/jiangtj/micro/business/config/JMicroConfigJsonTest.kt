@@ -7,16 +7,16 @@ import org.junit.jupiter.api.Test
 import org.mockito.kotlin.*
 import java.lang.reflect.Type
 
-class SystemConfigJsonTest {
+class JMicroConfigJsonTest {
 
     data class Item(
         val path: String,
         val size: Long? = null,
     )
 
-    private lateinit var saver: SystemConfigSaver
+    private lateinit var saver: JMicroConfigSaver
     private lateinit var publisher: org.springframework.context.ApplicationEventPublisher
-    private lateinit var properties: SystemConfigProperties
+    private lateinit var properties: JMicroConfigProperties
 
     private val itemMapType: Type = JsonUtils.jsonMapper.typeFactory
         .constructMapType(LinkedHashMap::class.java, String::class.java, Item::class.java)
@@ -47,16 +47,16 @@ class SystemConfigJsonTest {
     fun setup() {
         saver = mock()
         publisher = mock()
-        properties = SystemConfigProperties()
+        properties = JMicroConfigProperties()
         whenever(saver.fetchOneByConfigKey(any())).thenReturn(null)
         whenever(saver.findAll()).thenReturn(emptyList())
     }
 
-    private fun buildService(vararg items: SystemItemInfo): SystemConfigService {
-        val loader = object : SystemConfigLoader {
+    private fun buildService(vararg items: SystemItemInfo): JMicroConfigService {
+        val loader = object : JMicroConfigLoader {
             override fun load(): List<SystemItemInfo> = items.toList()
         }
-        return SystemConfigService(listOf(loader), publisher, properties, saver)
+        return JMicroConfigService(listOf(loader), publisher, properties, saver)
     }
 
     // ---- 读取 ----

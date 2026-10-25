@@ -1,6 +1,6 @@
 package com.jiangtj.micro.business.pic.upload.rustfs
 
-import com.jiangtj.micro.business.config.SystemConfigService
+import com.jiangtj.micro.business.config.JMicroConfigService
 import com.jiangtj.micro.business.pic.upload.PicUploadProperties
 import com.jiangtj.micro.business.pic.upload.PicUploadProvider
 import com.jiangtj.micro.business.pic.upload.PicUploadResult
@@ -25,11 +25,11 @@ import java.net.URI
 
 @PicUploadType("rustfs")
 class RustFSService(
-    private val systemConfigService: SystemConfigService,
+    private val jmicroConfigService: JMicroConfigService,
 ) : PicUploadProvider {
 
     override fun upload(dir: PicUploadProperties.Dir, file: MultipartFile): PicUploadResult {
-        val settings = RustFSSettings.from(systemConfigService)
+        val settings = RustFSSettings.from(jmicroConfigService)
         if (!settings.enable) {
             throw PicUploadInternalException(
                 "RustFS 未启用，请在系统配置中开启 " + RustFSConfigItem.ENABLE.key,

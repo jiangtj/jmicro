@@ -1,6 +1,6 @@
 package com.jiangtj.micro.business.pic.upload
 
-import com.jiangtj.micro.business.config.SystemConfigService
+import com.jiangtj.micro.business.config.JMicroConfigService
 import com.jiangtj.micro.business.pic.upload.ex.PicUploadCheckException
 import com.jiangtj.micro.common.utils.FileNameUtils
 import com.jiangtj.micro.web.AnnotationUtils
@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile
  */
 class PicUploadService(
     providers: List<PicUploadProvider>,
-    private val systemConfigService: SystemConfigService?,
+    private val jmicroConfigService: JMicroConfigService?,
 ) {
 
     private val providers: Map<String, PicUploadProvider> = providers.associateBy { provider ->
@@ -90,13 +90,13 @@ class PicUploadService(
      * 目录映射来源：系统配置项 `jmicro.pic.upload.dirs`。
      */
     private fun resolveDirs(): Map<String, PicUploadProperties.Dir> =
-        systemConfigService?.getMap(PicUploadConfigLoader.KEY, PicUploadProperties.Dir::class.java) ?: emptyMap()
+        jmicroConfigService?.getMap(PicUploadConfigLoader.KEY, PicUploadProperties.Dir::class.java) ?: emptyMap()
 
     /**
      * 通用配置来源：系统配置项 [PicUploadBaseConfigItem]。
      */
     private fun resolveSettings(): PicUploadSettings {
-        val service = systemConfigService
+        val service = jmicroConfigService
             ?: throw PicUploadCheckException("未开启系统配置，请设置 jmicro.config.enabled=true")
         return PicUploadSettings.from(service)
     }

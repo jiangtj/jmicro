@@ -1,6 +1,6 @@
 package com.jiangtj.micro.demobackend.config
 
-import com.jiangtj.micro.business.config.SystemConfigSaver
+import com.jiangtj.micro.business.config.JMicroConfigSaver
 import com.jiangtj.micro.demobackend.jooq.tables.SysConfig
 import org.jooq.DSLContext
 import org.springframework.stereotype.Repository
@@ -9,13 +9,13 @@ import java.time.LocalDateTime
 /**
  * 基于 `sys_config` 表的系统配置持久化实现。
  *
- * 只保存被覆盖的配置项，未写入的配置项由 `SystemConfigLoader` 提供的默认值兜底；
+ * 只保存被覆盖的配置项，未写入的配置项由 `JMicroConfigLoader` 提供的默认值兜底；
  * 新增/更新使用 `ON DUPLICATE KEY UPDATE`（H2 MySQL 模式与 MySQL 8 均支持）。
  */
 @Repository
-class JooqSystemConfigSaver(
+class JooqJMicroConfigSaver(
     private val dsl: DSLContext,
-) : SystemConfigSaver {
+) : JMicroConfigSaver {
 
     override fun fetchOneByConfigKey(key: String): String? =
         dsl.select(SysConfig.SYS_CONFIG.CONFIG_VALUE)

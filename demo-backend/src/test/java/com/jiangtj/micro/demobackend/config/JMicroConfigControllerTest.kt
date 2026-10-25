@@ -20,7 +20,7 @@ import org.springframework.test.web.servlet.client.RestTestClient
 @SpringBootTest
 @AutoConfigureMockMvc
 @Import(JMicroRestTestClientMvcConfiguration::class)
-class SystemConfigControllerTest {
+class JMicroConfigControllerTest {
 
     @Autowired
     lateinit var client: RestTestClient

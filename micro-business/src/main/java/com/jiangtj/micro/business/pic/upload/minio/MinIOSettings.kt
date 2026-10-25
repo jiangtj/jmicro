@@ -1,6 +1,6 @@
 package com.jiangtj.micro.business.pic.upload.minio
 
-import com.jiangtj.micro.business.config.SystemConfigService
+import com.jiangtj.micro.business.config.JMicroConfigService
 
 /**
  * MinIO 运行时配置，由系统配置项 [MinIOConfigItem] 解析而来
@@ -15,12 +15,12 @@ data class MinIOSettings(
 
     companion object {
 
-        fun from(systemConfigService: SystemConfigService): MinIOSettings = MinIOSettings(
-            endpoint = systemConfigService.getValue(MinIOConfigItem.ENDPOINT.key),
-            accessKey = systemConfigService.getValue(MinIOConfigItem.ACCESS_KEY.key),
-            secretKey = systemConfigService.getValue(MinIOConfigItem.SECRET_KEY.key),
-            bucket = systemConfigService.getValue(MinIOConfigItem.BUCKET.key),
-            isAllowGetObject = systemConfigService.isTrue(MinIOConfigItem.IS_ALLOW_GET_OBJECT.key),
+        fun from(jmicroConfigService: JMicroConfigService): MinIOSettings = MinIOSettings(
+            endpoint = jmicroConfigService.getValue(MinIOConfigItem.ENDPOINT.key),
+            accessKey = jmicroConfigService.getValue(MinIOConfigItem.ACCESS_KEY.key),
+            secretKey = jmicroConfigService.getValue(MinIOConfigItem.SECRET_KEY.key),
+            bucket = jmicroConfigService.getValue(MinIOConfigItem.BUCKET.key),
+            isAllowGetObject = jmicroConfigService.isTrue(MinIOConfigItem.IS_ALLOW_GET_OBJECT.key),
         )
     }
 }

@@ -1,10 +1,10 @@
 package com.jiangtj.micro.business.pic.upload.local
 
-import com.jiangtj.micro.business.config.SystemConfigLoader
+import com.jiangtj.micro.business.config.JMicroConfigLoader
 import com.jiangtj.micro.business.config.SystemGroup
 import com.jiangtj.micro.business.config.SystemItemInfo
 import com.jiangtj.micro.business.pic.upload.PicUploadConfigItem
-import com.jiangtj.micro.business.pic.upload.toSystemConfigItems
+import com.jiangtj.micro.business.pic.upload.toJMicroConfigItems
 
 /**
  * 本地上传配置项定义
@@ -31,8 +31,8 @@ const val LOCAL_TAG = "local"
 /**
  * 将本地上传配置注册为系统配置项默认值
  */
-class LocalPicUploadConfigLoader : SystemConfigLoader {
+class LocalPicUploadConfigLoader : JMicroConfigLoader {
 
     override fun load(): List<SystemItemInfo> =
-        LocalPicUploadConfigItem.entries.toSystemConfigItems(localGroup, LOCAL_TAG)
+        LocalPicUploadConfigItem.entries.toJMicroConfigItems(localGroup, LOCAL_TAG)
 }

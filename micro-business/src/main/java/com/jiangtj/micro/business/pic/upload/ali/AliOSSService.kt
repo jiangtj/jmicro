@@ -10,7 +10,7 @@ import com.aliyun.oss.common.auth.CredentialsProviderFactory
 import com.aliyun.oss.common.comm.SignVersion
 import com.aliyun.oss.model.PutObjectRequest
 import com.aliyuncs.exceptions.ClientException as CredentialsClientException
-import com.jiangtj.micro.business.config.SystemConfigService
+import com.jiangtj.micro.business.config.JMicroConfigService
 import com.jiangtj.micro.business.pic.upload.PicUploadProperties
 import com.jiangtj.micro.business.pic.upload.PicUploadProvider
 import com.jiangtj.micro.business.pic.upload.PicUploadResult
@@ -24,14 +24,14 @@ import java.io.InputStream
 
 @PicUploadType("ali")
 class AliOSSService(
-    private val systemConfigService: SystemConfigService,
+    private val jmicroConfigService: JMicroConfigService,
 ) : PicUploadProvider {
 
     override fun upload(dir: PicUploadProperties.Dir, file: MultipartFile): PicUploadResult {
         val name = PicUploadUtils.generateNewFileName(file)
         val url = try {
             file.inputStream.use { input ->
-                upload(AliOSSSettings.from(systemConfigService), dir.resolve(name), input)
+                upload(AliOSSSettings.from(jmicroConfigService), dir.resolve(name), input)
             }
         } catch (e: IOException) {
             log.error("获取图片失败", e)
