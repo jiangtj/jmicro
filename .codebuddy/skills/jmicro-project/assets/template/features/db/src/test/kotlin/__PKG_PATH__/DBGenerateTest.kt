@@ -25,7 +25,12 @@ import org.springframework.boot.test.context.SpringBootTest
 class DBGenerateTest(@Autowired private val properties: DataSourceProperties) {
 
     private val packagePath: String = this::class.java.`package`.name
-    private val outputDirectory: String = "src/main/java"
+
+    /**
+     * 生成目录必须与源集一致：Kotlin 项目为 `src/main/kotlin`，Java 项目才是 `src/main/java`。
+     * jmicro demo 使用 `src/main/java` 是早期 Java 项目的历史遗留，不要照搬。
+     */
+    private val outputDirectory: String = "src/main/kotlin"
 
     @Test
     fun generate() {

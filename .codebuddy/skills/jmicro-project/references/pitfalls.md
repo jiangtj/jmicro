@@ -52,7 +52,8 @@
 ## 数据相关
 
 14. **Flyway 未生效**：`micro-business` 里 Flyway 是 optional，需自己加 `spring-boot-starter-flyway`；迁移脚本放 `src/main/resources/db/migration/`，命名沿用 `V1.0.0.sql` 或 `V1__init.sql`。
-15. **jOOQ 类不存在**：生成代码依赖真实数据库结构，必须先启动/迁移数据库再跑 `db-generate` 标签的测试；生成目录默认 `src/main/java`（Kotlin 生成器允许写在 java 源集）。
+15. **jOOQ 类不存在**：生成代码依赖真实数据库结构，必须先启动/迁移数据库再跑 `db-generate` 标签的测试。
+    另外 `outputDirectory` 必须与源集一致——Kotlin 项目用 `src/main/kotlin`；jmicro demo 的 `src/main/java` 是早期 Java 项目的历史遗留，不要照搬。
 16. **`jmicro.flyway.clean-on-validation-error=true`** 会清库，仅限 dev/test。
 
 ## 其它

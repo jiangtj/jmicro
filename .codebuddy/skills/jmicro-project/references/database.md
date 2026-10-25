@@ -46,7 +46,8 @@ jOOQ 需要从数据库生成表类，流程是"先迁移建表 → 再生成代
 class DBGenerateTest(@Autowired private val properties: DataSourceProperties) {
 
     private val packagePath: String = this::class.java.`package`.name
-    private val outputDirectory: String = "src/main/java"
+    // Kotlin 项目：src/main/kotlin；Java 项目：src/main/java
+    private val outputDirectory: String = "src/main/kotlin"
 
     @Test
     fun generate() {
@@ -82,6 +83,7 @@ class DBGenerateTest(@Autowired private val properties: DataSourceProperties) {
 ```
 
 - `DataSourceProperties` 在 Boot 4 位于 `org.springframework.boot.jdbc.autoconfigure`。
+- **`outputDirectory` 必须与源集一致**：Kotlin 项目写 `src/main/kotlin`，Java 项目写 `src/main/java`。jmicro demo 用的是 `src/main/java`，那是早期 Java 项目的历史遗留，Kotlin 新项目照搬会让生成代码落在错误的源集目录里（虽然能被 Gradle 编译，但与项目结构不一致，IDE 索引与后续维护都会混乱）。
 - 生成产物（`*.jooq.tables.*`、`tables.daos.*`、`tables.pojos.*`）提交进仓库，`dao` 类带 `@Repository` 可直接注入。
 - 用 `@Tag("db-generate")` 标记，避免 CI 中无数据库时执行；`build.gradle.kts` 可加：
   ```kotlin
