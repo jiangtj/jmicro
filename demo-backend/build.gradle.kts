@@ -34,6 +34,11 @@ tasks.named<Jar>("jar") {
     enabled = false
 }
 
+// Image built by `bootBuildImage` (used by the Docker Push workflow) must run on Java 21.
+tasks.named<org.springframework.boot.gradle.tasks.bundling.BootBuildImage>("bootBuildImage") {
+    environment.set(mapOf("BP_JVM_VERSION" to "21"))
+}
+
 tasks.withType<Test> {
     useJUnitPlatform {
         if (project.hasProperty("ai")) {
