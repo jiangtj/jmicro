@@ -60,7 +60,7 @@ class SystemConfigController(
     }
 
     /**
-     * 生成 `jmicro.system.config.kv.*` 形式的配置行，方便前端提供「复制配置」能力
+     * 生成 `jmicro.config.kv.*` 形式的配置行，方便前端提供「复制配置」能力
      */
     @GetMapping("/{key}/properties")
     fun properties(@PathVariable key: String): String =

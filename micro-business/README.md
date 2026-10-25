@@ -39,7 +39,7 @@ jmicro 的业务能力聚合模块，用于承载通用的业务侧自动配置�
 
 ### 系统配置 SystemConfig（可选）
 
-系统配置能力位于包 `com.jiangtj.micro.business.config`，**默认不开启**，需显式配置 `jmicro.system.config.enabled=true` 才生效。它通过 `SystemConfigService` 集中管理配置项，支持从 `SystemConfigLoader` 加载默认值、通过 `SystemConfigSaver` 持久化覆盖值，并在变更时发布 `SystemConfigUpdateEvent` / `SystemConfigRefreshEvent` 事件。
+系统配置能力位于包 `com.jiangtj.micro.business.config`，**默认不开启**，需显式配置 `jmicro.config.enabled=true` 才生效。它通过 `SystemConfigService` 集中管理配置项，支持从 `SystemConfigLoader` 加载默认值、通过 `SystemConfigSaver` 持久化覆盖值，并在变更时发布 `SystemConfigUpdateEvent` / `SystemConfigRefreshEvent` 事件。
 
 默认实现提供了 `InMemorySystemConfigSaver`（基于 `ConcurrentHashMap` 的内存存储），并通过 `@ConditionalOnMissingBean` 注册，使用者可自定义 `SystemConfigSaver` Bean 接入数据库等持久化方案。
 
@@ -47,12 +47,12 @@ jmicro 的业务能力聚合模块，用于承载通用的业务侧自动配置�
 
 ```properties
 # 开启系统配置能力（默认 false）
-jmicro.system.config.enabled=true
+jmicro.config.enabled=true
 # 配置文件路径（默认 upload）
-jmicro.system.config.file-path=upload
+jmicro.config.file-path=upload
 # 覆盖默认配置值的键值对
-jmicro.system.config.kv.site-name=JMicro
-jmicro.system.config.kv.max-upload-size=10MB
+jmicro.config.kv.site-name=JMicro
+jmicro.config.kv.max-upload-size=10MB
 ```
 
 ```yaml
@@ -68,7 +68,7 @@ jmicro:
 
 #### 工作机制
 
-- 启动时 `SystemConfigService` 收集所有 `SystemConfigLoader` 提供的 `SystemItemInfo` 作为默认配置，再应用 `jmicro.system.config.kv` 中的覆盖值。
+- 启动时 `SystemConfigService` 收集所有 `SystemConfigLoader` 提供的 `SystemItemInfo` 作为默认配置，再应用 `jmicro.config.kv` 中的覆盖值。
 - 取值：`getValue(key)` / `isTrue(key)` 优先读取 `SystemConfigSaver` 中的覆盖值，未命中则回退到默认值；结果经 Caffeine 缓存加速，可通过 `refreshConfig()` 主动失效缓存。
 - 写值：`updateConfig(key, value)` 会做值格式校验（`valueFormatter`），保存到 `SystemConfigSaver` 并发布 `SystemConfigUpdateEvent`；`deleteConfig(key)` 删除覆盖值并回退默认值，同时发布事件。
 - `getAllConfig()` 返回排序后的配置视图（按分组 `group.order` 与 `order`），并对 `secret=true` 的项做脱敏（`******`），对带 `formatter` 的项生成 `formatedValue`。
@@ -77,7 +77,7 @@ jmicro:
 
 #### 结构化配置（JSON 类型）
 
-`SystemItemType.JSON` 用于表达对象、集合、`Map` 等嵌套结构。持久化仍是单个 `key -> String`，值为 JSON 文本；写入时会校验并规范化成紧凑单行，因此可以直接写在 `jmicro.system.config.kv.*` 中。
+`SystemItemType.JSON` 用于表达对象、集合、`Map` 等嵌套结构。持久化仍是单个 `key -> String`，值为 JSON 文本；写入时会校验并规范化成紧凑单行，因此可以直接写在 `jmicro.config.kv.*` 中。
 
 ```kotlin
 class MyConfigLoader : SystemConfigLoader {
@@ -258,10 +258,10 @@ jmicro.oidc.server.clients[0].callback-uri[0]=http://localhost:17001/callback
 
 #### 通用配置
 
-图片上传只有一个启动配置 `jmicro.pic.upload.enable`（默认 `true`），用于开关上传能力；其余配置统一由系统配置项提供，使用前需开启 `jmicro.system.config.enabled=true`：
+图片上传只有一个启动配置 `jmicro.pic.upload.enable`（默认 `true`），用于开关上传能力；其余配置统一由系统配置项提供，使用前需开启 `jmicro.config.enabled=true`：
 
 ```properties
-jmicro.system.config.enabled=true
+jmicro.config.enabled=true
 # 关闭图片上传能力（默认 true）
 jmicro.pic.upload.enable=true
 ```
@@ -276,9 +276,9 @@ jmicro.pic.upload.enable=true
 | `jmicro.pic.upload.dirs` | `JSON` | `{}` | 目录映射 `Map<String, Dir>`，其中 `path` 必填 |
 
 ```properties
-jmicro.system.config.kv.jmicro.pic.upload.provider=minio
-jmicro.system.config.kv.jmicro.pic.upload.max-file-size=5MB
-jmicro.system.config.kv.jmicro.pic.upload.dirs={"target-name":{"path":"/common","provider":"ali","maxFileSize":10485760}}
+jmicro.config.kv.jmicro.pic.upload.provider=minio
+jmicro.config.kv.jmicro.pic.upload.max-file-size=5MB
+jmicro.config.kv.jmicro.pic.upload.dirs={"target-name":{"path":"/common","provider":"ali","maxFileSize":10485760}}
 ```
 
 ```kotlin
@@ -287,7 +287,7 @@ systemConfigService.updateConfig("jmicro.pic.upload.provider", "local")
 systemConfigService.updateMapEntry("jmicro.pic.upload.dirs", "avatar", mapOf("path" to "/avatar"))
 ```
 
-各服务商（`local` / `ali` / `hw` / `minio` / `easyimages` / `rustfs`）的配置项统一由**系统配置（SystemConfig）**提供，使用前需开启 `jmicro.system.config.enabled=true`；未开启时对应服务商的上传服务不会注册。配置项定义在各自的 `*ConfigItem` 枚举中（`systemConfigService.getValue(key)` 读取），可通过 `jmicro.system.config.kv.*` 提供值，也可在运行期通过 `SystemConfigService.updateConfig(key, value)` 动态修改（上传时实时读取）。各服务商并可能需要引入对应 SDK：
+各服务商（`local` / `ali` / `hw` / `minio` / `easyimages` / `rustfs`）的配置项统一由**系统配置（SystemConfig）**提供，使用前需开启 `jmicro.config.enabled=true`；未开启时对应服务商的上传服务不会注册。配置项定义在各自的 `*ConfigItem` 枚举中（`systemConfigService.getValue(key)` 读取），可通过 `jmicro.config.kv.*` 提供值，也可在运行期通过 `SystemConfigService.updateConfig(key, value)` 动态修改（上传时实时读取）。各服务商并可能需要引入对应 SDK：
 
 | Provider | 配置来源 | 说明 |
 | --- | --- | --- |
@@ -311,13 +311,13 @@ systemConfigService.updateMapEntry("jmicro.pic.upload.dirs", "avatar", mapOf("pa
 ```
 
 ```properties
-jmicro.system.config.enabled=true
-jmicro.system.config.kv.minio.endpoint=http://localhost:9000
-jmicro.system.config.kv.minio.access-key=access-key
-jmicro.system.config.kv.minio.secret-key=secret-key
-jmicro.system.config.kv.minio.bucket=bucket
+jmicro.config.enabled=true
+jmicro.config.kv.minio.endpoint=http://localhost:9000
+jmicro.config.kv.minio.access-key=access-key
+jmicro.config.kv.minio.secret-key=secret-key
+jmicro.config.kv.minio.bucket=bucket
 # 是否允许匿名读取（默认 false）
-jmicro.system.config.kv.minio.is-allow-get-object=false
+jmicro.config.kv.minio.is-allow-get-object=false
 ```
 
 ##### Ali OSS
@@ -330,18 +330,18 @@ jmicro.system.config.kv.minio.is-allow-get-object=false
 </dependency>
 ```
 
-阿里云 OSS 的配置项由**系统配置（SystemConfig）**提供，需先开启 `jmicro.system.config.enabled=true`；未开启时不会注册 `ali` 上传服务。配置项定义见 `AliOSSConfigItem`，可通过配置文件 kv 提供默认值，也可在运行期通过 `SystemConfigService.updateConfig(key, value)` 动态修改（每次上传时读取最新配置）：
+阿里云 OSS 的配置项由**系统配置（SystemConfig）**提供，需先开启 `jmicro.config.enabled=true`；未开启时不会注册 `ali` 上传服务。配置项定义见 `AliOSSConfigItem`，可通过配置文件 kv 提供默认值，也可在运行期通过 `SystemConfigService.updateConfig(key, value)` 动态修改（每次上传时读取最新配置）：
 
 ```properties
 # 开启系统配置（阿里云 OSS 配置项的载体）
-jmicro.system.config.enabled=true
-jmicro.system.config.kv.ali.oss.endpoint=https://oss-cn-hangzhou.aliyuncs.com
-jmicro.system.config.kv.ali.oss.region=cn-hangzhou
-jmicro.system.config.kv.ali.oss.bucket-name=bucket-name
-jmicro.system.config.kv.ali.oss.url=https://bucket-name.oss-cn-hangzhou.aliyuncs.com
+jmicro.config.enabled=true
+jmicro.config.kv.ali.oss.endpoint=https://oss-cn-hangzhou.aliyuncs.com
+jmicro.config.kv.ali.oss.region=cn-hangzhou
+jmicro.config.kv.ali.oss.bucket-name=bucket-name
+jmicro.config.kv.ali.oss.url=https://bucket-name.oss-cn-hangzhou.aliyuncs.com
 # 你需要配置密钥，也可以从系统环境中读取（不配置时使用 SDK 的默认环境变量凭证）
-#jmicro.system.config.kv.ali.oss.access-key-id=access-key-id
-#jmicro.system.config.kv.ali.oss.secret-access-key=secret-access-key
+#jmicro.config.kv.ali.oss.access-key-id=access-key-id
+#jmicro.config.kv.ali.oss.secret-access-key=secret-access-key
 ```
 
 ##### Huawei OBS
@@ -355,19 +355,19 @@ jmicro.system.config.kv.ali.oss.url=https://bucket-name.oss-cn-hangzhou.aliyuncs
 ```
 
 ```properties
-jmicro.system.config.enabled=true
-jmicro.system.config.kv.hw.obs.end-point=https://obs.cn-north-1.myhuaweicloud.com
-jmicro.system.config.kv.hw.obs.bucket-name=bucket-name
-jmicro.system.config.kv.hw.obs.key=key
-jmicro.system.config.kv.hw.obs.secret=secret
+jmicro.config.enabled=true
+jmicro.config.kv.hw.obs.end-point=https://obs.cn-north-1.myhuaweicloud.com
+jmicro.config.kv.hw.obs.bucket-name=bucket-name
+jmicro.config.kv.hw.obs.key=key
+jmicro.config.kv.hw.obs.secret=secret
 ```
 
 ##### EasyImages 2.0
 
 ```properties
-jmicro.system.config.enabled=true
-jmicro.system.config.kv.easyimages.api.url=http://localhost:40061/api/index.php
-jmicro.system.config.kv.easyimages.api.token=token
+jmicro.config.enabled=true
+jmicro.config.kv.easyimages.api.url=http://localhost:40061/api/index.php
+jmicro.config.kv.easyimages.api.token=token
 ```
 
 ##### RustFS
@@ -381,14 +381,14 @@ jmicro.system.config.kv.easyimages.api.token=token
 ```
 
 ```properties
-jmicro.system.config.enabled=true
+jmicro.config.enabled=true
 # 开启 RustFS 上传能力（默认 false）
-jmicro.system.config.kv.jmicro.rustfs.enable=true
-jmicro.system.config.kv.jmicro.rustfs.endpoint=http://localhost:9000
-jmicro.system.config.kv.jmicro.rustfs.access-key=access-key
-jmicro.system.config.kv.jmicro.rustfs.secret-key=secret-key
-jmicro.system.config.kv.jmicro.rustfs.bucket=bucket
-jmicro.system.config.kv.jmicro.rustfs.is-allow-get-object=false
+jmicro.config.kv.jmicro.rustfs.enable=true
+jmicro.config.kv.jmicro.rustfs.endpoint=http://localhost:9000
+jmicro.config.kv.jmicro.rustfs.access-key=access-key
+jmicro.config.kv.jmicro.rustfs.secret-key=secret-key
+jmicro.config.kv.jmicro.rustfs.bucket=bucket
+jmicro.config.kv.jmicro.rustfs.is-allow-get-object=false
 ```
 
 ##### 本地上传（local）
@@ -396,14 +396,14 @@ jmicro.system.config.kv.jmicro.rustfs.is-allow-get-object=false
 无需引入额外 SDK，配置 `provider=local` 并指定目录路径与访问 URL 即可：
 
 ```properties
-jmicro.system.config.enabled=true
-jmicro.system.config.kv.jmicro.pic.upload.provider=local
+jmicro.config.enabled=true
+jmicro.config.kv.jmicro.pic.upload.provider=local
 # 本地存储根路径（系统配置项默认值为系统临时目录）
-jmicro.system.config.kv.jmicro.pic.upload.local.upload-path=/data/uploads
+jmicro.config.kv.jmicro.pic.upload.local.upload-path=/data/uploads
 # 上传文件的可访问 URL 前缀（由你的静态资源映射暴露）
-jmicro.system.config.kv.jmicro.pic.upload.local.url=/files
+jmicro.config.kv.jmicro.pic.upload.local.url=/files
 # 目录映射（系统配置项 jmicro.pic.upload.dirs 的 JSON 配置）
-jmicro.system.config.kv.jmicro.pic.upload.dirs={"target-name":{"path":"/uploads"}}
+jmicro.config.kv.jmicro.pic.upload.dirs={"target-name":{"path":"/uploads"}}
 ```
 
 #### 在代码中使用

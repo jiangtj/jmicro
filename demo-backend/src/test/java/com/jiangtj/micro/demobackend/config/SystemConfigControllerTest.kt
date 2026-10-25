@@ -88,7 +88,7 @@ class SystemConfigControllerTest {
             .expectStatus().isOk()
             .returnResult(String::class.java)
             .responseBody
-        assertThat(properties).isEqualTo("jmicro.system.config.kv.demo.site.name=我的站点")
+        assertThat(properties).isEqualTo("jmicro.config.kv.demo.site.name=我的站点")
 
         // 恢复默认值 -> 删除持久化记录
         client.delete().uri("/system/configs/demo.site.name")

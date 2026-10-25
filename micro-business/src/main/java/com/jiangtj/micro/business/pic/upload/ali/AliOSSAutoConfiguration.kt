@@ -10,7 +10,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean
 
 /**
- * 阿里云 OSS 自动配置，配置项来自系统配置（需开启 `jmicro.system.config.enabled=true`）
+ * 阿里云 OSS 自动配置，配置项来自系统配置（需开启 `jmicro.config.enabled=true`）
  */
 @AutoConfiguration(after = [SystemConfigAutoConfiguration::class])
 @ConditionalOnClass(OSS::class)

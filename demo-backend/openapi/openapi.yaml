@@ -340,7 +340,7 @@ paths:
       summary: 上传图片
       description: |
         上传到指定目录，实际存储服务商、允许的扩展名、大小限制与目录映射均来自系统配置项
-        （`jmicro.pic.upload.*`，需 `jmicro.system.config.enabled=true`）。
+        （`jmicro.pic.upload.*`，需 `jmicro.config.enabled=true`）。
 
         该接口当前未添加鉴权注解，属于公开接口，部署时请自行在网关或反向代理层保护。
       operationId: uploadPic
@@ -673,7 +673,7 @@ paths:
       tags: [SystemConfig]
       summary: 生成可粘贴到 application.properties 的配置行
       description: |
-        仅 `admin` 角色可访问。返回 `jmicro.system.config.kv.<key>=<value>` 形式的纯文本，
+        仅 `admin` 角色可访问。返回 `jmicro.config.kv.<key>=<value>` 形式的纯文本，
         供前端「复制配置」使用；key 中的 `_` 会转换为 `-` 并转小写。
       operationId: getSystemConfigProperties
       security:
@@ -685,7 +685,7 @@ paths:
             text/plain:
               schema:
                 type: string
-              example: jmicro.system.config.kv.demo.site.name=我的站点
+              example: jmicro.config.kv.demo.site.name=我的站点
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':

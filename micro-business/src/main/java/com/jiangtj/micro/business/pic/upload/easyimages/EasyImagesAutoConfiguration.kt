@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean
 
 /**
- * EasyImages 自动配置，配置项来自系统配置（需开启 `jmicro.system.config.enabled=true`，
+ * EasyImages 自动配置，配置项来自系统配置（需开启 `jmicro.config.enabled=true`，
  * 且配置 `easyimages.api.url` 后才可正常上传）
  */
 @AutoConfiguration(after = [SystemConfigAutoConfiguration::class])

@@ -10,7 +10,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean
 
 /**
- * 华为云 OBS 自动配置，配置项来自系统配置（需开启 `jmicro.system.config.enabled=true`）
+ * 华为云 OBS 自动配置，配置项来自系统配置（需开启 `jmicro.config.enabled=true`）
  */
 @AutoConfiguration(after = [SystemConfigAutoConfiguration::class])
 @ConditionalOnClass(ObsClient::class)

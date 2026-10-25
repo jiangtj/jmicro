@@ -97,7 +97,7 @@ class PicUploadService(
      */
     private fun resolveSettings(): PicUploadSettings {
         val service = systemConfigService
-            ?: throw PicUploadCheckException("未开启系统配置，请设置 jmicro.system.config.enabled=true")
+            ?: throw PicUploadCheckException("未开启系统配置，请设置 jmicro.config.enabled=true")
         return PicUploadSettings.from(service)
     }
 

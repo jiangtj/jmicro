@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Bean
 import software.amazon.awssdk.services.s3.S3Client
 
 /**
- * RustFS 自动配置，配置项来自系统配置（需开启 `jmicro.system.config.enabled=true`，
+ * RustFS 自动配置，配置项来自系统配置（需开启 `jmicro.config.enabled=true`，
  * 并通过 `jmicro.rustfs.enable` 开启上传能力）
  */
 @AutoConfiguration(after = [SystemConfigAutoConfiguration::class])

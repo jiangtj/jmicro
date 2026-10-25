@@ -155,7 +155,7 @@ class SystemConfigJsonTest {
     fun `generateConfig outputs single line json`() {
         val service = buildService(mapItem)
         val line = service.generateConfig(mapKey, """{"a":{"path":"/a"}}""")
-        assertEquals("jmicro.system.config.kv.jmicro.test.map={\"a\":{\"path\":\"/a\"}}", line)
+        assertEquals("jmicro.config.kv.jmicro.test.map={\"a\":{\"path\":\"/a\"}}", line)
         assertFalse(line.contains("\n"))
     }
 

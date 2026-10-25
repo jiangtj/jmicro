@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Bean
  *
  * 启动时注册 [PicUploadConfigLoader]，把通用配置与目录映射（`jmicro.pic.upload.*`）作为系统配置项加载；
  * 各上传服务商（local / ali / hw / minio / easyimages / rustfs）的配置同样由系统配置提供，
- * 其自动配置类在开启 `jmicro.system.config.enabled=true` 后生效。
+ * 其自动配置类在开启 `jmicro.config.enabled=true` 后生效。
  *
  * 可通过 `jmicro.pic.upload.enable=false` 关闭图片上传能力。
  */

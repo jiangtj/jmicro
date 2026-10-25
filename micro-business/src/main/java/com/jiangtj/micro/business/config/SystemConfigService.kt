@@ -242,7 +242,7 @@ class SystemConfigService(
     fun generateConfig(key: String, value: String?): String {
         val k = key.replace("_", "-").lowercase()
         if (value.isNullOrBlank()) {
-            return "jmicro.system.config.kv.${k}="
+            return "jmicro.config.kv.${k}="
         }
         val item = defaultConfig[key.trimKey()]
         val v = if (item != null && item.type == SystemItemType.JSON.name) {
@@ -250,7 +250,7 @@ class SystemConfigService(
         } else {
             item?.valueFormatter?.apply(value) ?: value
         }
-        return "jmicro.system.config.kv.${k}=${v}"
+        return "jmicro.config.kv.${k}=${v}"
     }
 
     fun updateConfig(key: String, value: String) {

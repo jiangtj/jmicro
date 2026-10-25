@@ -30,7 +30,7 @@ class PicUploadSystemConfigWiringTest {
 
     @Test
     fun `providers are registered when system config enabled`() {
-        runner.withPropertyValues("jmicro.system.config.enabled=true")
+        runner.withPropertyValues("jmicro.config.enabled=true")
             .run { context ->
                 assertNotNull(context.getBean(SystemConfigService::class.java))
                 assertNotNull(context.getBean(PicUploadConfigLoader::class.java))
