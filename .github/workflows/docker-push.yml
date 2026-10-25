@@ -14,10 +14,14 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository_owner }}/jmicro-demo-backend
+  # bootBuildImage 的构建产物平台，显式固定为 amd64，避免在 arm64 运行器/构建器上出现
+  # "exec /cnb/lifecycle/creator: exec format error"
+  IMAGE_PLATFORM: linux/amd64
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # 显式使用 amd64 运行器（ubuntu-24.04），保证 buildpacks 生命周期与目标镜像架构一致
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       packages: write
@@ -32,6 +36,10 @@ jobs:
           cache: gradle
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
+      - name: Show build environment
+        run: |
+          uname -m
+          docker version --format 'server arch: {{.Server.Arch}}'
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v6
@@ -54,7 +62,10 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build Image
         run: |
-          ./gradlew :demo-backend:bootBuildImage --imageName=${{ env.IMAGE_NAME }} -x test
+          ./gradlew :demo-backend:bootBuildImage \
+            --imageName=${{ env.IMAGE_NAME }} \
+            --imagePlatform=${{ env.IMAGE_PLATFORM }} \
+            -x test
       - name: Push
         run: |
           # 读取并应用所有标签
