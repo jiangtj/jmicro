@@ -1,0 +1,17 @@
+-- 初始迁移脚本（兼容 H2 MODE=MySQL 与 MySQL 8）
+-- 建表后执行 `./gradlew test --tests "*DBGenerateTest*"` 生成 jOOQ 代码
+
+CREATE TABLE book (
+    id          BIGINT         NOT NULL AUTO_INCREMENT,
+    title       VARCHAR(128)   NOT NULL,
+    author      VARCHAR(64)    NOT NULL,
+    isbn        VARCHAR(32),
+    price       DECIMAL(10, 2) NOT NULL DEFAULT 0,
+    stock       INT            NOT NULL DEFAULT 0,
+    create_time DATETIME       NOT NULL,
+    PRIMARY KEY (id)
+);
+
+INSERT INTO book (title, author, isbn, price, stock, create_time)
+VALUES ('深入理解 Java 虚拟机', '周志明', '9787111641247', 129.00, 10, CURRENT_TIMESTAMP),
+       ('Spring Boot 编程思想', '小马哥', '9787121359569', 99.00, 5, CURRENT_TIMESTAMP);
