@@ -17,6 +17,9 @@ env:
   # bootBuildImage 的构建产物平台，显式固定为 amd64，避免在 arm64 运行器/构建器上出现
   # "exec /cnb/lifecycle/creator: exec format error"
   IMAGE_PLATFORM: linux/amd64
+  # Spring Boot 4 默认的 paketobuildpacks/builder-noble-java-tiny:latest 目前只提供 arm64 变体，
+  # 在 amd64 运行器上会报 platform mismatch，改用同时提供 amd64 的 jammy-base builder
+  BUILDER_IMAGE: paketobuildpacks/builder-jammy-base
 
 jobs:
   build:
@@ -65,6 +68,7 @@ jobs:
           ./gradlew :demo-backend:bootBuildImage \
             --imageName=${{ env.IMAGE_NAME }} \
             --imagePlatform=${{ env.IMAGE_PLATFORM }} \
+            --builder=${{ env.BUILDER_IMAGE }} \
             -x test
       - name: Push
         run: |
