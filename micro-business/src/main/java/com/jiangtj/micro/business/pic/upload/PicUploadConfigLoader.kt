@@ -53,7 +53,7 @@ enum class PicUploadBaseConfigItem(
  * - 通用配置（[PicUploadBaseConfigItem]）为文本类型；
  * - 目录映射 `jmicro.pic.upload.dirs` 为 JSON 类型，配置值形如：
  * ```json
- * {"avatar":{"path":"/avatar","provider":"local","maxFileSize":10485760}}
+ * {"avatar":{"path":"/avatar","provider":"local","maxFileSize":"10MB"}}
  * ```
  *
  * 运行期读取见 [PicUploadService]。

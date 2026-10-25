@@ -6,8 +6,10 @@ import com.jiangtj.micro.business.config.JMicroConfigSaver
 import com.jiangtj.micro.business.config.JMicroConfigService
 import com.jiangtj.micro.business.config.SystemItemInfo
 import com.jiangtj.micro.business.config.SystemItemType
+import com.jiangtj.micro.business.config.jackson.formatDataSize
 import com.jiangtj.micro.business.pic.upload.ex.PicUploadCheckException
 import com.jiangtj.micro.common.JsonUtils
+import com.jiangtj.micro.common.schema.JsonSchemaGenerator
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -100,16 +102,37 @@ class PicUploadDirsConfigTest {
     }
 
     @Test
-    fun `dir json serializes datasize as bytes`() {
+    fun `dir json serializes datasize as readable string`() {
         val dir = PicUploadProperties.Dir()
         dir.path = "/a"
         dir.maxFileSize = DataSize.ofKilobytes(2)
 
         val json = JsonUtils.toJson(dir)
         assertNotNull(json)
-        assertTrue(json!!.contains("\"maxFileSize\":2048"))
+        assertTrue(json!!.contains("\"maxFileSize\":\"2KB\""))
         // 未设置的字段不进入 JSON
         assertFalse(json.contains("provider"))
+
+        // 序列化结果可被反序列化回原值
+        val parsed = JsonUtils.fromJson(json, PicUploadProperties.Dir::class.java)!!
+        assertEquals(2048, parsed.maxFileSize!!.toBytes())
+    }
+
+    @Test
+    fun `datasize string round trip`() {
+        assertEquals("10MB", formatDataSize(DataSize.ofMegabytes(10)))
+        assertEquals("1TB", formatDataSize(DataSize.ofTerabytes(1)))
+        assertEquals("1536B", formatDataSize(DataSize.ofBytes(1536)))
+        assertEquals("0B", formatDataSize(DataSize.ofBytes(0)))
+    }
+
+    @Test
+    fun `dirs schema describes datasize as string`() {
+        val item = PicUploadConfigLoader().load().single { it.key == PicUploadConfigLoader.KEY }
+        val schema = JsonSchemaGenerator.generate(item.jsonType!!)
+        val dir = schema.additionalProperties!!
+        val maxFileSize = dir.properties!!["maxFileSize"]!!
+        assertEquals("string", maxFileSize.type)
     }
 
     @Test

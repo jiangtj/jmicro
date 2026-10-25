@@ -63,6 +63,13 @@ object JsonSchemaGenerator {
 
     private const val MOBILE_PHONE_PATTERN = "^1[0-9]{10}$"
 
+    /**
+     * `org.springframework.util.unit.DataSize` 的全限定名。
+     *
+     * 这里按类名匹配而不是直接引用，避免 `micro-common` 对 spring-core（`compileOnly`）产生运行时依赖。
+     */
+    private const val DATA_SIZE_CLASS_NAME = "org.springframework.util.unit.DataSize"
+
     val cache: MutableMap<Class<*>, JsonSchema> = ConcurrentHashMap()
 
     /**
@@ -202,6 +209,9 @@ object JsonSchemaGenerator {
 
         clazz == UUID::class.java -> JsonSchema(type = "string", format = "uuid")
         clazz == URI::class.java || clazz == URL::class.java -> JsonSchema(type = "string", format = "uri")
+
+        // Spring 的 DataSize（如 `10MB`）在配置中以字符串表示，内部字段不参与序列化
+        clazz.name == DATA_SIZE_CLASS_NAME -> JsonSchema(type = "string")
 
         else -> null
     }

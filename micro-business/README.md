@@ -278,7 +278,7 @@ jmicro.pic.upload.enable=true
 ```properties
 jmicro.config.kv.jmicro.pic.upload.provider=minio
 jmicro.config.kv.jmicro.pic.upload.max-file-size=5MB
-jmicro.config.kv.jmicro.pic.upload.dirs={"target-name":{"path":"/common","provider":"ali","maxFileSize":10485760}}
+jmicro.config.kv.jmicro.pic.upload.dirs={"target-name":{"path":"/common","provider":"ali","maxFileSize":"10MB"}}
 ```
 
 ```kotlin
