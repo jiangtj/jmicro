@@ -117,6 +117,22 @@ class SystemConfigControllerTest {
     }
 
     @Test
+    fun `public configs are readable without login`() {
+        val configs = client.get().uri("/system/configs/public")
+            .exchange()
+            .expectStatus().isOk()
+            .returnResult(object : ParameterizedTypeReference<List<Map<String, Any?>>>() {})
+            .responseBody
+        val keys = checkNotNull(configs) { "public config list is null" }.map { it["key"] }
+        assertThat(keys).containsExactlyInAnyOrder(
+            "demo.site.name",
+            "demo.site.description",
+            "demo.site.theme",
+            "demo.site.social-links",
+        )
+    }
+
+    @Test
     fun `reader cannot manage system config`() {
         val bearer = "Bearer " + login("reader", "reader123")
 

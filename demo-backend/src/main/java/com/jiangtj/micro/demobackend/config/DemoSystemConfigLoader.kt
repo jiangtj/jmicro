@@ -1,5 +1,6 @@
 package com.jiangtj.micro.demobackend.config
 
+import com.jiangtj.micro.business.config.PUBLIC_TAG
 import com.jiangtj.micro.business.config.SystemConfigLoader
 import com.jiangtj.micro.business.config.SystemGroup
 import com.jiangtj.micro.business.config.SystemItemInfo
@@ -29,6 +30,7 @@ class DemoSystemConfigLoader : SystemConfigLoader {
             value = "JMicro Demo",
             group = demoSiteGroup,
             type = SystemItemType.TEXT.name,
+            tag = listOf(PUBLIC_TAG),
             order = 0,
             valueFormatter = Function { it.trim().ifEmpty { throw IllegalArgumentException("站点名称不能为空") } },
         ),
@@ -39,6 +41,7 @@ class DemoSystemConfigLoader : SystemConfigLoader {
             value = "基于 JMicro 的演示站点",
             group = demoSiteGroup,
             type = SystemItemType.TEXTAREA.name,
+            tag = listOf(PUBLIC_TAG),
             order = 1,
         ),
         SystemItemInfo(
@@ -62,6 +65,7 @@ class DemoSystemConfigLoader : SystemConfigLoader {
             value = "light",
             group = demoSiteGroup,
             type = SystemItemType.SELECT.name,
+            tag = listOf(PUBLIC_TAG),
             order = 3,
             provider = themes,
             valueFormatter = Function {
@@ -80,6 +84,7 @@ class DemoSystemConfigLoader : SystemConfigLoader {
             group = demoSiteGroup,
             type = SystemItemType.JSON.name,
             jsonType = socialLinksType,
+            tag = listOf(PUBLIC_TAG),
             order = 4,
         ),
     )

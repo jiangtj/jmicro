@@ -1,7 +1,9 @@
 package com.jiangtj.micro.demobackend.controller
 
 import com.jiangtj.micro.auth.annotations.HasRole
+import com.jiangtj.micro.business.config.PUBLIC_TAG
 import com.jiangtj.micro.business.config.SystemConfigService
+import com.jiangtj.micro.business.config.SystemItem
 import com.jiangtj.micro.business.config.SystemItemInfo
 import com.jiangtj.micro.business.config.trimKey
 import com.jiangtj.micro.web.BaseExceptionUtils
@@ -73,6 +75,23 @@ class SystemConfigController(
         systemConfigService.getAllConfig()
             .firstOrNull { it.key.trimKey() == key.trimKey() }
             ?: throw BaseExceptionUtils.notFound("配置项不存在：$key")
+}
+
+/**
+ * 公开的系统配置接口（未标注鉴权注解，无需登录与权限）
+ *
+ * - `GET /system/configs/public`：返回 `tag` 含 [PUBLIC_TAG] 的配置项，供前端读取站点名称等展示信息
+ *
+ * 配置项是否公开由其 `tag` 决定（见 `DemoSystemConfigLoader`），敏感项不会标记为 `public`。
+ */
+@RestController
+@RequestMapping("/system/configs/public")
+class PublicSystemConfigController(
+    private val systemConfigService: SystemConfigService,
+) {
+
+    @GetMapping
+    fun list(): List<SystemItem> = systemConfigService.getConfigByTag(PUBLIC_TAG)
 }
 
 /**

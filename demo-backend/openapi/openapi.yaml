@@ -14,7 +14,8 @@
 #   - 认证使用请求头 `Authorization: Bearer <JWT>`，token 由 POST /login 获取
 #   - 错误响应统一为 RFC 7807 ProblemDetail（application/problem+json）
 #   - 全局 spring.jackson.default-property-inclusion=NON_NULL，值为 null 的字段不会出现在响应中
-#   - 未标注 @HasLogin / @HasRole / @HasPermission 的接口为公开接口（如 /login、/books/form-schema、/pic/upload）
+#   - 未标注 @HasLogin / @HasRole / @HasPermission 的接口为公开接口
+#     （如 /login、/books/form-schema、/pic/upload、/system/configs/public）
 
 openapi: 3.0.3
 
@@ -477,6 +478,41 @@ paths:
                 detail: "Don't have role<admin>."
                 instance: /system/configs/refresh
 
+  # ------------------------------------------------------------------
+  # PublicSystemConfigController（公开接口，无需鉴权）
+  # ------------------------------------------------------------------
+  /system/configs/public:
+    get:
+      tags: [SystemConfig]
+      summary: 查询公开配置项
+      description: |
+        公开接口，无需登录与权限。返回 `tag` 含 `public` 的配置项（如站点名称、站点描述、主题），
+        供前端在未登录时渲染页面基础信息。敏感配置项不会标记为 `public`。
+      operationId: listPublicSystemConfigs
+      security: []
+      responses:
+        '200':
+          description: 公开配置项列表（按 group.order、order 排序）
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SystemConfigItem'
+              example:
+                - key: demo.site.name
+                  name: 站点名称
+                  value: JMicro Demo
+                - key: demo.site.description
+                  name: 站点描述
+                  value: 基于 JMicro 的演示站点
+                - key: demo.site.theme
+                  name: 站点主题
+                  value: light
+                - key: demo.site.social-links
+                  name: 社交链接
+                  value: '{"github":"https://github.com/jiangtj/jmicro"}'
+
   /system/configs/{key}:
     parameters:
       - name: key
@@ -514,7 +550,7 @@ paths:
                 provider: []
                 order: 0
                 isModified: false
-                tag: []
+                tag: [public]
                 secretPaths: []
         '401':
           $ref: '#/components/responses/Unauthorized'
@@ -1083,9 +1119,12 @@ components:
           example: false
         tag:
           type: array
-          description: 分类标签，供 `GET /system/configs?tag=` 过滤
+          description: |
+            分类标签，供 `GET /system/configs?tag=` 过滤；含 `public` 的配置项会通过
+            `GET /system/configs/public` 匿名暴露给前端
           items:
             type: string
+          example: [public]
         secretPaths:
           type: array
           description: JSON 类型下需要局部脱敏的字段路径，如 `a.b.c` 或 `/a/b/c`
@@ -1129,6 +1168,24 @@ components:
         second:
           type: string
           example: 浅色
+
+    SystemConfigItem:
+      type: object
+      description: 公开配置项（`SystemItem`），仅包含 key / name / value
+      required: [key, name, value]
+      properties:
+        key:
+          type: string
+          description: 配置项 key
+          example: demo.site.name
+        name:
+          type: string
+          description: 显示名称
+          example: 站点名称
+        value:
+          type: string
+          description: 当前值；JSON 类型配置项为 JSON 文本
+          example: JMicro Demo
 
     SystemConfigForm:
       type: object
