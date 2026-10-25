@@ -81,7 +81,7 @@ class PicUploadService(
             throw PicUploadCheckException("请提供上传目标")
         }
         val dir = resolveDirs()[target]
-            ?: throw PicUploadCheckException("不存在上传的目标定义，请在配置中添加: jmicro.pic.upload.dirs.$target")
+            ?: throw PicUploadCheckException("不存在上传的目标定义，请在配置中添加key($target)")
         applyDefaults(dir)
         return dir
     }
