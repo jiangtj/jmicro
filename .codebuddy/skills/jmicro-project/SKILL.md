@@ -7,22 +7,16 @@ description: 从零创建基于 JMicro（com.jiangtj.micro）的 Spring Boot 4 �
 
 ## 用途
 
-以 `demo-backend` 为参考实现，生成一个可运行、可测试的 JMicro 后端项目，并按需接入各模块能力。
-所有 API 细节以本 skill 的 `references/` 为准，以 jmicro 仓库源码为最终事实来源；不要凭记忆编造类名或属性名。
+以 jmicro 官方 demo 后端为参考实现（等价结构已内置在 `assets/template`），生成一个可运行、可测试的 JMicro 后端项目，并按需接入各模块能力。
+技能自带项目模板与 Gradle wrapper，**无需克隆 jmicro 仓库**：依赖来自 Maven Central，所有 API 细节以本 skill 的 `references/` 为准。不要凭记忆编造类名、属性名或版本号。
 
 ## 前置确认
 
-1. 定位 jmicro 仓库根：本文件位于 `<repo>/.codebuddy/skills/jmicro-project/SKILL.md`，仓库根即其三级父目录。
-2. 读取版本事实，禁止凭记忆填版本号：
-   - `<repo>/gradle.properties` 的 `version`（如 `0.3.3`）→ 依赖坐标版本
-   - `<repo>/gradle/libs.versions.toml` 的 `java`、`kotlin`、`springBoot`、`springDependencyManagement`
-3. 确认依赖可解析：检查 `~/.m2/repository/com/jiangtj/micro/micro-auth/<version>/`。
-   若不存在，提示用户在 jmicro 仓库执行：
-   ```
-   ./gradlew publishToMavenLocal -x test -PsignAllPublications=false -PmavenCentralPublishing=false
-   ```
-   当前仓库默认 `signAllPublications=true` 且本机通常没有 PGP key，不加这两个参数会因 `No configured signatory` 失败。
-   Maven Central 上已发布的同版本号**可能落后于当前源码**（例如缺少 `BCryptUtils`、`common.schema` 包），必须用本地发布产物。
+1. 版本必须对齐（不匹配会导致依赖解析失败或自动配置不生效）：jmicro `0.4.0`、Spring Boot `4.1.1`、Kotlin `2.4.20`、Java 21。
+   - 本技能的模板与 references 对应 `0.4.0`；改用更旧版本时须自行核对 API（0.3.x 可能没有 `BCryptUtils`、`com.jiangtj.micro.common.schema` 等模板用到的能力）。
+   - 需要确认是否有更新版本时，读 Maven Central 元数据 `https://repo1.maven.org/maven2/com/jiangtj/micro/micro-dependencies/maven-metadata.xml`（脚本 `--latest` 也是读它）。
+   - 用户指定版本则以用户为准。
+2. 不需要检查本地 Maven 仓库。构建若报 `Could not find com.jiangtj.micro:micro-*:<version>`，说明该版本尚未发布到 Maven Central：改用已发布版本；确需使用未发布版本时加 `--local-repo`（写入 `mavenLocal()`），并要求用户先 `publishToMavenLocal`。
 
 ## 步骤 1：确定参数
 
@@ -46,14 +40,15 @@ description: 从零创建基于 JMicro（com.jiangtj.micro）的 Spring Boot 4 �
 
 ## 步骤 2：生成骨架
 
-优先用脚本（复制模板 + 替换占位符 + 按 feature 裁剪 `#if` 块 + 复制 Gradle wrapper）：
+优先用脚本（复制模板 + 替换占位符 + 按 feature 裁剪 `#if` 块 + 安装内置 Gradle wrapper）：
 
 ```
 python scripts/init_project.py --path <目录> --package <包名> --name <项目名> --port <端口> --features db,config
 ```
 
-脚本参数 `--jmicro-repo <仓库根>` 可显式指定仓库根以自动读取版本；省略时自动探测。
-无 Python 时，手工把 `assets/template/` 复制到目标目录，替换下列占位符，并删除未启用 feature 的 `#if <feature>` 块：
+可选参数：`--latest`（从 Maven Central 解析最新发布版本）、`--local-repo`（额外启用 `mavenLocal()`）、`--jmicro-version/--spring-boot-version/--kotlin-version`、`--no-wrapper`、`--force`。
+
+无 Python 时，手工把 `assets/template/base` 与 `assets/template/features/<feature>` 复制到目标目录（wrapper 从 `assets/gradle-wrapper/` 取），替换下列占位符，并删除未启用 feature 的 `#if <feature>` 块：
 
 | 占位符 | 含义 |
 | --- | --- |
@@ -61,8 +56,9 @@ python scripts/init_project.py --path <目录> --package <包名> --name <项目
 | `__PKG_PATH__` | 包路径，如 `com/example/app` |
 | `__APP_CLASS__` | 应用主类前缀，如 `Shop`（`ShopApplication.kt`） |
 | `__PROJECT_NAME__` | 项目名（kebab-case） |
-| `__GROUP__` | Maven groupId（默认取包名前两段 + 第三段） |
-| `__PORT__`、`__JMICRO_VERSION__`、`__SPRING_BOOT_VERSION__`、`__KOTLIN_VERSION__`、`__DEP_MANAGEMENT_VERSION__` | 见前置确认 |
+| `__GROUP__` | Maven groupId（默认取包名去掉最后一段） |
+| `__PORT__` | `server.port` |
+| `__JMICRO_VERSION__`、`__SPRING_BOOT_VERSION__`、`__KOTLIN_VERSION__` | 见前置确认 |
 
 生成后目录结构：
 
@@ -71,7 +67,7 @@ python scripts/init_project.py --path <目录> --package <包名> --name <项目
 ├── build.gradle.kts            # platform(BOM) + Boot 4 starter
 ├── settings.gradle.kts
 ├── gradle.properties
-├── gradlew / gradle/wrapper/   # 从 jmicro 仓库复制
+├── gradlew / gradle/wrapper/   # 技能内置，无需联网安装
 └── src/main/kotlin/<pkg>/
     ├── <App>Application.kt
     ├── auth/                   # JwtProperties / JwtService / AuthContextConverter / UserStore
@@ -82,7 +78,7 @@ python scripts/init_project.py --path <目录> --package <包名> --name <项目
 
 ## 步骤 3：必做接线（缺一不可）
 
-1. **必须自己提供 `AuthContextConverter` Bean**。`AuthContextFactory` 不做任何兜底：没有转换器时所有请求都是未登录。模板中的 `auth/AuthContextConverter.kt` 是最小范式，契约见 `references/auth.md`。
+1. **必须自己提供 `AuthContextConverter` Bean**。`AuthContextFactory` 不做任何兜底：没有转换器时所有请求都是未登录。模板中的 `auth/JwtAuthContextConverter.kt` 是最小范式，契约见 `references/auth.md`。
 2. **注册 `BaseException` → RFC 9457 ProblemDetail 的转换**。模板 `common/ApiExceptionHandler.kt` 继承 `ResponseEntityExceptionHandler` 并把 `RuntimeException` 交给 `BaseException.toProblemDetail()`，否则 `@HasLogin` 拒绝时拿不到 401 响应体。
 3. **不要写** `@EnableXxx`、`ObjectMapper`/`JsonMapper` 配置、鉴权拦截器注册——自动配置已处理（`micro-web` 初始化 `JsonUtils`，`micro-auth` 注册 `@HasLogin/@HasSubject/@HasRole/@HasPermission` 四个 Advisor）。
 4. 主类放在基础包根（`@SpringBootApplication` 扫描所有子包），Kotlin 组件类需要 `kotlin("plugin.spring")` 插件才能被 AOP 代理。
@@ -100,11 +96,11 @@ python scripts/init_project.py --path <目录> --package <包名> --name <项目
 
 1. `./gradlew compileKotlin` 通过。
 2. `./gradlew test` 通过（模板自带 `AuthFlowTest`，覆盖登录、401、403、JSON Schema）。
-3. `./gradlew bootRun` 启动无异常后：
+3. `./gradlew bootRun` 启动无异常后（模板内置账号 `admin/admin123`、`reader/reader123`）：
    - `POST /login` 取 token；
    - 不带 token 访问受保护接口应返回 401 且响应体为 ProblemDetail；
    - 带 token 访问成功；
-   - 权限不足返回 403。
+   - `reader` 删除接口返回 403。
 4. 任一失败按 `references/pitfalls.md` 排查；仍失败时如实报告错误输出，不要声称已通过。
 
 ## 常见失败速查
@@ -117,7 +113,7 @@ python scripts/init_project.py --path <目录> --package <包名> --name <项目
 | `jmicro.config.enabled` 不生效 | 默认 `false`，必须显式开启；图片上传、provider 配置都依赖它 |
 | 找不到 `spring-boot-starter-web` | Boot 4 改名为 `spring-boot-starter-webmvc` |
 | jOOQ 生成的类不存在 | 生成代码需先跑 `db-generate` 标签的测试（需要可连的数据库） |
-| 依赖解析失败 | 未发布到本地仓库，或新项目未加 `mavenLocal()` |
+| `Could not find com.jiangtj.micro:micro-*` | 该版本未发布到 Maven Central；改用已发布版本，或 `--local-repo` + 本地发布 |
 
 ## 参考文件
 

@@ -14,7 +14,8 @@
 
 ## Maven 坐标
 
-`group = com.jiangtj.micro`，`version` 取自仓库 `gradle.properties`（本文档编写时为 `0.3.3`）：
+`group = com.jiangtj.micro`，`version` 取 Maven Central 上的发布版本（本文档对应 `0.4.0`，最新版本见
+`https://repo1.maven.org/maven2/com/jiangtj/micro/micro-dependencies/maven-metadata.xml`）：
 
 ```
 com.jiangtj.micro:micro-dependencies:<version>   # type=pom, import
@@ -35,8 +36,9 @@ com.jiangtj.micro:micro-test        # testImplementation
 
 ```kotlin
 repositories {
-    mavenLocal()      // 本地发布（./gradlew publishToMavenLocal）时必需
     mavenCentral()
+    // 仅当使用本地发布的未发布版本时添加（放在 mavenCentral() 之前）：
+    // mavenLocal()
 }
 
 dependencies {
@@ -48,7 +50,19 @@ dependencies {
 
 Maven 接入用 `dependencyManagement` + `<type>pom</type><scope>import</scope>`。
 
-> 仓库根使用 `io.spring.dependency-management` 插件并 `imports { mavenBom(spring-boot-dependencies) }`；独立新项目用 `platform(...)` 已足够，无需该插件。
+> 官方示例工程用 `io.spring.dependency-management` 插件 `imports { mavenBom(spring-boot-dependencies) }`；独立项目用 `platform(...)` 等价且更简单。
+> `micro-dependencies` 只约束 `micro-*` 版本，**不含** Spring Boot BOM，因此 Boot BOM 必须自己 import。
+
+## 版本对齐
+
+| 组件 | 版本 |
+| --- | --- |
+| jmicro | `0.4.0` |
+| Spring Boot | `4.1.1`（Boot 4 / Servlet 栈） |
+| Kotlin | `2.4.20` |
+| Java | 21 |
+
+Boot 大版本与 jmicro 的编译目标不匹配时，会出现自动配置类缺失、`NoSuchMethodError` 等问题，优先对齐上表。
 
 ## Spring Boot 4 starter 名称差异
 

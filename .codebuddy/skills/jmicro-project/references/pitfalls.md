@@ -42,13 +42,12 @@
 ## 构建/依赖
 
 11. **Spring Boot 4 starter 名称**：`spring-boot-starter-webmvc`（不是 `-web`）、`spring-boot-webmvc-test`。
-12. **依赖解析失败**：`micro-*` 需先发布到本地仓库，新项目 repositories 中必须有 `mavenLocal()`。
-    发布命令（当前仓库默认开启 PGP 签名，本机无 key 时会失败）：
-    ```
-    ./gradlew publishToMavenLocal -x test -PsignAllPublications=false -PmavenCentralPublishing=false
-    ```
-    Maven Central 上同版本号可能落后于源码（如缺少 `BCryptUtils`、`com.jiangtj.micro.common.schema`），遇到 `Unresolved reference` 先本地重新发布。
-13. **版本写错**：`micro-dependencies`、`micro-*` 版本必须一致，且与所用 Boot 大版本匹配（本仓库为 Boot 4 / Java 21 / Kotlin 2.4）。
+12. **`Could not find com.jiangtj.micro:micro-*:<version>`**
+    该版本尚未发布到 Maven Central，或拼错了版本号。先用 `maven-metadata.xml` 确认可用版本，换成已发布版本。
+    仅在需要未发布版本时，才由使用方本地发布（`publishToMavenLocal`）并加 `mavenLocal()`；jmicro 官方仓库默认开启 PGP 签名，本机无 key 时发布需加
+    `-PsignAllPublications=false -PmavenCentralPublishing=false`。
+13. **版本写错**：`micro-dependencies`、`micro-*` 版本必须一致，且与所用 Boot 大版本匹配（0.4.0 → Spring Boot 4.1.1 / Kotlin 2.4.20 / Java 21）。
+    本技能模板针对 0.4.0；用 `--latest` 解析到更旧版本时会出现 `Unresolved reference`（`BCryptUtils`、`common.schema` 等新 API 尚不存在）。
 
 ## 数据相关
 

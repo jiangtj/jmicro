@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
 """Scaffold a new JMicro (com.jiangtj.micro) Spring Boot project from bundled templates.
 
+Works standalone: the Gradle wrapper is bundled with this skill, templates use
+Maven Central coordinates and no local clone of the jmicro repository is required.
+
 Usage:
-    python scripts/init_project.py --path ../my-app --package com.example.app --name my-app --port 8080
-    python scripts/init_project.py --path ../my-app --features db,config,pic
+    python scripts/init_project.py --path ../shop-api --package com.example.shop --name shop-api
+    python scripts/init_project.py --path ../shop-api --features db,config,pic
+    python scripts/init_project.py --path ../shop-api --latest            # resolve newest released version
+    python scripts/init_project.py --path ../shop-api --local-repo        # also look in ~/.m2
 
 Templates live in <skill>/assets/template:
     base/                 always copied
@@ -16,6 +21,9 @@ Placeholders replaced in both file names and file contents:
 Line blocks inside text files:
     // #if db          /  # #if db|config     (any-of)
     // #endif          /  # #endif
+
+Runner-up: without Python, copy assets/template manually, replace the
+placeholders above and drop the blocks of unused features.
 """
 
 from __future__ import annotations
@@ -24,51 +32,39 @@ import argparse
 import re
 import shutil
 import sys
+import urllib.request
 from pathlib import Path
 
 SKILL_DIR = Path(__file__).resolve().parent.parent
 TEMPLATE_DIR = SKILL_DIR / "assets" / "template"
-OWNER_REPO = SKILL_DIR.parents[2]
+WRAPPER_DIR = SKILL_DIR / "assets" / "gradle-wrapper"
 
 FEATURES = ("db", "config", "pic")
+
+# Versions CORS: keep in sync with the jmicro release this skill targets.
+DEFAULT_JMICRO_VERSION = "0.4.0"
+DEFAULT_SPRING_BOOT_VERSION = "4.1.1"
+DEFAULT_KOTLIN_VERSION = "2.4.20"
+MAVEN_METADATA = "https://repo1.maven.org/maven2/com/jiangtj/micro/micro-dependencies/maven-metadata.xml"
+
 TEXT_SUFFIXES = {".kt", ".kts", ".java", ".properties", ".sql", ".xml", ".json", ".md", ".yml", ".yaml", ".toml", ""}
 IF_RE = re.compile(r"^\s*(?://|#)\s*#if\s+([a-z0-9_|.\- ]+)\s*$", re.IGNORECASE)
 ENDIF_RE = re.compile(r"^\s*(?://|#)\s*#endif\s*$", re.IGNORECASE)
 
 
-def parse_properties(path: Path) -> dict[str, str]:
-    result: dict[str, str] = {}
-    if not path.is_file():
-        return result
-    for line in path.read_text(encoding="utf-8").splitlines():
-        line = line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        key, value = line.split("=", 1)
-        result[key.strip()] = value.strip()
-    return result
-
-
-def read_jmicro_versions(repo: Path) -> dict[str, str]:
-    """Read versions from the jmicro repository (single source of truth)."""
-    versions: dict[str, str] = {}
-    props = parse_properties(repo / "gradle.properties")
-    if props.get("version"):
-        versions["jmicro"] = props["version"]
-
-    toml = repo / "gradle" / "libs.versions.toml"
-    if toml.is_file():
-        text = toml.read_text(encoding="utf-8")
-        for key, name in (
-            ("springBoot", "springBoot"),
-            ("kotlin", "kotlin"),
-            ("springDependencyManagement", "depManagement"),
-            ("java", "java"),
-        ):
-            match = re.search(rf'^{key}\s*=\s*"([^"]+)"', text, re.MULTILINE)
-            if match:
-                versions[name] = match.group(1)
-    return versions
+def latest_released_version() -> str | None:
+    """Query Maven Central for the newest released micro-dependencies version."""
+    try:
+        with urllib.request.urlopen(MAVEN_METADATA, timeout=10) as response:
+            text = response.read().decode("utf-8", errors="replace")
+    except Exception as error:  # network restrictions are common; fall back silently
+        print(f"[warn] cannot read Maven Central metadata ({error}); using {DEFAULT_JMICRO_VERSION}")
+        return None
+    releases = re.findall(r"<version>([^<]+)</version>", text)
+    stable = [v for v in releases if not any(tag in v.lower() for tag in ("alpha", "beta", "rc", "snapshot"))]
+    if stable:
+        return stable[-1]
+    return releases[-1] if releases else None
 
 
 def pascal_case(name: str) -> str:
@@ -101,17 +97,19 @@ def filter_if_blocks(text: str, enabled: set[str]) -> str:
 
 
 class Context:
-    def __init__(self, args: argparse.Namespace, versions: dict[str, str]) -> None:
+    def __init__(self, args: argparse.Namespace, jmicro_version: str) -> None:
         self.package = args.package
         self.pkg_path = args.package.replace(".", "/")
         self.name = args.name
         self.app_class = args.app_class or pascal_case(args.name)
         self.port = str(args.port)
         self.group = args.group or default_group(args.package)
-        self.jmicro = args.jmicro_version or versions.get("jmicro", "0.3.3")
-        self.spring_boot = args.spring_boot_version or versions.get("springBoot", "4.1.1")
-        self.kotlin = args.kotlin_version or versions.get("kotlin", "2.4.20")
-        self.features = set(args.features)
+        self.jmicro = jmicro_version
+        self.spring_boot = args.spring_boot_version or DEFAULT_SPRING_BOOT_VERSION
+        self.kotlin = args.kotlin_version or DEFAULT_KOTLIN_VERSION
+        self.features = {f.strip().lower() for f in args.features.split(",") if f.strip()}
+        if args.local_repo:
+            self.features.add("local-repo")
 
     def apply(self, text: str) -> str:
         replacements = {
@@ -150,23 +148,24 @@ def copy_tree(src: Path, dest_root: Path, ctx: Context) -> list[Path]:
     return created
 
 
-def copy_wrapper(repo: Path, dest_root: Path) -> list[str]:
+def copy_wrapper(dest_root: Path) -> list[str]:
+    """Install the bundled Gradle wrapper (no local clone of jmicro required)."""
     copied: list[str] = []
-    candidates = ["gradlew", "gradlew.bat", "gradle/wrapper/gradle-wrapper.jar", "gradle/wrapper/gradle-wrapper.properties"]
-    for name in candidates:
-        src = repo / name
-        if not src.is_file():
+    mapping = {
+        "gradlew": "gradlew",
+        "gradlew.bat": "gradlew.bat",
+        "gradle-wrapper.jar": "gradle/wrapper/gradle-wrapper.jar",
+        "gradle-wrapper.properties": "gradle/wrapper/gradle-wrapper.properties",
+    }
+    for source_name, relative_target in mapping.items():
+        source = WRAPPER_DIR / source_name
+        if not source.is_file():
             continue
-        target = dest_root / name
+        target = dest_root / relative_target
         target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(src, target)
-        copied.append(name)
+        shutil.copy2(source, target)
+        copied.append(relative_target)
     return copied
-
-
-def install_hint(version: str) -> str:
-    m2 = Path.home() / ".m2" / "repository" / "com" / "jiangtj" / "micro" / "micro-auth" / version
-    return "" if m2.is_dir() else version
 
 
 def main() -> int:
@@ -178,10 +177,11 @@ def main() -> int:
     parser.add_argument("--group", default=None, help="Maven groupId")
     parser.add_argument("--app-class", default=None, help="main class prefix, e.g. Shop")
     parser.add_argument("--features", default="", help="comma separated: db,config,pic")
-    parser.add_argument("--jmicro-repo", default=None, help="jmicro repository root (version discovery + gradle wrapper)")
-    parser.add_argument("--jmicro-version", default=None)
-    parser.add_argument("--spring-boot-version", default=None)
-    parser.add_argument("--kotlin-version", default=None)
+    parser.add_argument("--jmicro-version", default=None, help=f"default {DEFAULT_JMICRO_VERSION}")
+    parser.add_argument("--spring-boot-version", default=None, help=f"default {DEFAULT_SPRING_BOOT_VERSION}")
+    parser.add_argument("--kotlin-version", default=None, help=f"default {DEFAULT_KOTLIN_VERSION}")
+    parser.add_argument("--latest", action="store_true", help="resolve the newest released version from Maven Central")
+    parser.add_argument("--local-repo", action="store_true", help="add mavenLocal() for unpublished builds")
     parser.add_argument("--no-wrapper", action="store_true")
     parser.add_argument("--force", action="store_true", help="allow non-empty target directory")
     args = parser.parse_args()
@@ -198,41 +198,39 @@ def main() -> int:
     if not args.name:
         args.name = target.name.lower().replace("_", "-").replace(" ", "-") or "app"
 
-    features = {f.strip().lower() for f in args.features.split(",") if f.strip()}
-    unknown = features - set(FEATURES)
+    unknown = {f.strip().lower() for f in args.features.split(",") if f.strip()} - set(FEATURES)
     if unknown:
         print(f"[error] unknown features: {', '.join(sorted(unknown))} (allowed: {', '.join(FEATURES)})", file=sys.stderr)
         return 1
-    args.features = features
 
-    repo = Path(args.jmicro_repo).expanduser().resolve() if args.jmicro_repo else OWNER_REPO
-    versions = read_jmicro_versions(repo) if repo.is_dir() else {}
+    jmicro_version = args.jmicro_version
+    if not jmicro_version and args.latest:
+        jmicro_version = latest_released_version()
+        if jmicro_version and jmicro_version != DEFAULT_JMICRO_VERSION:
+            print(f"[warn] Maven Central latest is {jmicro_version}, but this skill's templates target "
+                  f"{DEFAULT_JMICRO_VERSION}. Older releases may lack APIs the templates use "
+                  f"(BCryptUtils, com.jiangtj.micro.common.schema).")
+    ctx = Context(args, jmicro_version or DEFAULT_JMICRO_VERSION)
 
-    ctx = Context(args, versions)
     created = copy_tree(TEMPLATE_DIR / "base", target, ctx)
-    for feature in sorted(features):
+    for feature in sorted(ctx.features & set(FEATURES)):
         feature_dir = TEMPLATE_DIR / "features" / feature
         if feature_dir.is_dir():
             created += copy_tree(feature_dir, target, ctx)
 
     wrapper: list[str] = []
     if not args.no_wrapper:
-        wrapper = copy_wrapper(repo, target)
+        wrapper = copy_wrapper(target)
 
     print(f"[ok] created {len(created)} files at {target}")
     print(f"     package      : {ctx.package}")
     print(f"     app class    : {ctx.app_class}Application")
-    print(f"     jmicro       : {ctx.jmicro}")
-    print(f"     spring boot  : {ctx.spring_boot} / kotlin {ctx.kotlin}")
-    print(f"     features     : {', '.join(sorted(features)) or '(none)'}")
-    print(f"     gradle wrapper: {', '.join(wrapper) if wrapper else 'NOT copied (run `gradle wrapper` manually)'}")
-
-    missing = install_hint(ctx.jmicro)
-    if missing:
-        print(f"[warn] com.jiangtj.micro:micro-*:{missing} not found in ~/.m2; run "
-              f"`./gradlew publishToMavenLocal -x test -PsignAllPublications=false "
-              f"-PmavenCentralPublishing=false` in {repo} before building.")
-    print("[next] ./gradlew build  ->  ./gradlew bootRun")
+    print(f"     jmicro       : {ctx.jmicro} ({'mavenLocal + Maven Central' if args.local_repo else 'Maven Central'})")
+    print(f"     spring boot  : {ctx.spring_boot} / kotlin {ctx.kotlin} / java 21")
+    print(f"     features     : {', '.join(sorted(ctx.features & set(FEATURES))) or '(none)'}")
+    print(f"     gradle wrapper: {', '.join(wrapper) if wrapper else 'NOT installed'}")
+    print("[next] ./gradlew build   then   ./gradlew bootRun")
+    print("       login: POST /login {\"username\":\"admin\",\"password\":\"admin123\"}")
     return 0
 
 

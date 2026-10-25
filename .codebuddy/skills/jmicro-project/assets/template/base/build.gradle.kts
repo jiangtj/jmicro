@@ -13,8 +13,9 @@ kotlin {
 }
 
 repositories {
-    // 本地开发：先在 jmicro 仓库执行 ./gradlew publishToMavenLocal
+    // #if local-repo
     mavenLocal()
+    // #endif
     mavenCentral()
 }
 
