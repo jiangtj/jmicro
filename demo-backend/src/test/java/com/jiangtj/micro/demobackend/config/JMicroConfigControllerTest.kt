@@ -127,7 +127,6 @@ class JMicroConfigControllerTest {
         assertThat(keys).containsExactlyInAnyOrder(
             "demo.site.name",
             "demo.site.description",
-            "demo.site.theme",
             "demo.site.social-links",
         )
     }

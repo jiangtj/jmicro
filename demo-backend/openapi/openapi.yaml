@@ -506,9 +506,6 @@ paths:
                 - key: demo.site.description
                   name: 站点描述
                   value: 基于 JMicro 的演示站点
-                - key: demo.site.theme
-                  name: 站点主题
-                  value: light
                 - key: demo.site.social-links
                   name: 社交链接
                   value: '{"github":"https://github.com/jiangtj/jmicro"}'

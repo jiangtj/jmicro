@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component
 import java.util.function.Function
 
 /**
- * 演示用系统配置项，覆盖 TEXT / TEXTAREA / SWITCH / SELECT / JSON 五种前端表单类型。
+ * 演示用系统配置项，覆盖 TEXT / TEXTAREA / SWITCH / JSON 四种前端表单类型。
  *
  * 这里的 [SystemItemInfo.value] 是默认值，运行期通过接口修改后的值持久化在 `sys_config` 表。
  */
@@ -19,8 +19,6 @@ class DemoConfigLoader : JMicroConfigLoader {
 
     private val socialLinksType = JsonUtils.jsonMapper.typeFactory
         .constructMapType(LinkedHashMap::class.java, String::class.java, String::class.java)
-
-    private val themes = listOf("light" to "浅色", "dark" to "深色")
 
     override fun load(): List<SystemItemInfo> = listOf(
         SystemItemInfo(
@@ -59,24 +57,6 @@ class DemoConfigLoader : JMicroConfigLoader {
             },
         ),
         SystemItemInfo(
-            key = "demo.site.theme",
-            name = "站点主题",
-            description = "前端配色方案",
-            value = "light",
-            group = demoSiteGroup,
-            type = SystemItemType.SELECT.name,
-            tag = listOf(PUBLIC_TAG),
-            order = 3,
-            provider = themes,
-            valueFormatter = Function {
-                val v = it.trim().lowercase()
-                if (themes.none { theme -> theme.first == v }) {
-                    throw IllegalArgumentException("可选值: ${themes.joinToString(",") { theme -> theme.first }}")
-                }
-                v
-            },
-        ),
-        SystemItemInfo(
             key = "demo.site.social-links",
             name = "社交链接",
             description = "JSON 对象，key 为平台名称，value 为链接地址",
@@ -85,7 +65,7 @@ class DemoConfigLoader : JMicroConfigLoader {
             type = SystemItemType.JSON.name,
             jsonType = socialLinksType,
             tag = listOf(PUBLIC_TAG),
-            order = 4,
+            order = 3,
         ),
     )
 
