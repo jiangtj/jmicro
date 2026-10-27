@@ -37,6 +37,7 @@ info:
     - `book:write`：新增/修改图书
     - `admin` 角色：删除图书、管理系统配置、管理角色与查询权限
     - 权限匹配方式为 simple（`jmicro.auth.permission-match=simple`），前后端权限点一一对应
+    - JWT 只保存角色，不保存权限；权限在鉴权/读取当前用户时按角色解析（Caffeine 缓存，角色权限变更即时失效）
   license:
     name: Apache-2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
@@ -1107,7 +1108,10 @@ components:
       properties:
         token:
           type: string
-          description: 'HS256 签名的 JWT，后续请求放入 `Authorization: Bearer <token>`'
+          description: |
+            HS256 签名的 JWT，后续请求放入 `Authorization: Bearer <token>`。
+            claims 仅包含 `sub` / `name` / `type` / `roles` 等基础信息，**不包含 permissions**：
+            权限由服务端按角色解析并缓存，避免权限点增多后 token 体积膨胀。
         username:
           type: string
           description: 用户名（JWT subject）

@@ -14,7 +14,8 @@ import javax.crypto.SecretKey
 /**
  * demo 的 JWT 服务：基于 HS256 签发与校验 token。
  *
- * 角色与权限直接写入 claims，服务端无需保存会话（无状态）。
+ * 只有角色写入 claims，权限不进 token：权限均由角色派生，项目权限点变多后 token 不会膨胀，
+ * 鉴权时再按角色解析（见 `auth.permission.RolePermissionResolver`，带缓存）。
  */
 @Component
 class DemoJwtService(
@@ -25,7 +26,6 @@ class DemoJwtService(
         const val CLAIM_NAME: String = "name"
         const val CLAIM_TYPE: String = "type"
         const val CLAIM_ROLES: String = "roles"
-        const val CLAIM_PERMISSIONS: String = "permissions"
 
         /**
          * 标识 demo 自己签发的账号体系
@@ -46,7 +46,6 @@ class DemoJwtService(
             .claim(CLAIM_NAME, user.nickname)
             .claim(CLAIM_TYPE, SUBJECT_TYPE)
             .claim(CLAIM_ROLES, user.roles)
-            .claim(CLAIM_PERMISSIONS, user.permissions)
             .issuedAt(Date.from(now))
             .expiration(Date.from(now.plus(properties.ttl)))
             .signWith(signKey, Jwts.SIG.HS256)
@@ -70,8 +69,6 @@ class DemoJwtService(
         }
 
     fun roles(claims: Claims): List<String> = stringList(claims, CLAIM_ROLES)
-
-    fun permissions(claims: Claims): List<String> = stringList(claims, CLAIM_PERMISSIONS)
 
     private fun stringList(claims: Claims, name: String): List<String> {
         val value = claims[name]

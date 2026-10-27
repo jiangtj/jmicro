@@ -4,8 +4,8 @@ import com.jiangtj.micro.auth.AuthRequestAttributes
 import com.jiangtj.micro.auth.context.AuthContext
 import com.jiangtj.micro.auth.context.AuthContextConverter
 import com.jiangtj.micro.auth.context.AuthRequest
-import com.jiangtj.micro.auth.context.Authorization
 import com.jiangtj.micro.auth.context.Subject
+import com.jiangtj.micro.demobackend.auth.permission.RolePermissionResolver
 import io.jsonwebtoken.Claims
 import org.springframework.core.Ordered
 import org.springframework.stereotype.Component
@@ -14,11 +14,13 @@ import org.springframework.stereotype.Component
  * 将请求头中的 JWT 转换为鉴权上下文。
  *
  * token 由 `POST /login` 以 HS256 签发；签名或有效期校验失败时视为未登录。
+ * token 中只包含角色，权限由 [RoleBasedAuthorization] 按角色惰性解析（带缓存）。
  * 优先级高于内置的 `JwtConverter`（后者用于 OIDC/JWKS 场景）。
  */
 @Component
 class DemoAuthContextConverter(
     private val jwtService: DemoJwtService,
+    private val rolePermissionResolver: RolePermissionResolver,
 ) : AuthContextConverter, Ordered {
 
     override fun getOrder(): Int = 0
@@ -41,7 +43,7 @@ class DemoAuthContextConverter(
             .build()
         return AuthContext.create(
             subject,
-            Authorization.create(jwtService.roles(claims), jwtService.permissions(claims)),
+            RoleBasedAuthorization(jwtService.roles(claims), rolePermissionResolver::resolve),
         )
     }
 

@@ -1,5 +1,6 @@
 package com.jiangtj.micro.demobackend.auth.role
 
+import com.jiangtj.micro.demobackend.auth.permission.RolePermissionResolver
 import com.jiangtj.micro.demobackend.dao.SysRoleRepository
 import com.jiangtj.micro.demobackend.jooq.tables.daos.SysPermissionDao
 import com.jiangtj.micro.demobackend.jooq.tables.daos.SysRoleDao
@@ -13,12 +14,15 @@ import org.springframework.transaction.annotation.Transactional
  *
  * 角色主体存放在 `sys_role`（持久层使用 jOOQ 生成的 `SysRoleDao`），
  * 角色与权限的绑定存放在 `sys_role_permission`，按权限编码关联（权限字典见 `sys_permission`）。
+ *
+ * 角色权限变更后会失效 [RolePermissionResolver] 中对应角色的缓存，保证鉴权立即生效。
  */
 @Service
 class RoleService(
     private val roleDao: SysRoleDao,
     private val permissionDao: SysPermissionDao,
     private val roleRepository: SysRoleRepository,
+    private val rolePermissionResolver: RolePermissionResolver,
 ) {
 
     /**
@@ -50,6 +54,7 @@ class RoleService(
     @Transactional
     fun update(id: Long, form: RoleForm): RoleDetail {
         val role = findRole(id)
+        val oldCode = role.code
         val code = form.code.trim()
         checkCodeAvailable(code, id)
         val permissionCodes = checkPermissionCodes(form.permissionCodes)
@@ -57,6 +62,9 @@ class RoleService(
         role.name = form.name.trim()
         roleDao.update(role)
         roleRepository.replacePermissions(id, permissionCodes)
+        // 权限绑定或角色编码变化后失效缓存，旧编码的缓存也要清掉
+        oldCode?.let(rolePermissionResolver::invalidate)
+        rolePermissionResolver.invalidate(code)
         return role.toDetail(permissionCodes)
     }
 
@@ -66,9 +74,10 @@ class RoleService(
      */
     @Transactional
     fun delete(id: Long) {
-        findRole(id)
+        val role = findRole(id)
         roleRepository.deleteRelations(id)
         roleDao.deleteById(id)
+        role.code?.let(rolePermissionResolver::invalidate)
     }
 
     private fun findRole(id: Long): SysRole = roleDao.fetchOneById(id)

@@ -173,4 +173,61 @@ class RoleControllerTest {
             .exchange()
             .expectAll(ProblemDetailMvcConsumer.unRole("admin").expect())
     }
+
+    /**
+     * JWT 只保存角色，权限按角色解析并缓存：角色权限变化后缓存失效，
+     * 已签发的 token 无需重新登录即可拿到新权限。
+     */
+    @Test
+    fun rolePermissionChangeTakesEffectWithoutNewToken() {
+        val admin = adminBearer()
+        val reader = "Bearer " + login("reader", "reader123")
+        val readerId = findRoleId(admin, "reader")
+
+        // 预热缓存
+        client.get().uri("/me")
+            .header(HttpHeaders.AUTHORIZATION, reader)
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody()
+            .jsonPath("$.permissions.length()").isEqualTo(1)
+
+        try {
+            client.put().uri("/roles/{id}", readerId)
+                .header(HttpHeaders.AUTHORIZATION, admin)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(RoleForm("reader", "读者", listOf("book:read", "book:write")))
+                .exchange()
+                .expectStatus().isOk()
+
+            // 同一个 token，权限立即生效
+            client.get().uri("/me")
+                .header(HttpHeaders.AUTHORIZATION, reader)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.permissions.length()").isEqualTo(2)
+                .jsonPath("$.permissions[1]").isEqualTo("book:write")
+        } finally {
+            // 还原初始数据，避免影响其它用例
+            client.put().uri("/roles/{id}", readerId)
+                .header(HttpHeaders.AUTHORIZATION, admin)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(RoleForm("reader", "读者", listOf("book:read")))
+                .exchange()
+                .expectStatus().isOk()
+        }
+    }
+
+    private fun findRoleId(bearer: String, code: String): Long {
+        val roles = checkNotNull(
+            client.get().uri("/roles")
+                .header(HttpHeaders.AUTHORIZATION, bearer)
+                .exchange()
+                .expectStatus().isOk()
+                .returnResult(object : ParameterizedTypeReference<List<Map<String, Any>>>() {})
+                .responseBody,
+        ) { "role list is null" }
+        return (roles.first { it["code"] == code }["id"] as Number).toLong()
+    }
 }
