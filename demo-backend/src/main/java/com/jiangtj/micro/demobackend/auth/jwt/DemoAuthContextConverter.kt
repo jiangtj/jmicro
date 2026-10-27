@@ -1,4 +1,4 @@
-package com.jiangtj.micro.demobackend.auth
+package com.jiangtj.micro.demobackend.auth.jwt
 
 import com.jiangtj.micro.auth.AuthRequestAttributes
 import com.jiangtj.micro.auth.context.AuthContext

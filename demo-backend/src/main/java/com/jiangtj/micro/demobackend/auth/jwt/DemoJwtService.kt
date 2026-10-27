@@ -1,5 +1,6 @@
-package com.jiangtj.micro.demobackend.auth
+package com.jiangtj.micro.demobackend.auth.jwt
 
+import com.jiangtj.micro.demobackend.auth.user.DemoUser
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.Jwts

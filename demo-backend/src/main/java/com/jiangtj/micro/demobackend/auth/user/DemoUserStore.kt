@@ -1,4 +1,4 @@
-package com.jiangtj.micro.demobackend.auth
+package com.jiangtj.micro.demobackend.auth.user
 
 import com.jiangtj.micro.auth.BCryptUtils
 import com.jiangtj.micro.demobackend.dao.SysPermissionRepository
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component
  * `sys_user` / `sys_role` / `sys_permission` 及两张关联表。
  *
  * 密码以 bcrypt 哈希保存，校验时通过 [BCryptUtils] 比对；
- * 登录态由 [DemoJwtService] 签发的 JWT 承载，服务端不保存会话。
+ * 登录态由 `auth.jwt.DemoJwtService` 签发的 JWT 承载，服务端不保存会话。
  */
 @Component
 open class DemoUserStore(

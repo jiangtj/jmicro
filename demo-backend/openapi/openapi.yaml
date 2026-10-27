@@ -3,6 +3,8 @@
 # 依据模块内的 controller 编写（src/main/java/com/jiangtj/micro/demobackend/controller）：
 #   LoginController.kt        -> POST /login、GET /me
 #   BookController.kt         -> /books、/books/{id}、/books/form-schema
+#   RoleController.kt         -> /roles、/roles/{id}
+#   PermissionController.kt   -> /permissions、/permissions/{code}
 #   PicUploadController.kt    -> POST /pic/upload
 #   JMicroConfigController.kt -> /system/configs/**
 #
@@ -33,7 +35,7 @@ info:
     鉴权规则：
     - `book:read`：查看图书
     - `book:write`：新增/修改图书
-    - `admin` 角色：删除图书、管理系统配置
+    - `admin` 角色：删除图书、管理系统配置、管理角色与查询权限
     - 权限匹配方式为 simple（`jmicro.auth.permission-match=simple`），前后端权限点一一对应
   license:
     name: Apache-2.0
@@ -48,6 +50,10 @@ tags:
     description: 登录与当前用户信息（LoginController）
   - name: Books
     description: 图书增删改查与表单 Schema（BookController）
+  - name: Role
+    description: 用户角色增删改查（RoleController），仅 admin 角色可访问
+  - name: Permission
+    description: 权限字典查询（PermissionController），仅 admin 角色可访问
   - name: PicUpload
     description: 图片上传（PicUploadController）
   - name: JMicroConfig
@@ -330,6 +336,251 @@ paths:
                 instance: /books/1
         '404':
           $ref: '#/components/responses/BookNotFound'
+
+  # ------------------------------------------------------------------
+  # RoleController
+  # ------------------------------------------------------------------
+  /roles:
+    get:
+      tags: [Role]
+      summary: 查询角色列表
+      description: 仅 `admin` 角色可访问。返回所有角色及其绑定的权限编码。
+      operationId: listRoles
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 角色列表（无数据时为空数组）
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RoleDetail'
+              example:
+                - id: 1
+                  code: admin
+                  name: 管理员
+                  permissionCodes: ['book:read', 'book:write']
+                - id: 2
+                  code: reader
+                  name: 读者
+                  permissionCodes: ['book:read']
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: 缺少 admin 角色
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              example:
+                type: 'about:blank'
+                title: No Role
+                status: 403
+                detail: "Don't have role<admin>."
+                instance: /roles
+    post:
+      tags: [Role]
+      summary: 新增角色
+      description: |
+        仅 `admin` 角色可访问。角色编码 `code` 全局唯一，重复时返回 400；
+        `permissionCodes` 必须存在于 `sys_permission` 字典中（见 `GET /permissions`），否则返回 400。
+      operationId: createRole
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleForm'
+            example:
+              code: tester
+              name: 测试角色
+              permissionCodes: ['book:read']
+      responses:
+        '200':
+          description: 创建成功，返回含主键的角色详情
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleDetail'
+              example:
+                id: 3
+                code: tester
+                name: 测试角色
+                permissionCodes: ['book:read']
+        '400':
+          description: 字段校验失败、角色编码重复或权限编码不存在
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              example:
+                type: 'about:blank'
+                title: Bad Request
+                status: 400
+                detail: 角色编码已存在：admin
+                instance: /roles
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /roles/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: 角色主键
+        schema:
+          type: integer
+          format: int64
+          minimum: 1
+        example: 3
+    get:
+      tags: [Role]
+      summary: 查询单个角色
+      description: 仅 `admin` 角色可访问，返回角色绑定的权限编码。
+      operationId: getRole
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 角色详情
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleDetail'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/RoleNotFound'
+    put:
+      tags: [Role]
+      summary: 修改角色
+      description: |
+        仅 `admin` 角色可访问。`permissionCodes` 整体覆盖该角色的权限绑定，传空数组表示清空。
+        `code` 需保持全局唯一（排除自身）。
+      operationId: updateRole
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleForm'
+            example:
+              code: tester
+              name: 测试角色（改）
+              permissionCodes: ['book:read', 'book:write']
+      responses:
+        '200':
+          description: 修改成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleDetail'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/RoleNotFound'
+    delete:
+      tags: [Role]
+      summary: 删除角色
+      description: |
+        仅 `admin` 角色可访问。同时清理 `sys_user_role` / `sys_role_permission` 中该角色的关联记录
+        （关联表未建外键，由应用层维护）。
+      operationId: deleteRole
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 删除成功（无响应体）
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/RoleNotFound'
+
+  # ------------------------------------------------------------------
+  # PermissionController
+  # ------------------------------------------------------------------
+  /permissions:
+    get:
+      tags: [Permission]
+      summary: 查询权限字典
+      description: 仅 `admin` 角色可访问。字典内容由 `db/migration/R__sys_permission.sql` 维护。
+      operationId: listPermissions
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: keyword
+          in: query
+          required: false
+          description: 关键字，同时匹配权限编码与名称（忽略大小写）
+          schema:
+            type: string
+          example: write
+      responses:
+        '200':
+          description: 权限列表，按编码排序（无数据时为空数组）
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Permission'
+              example:
+                - id: 1
+                  code: book:read
+                  name: 图书查看权限
+                - id: 2
+                  code: book:write
+                  name: 图书新增/修改权限
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /permissions/{code}:
+    parameters:
+      - name: code
+        in: path
+        required: true
+        description: 权限编码，如 `book:read`
+        schema:
+          type: string
+        example: book:read
+    get:
+      tags: [Permission]
+      summary: 按编码查询权限
+      description: 仅 `admin` 角色可访问。
+      operationId: getPermission
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 权限详情
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Permission'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/PermissionNotFound'
 
   # ------------------------------------------------------------------
   # PicUploadController
@@ -757,6 +1008,30 @@ components:
             status: 404
             detail: 图书不存在：1
             instance: /books/1
+    RoleNotFound:
+      description: 角色不存在
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+          example:
+            type: 'about:blank'
+            title: Not Found
+            status: 404
+            detail: 角色不存在：3
+            instance: /roles/3
+    PermissionNotFound:
+      description: 权限编码不存在
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+          example:
+            type: 'about:blank'
+            title: Not Found
+            status: 404
+            detail: 权限不存在：not:exist
+            instance: /permissions/not:exist
     ConfigNotFound:
       description: 配置项不存在
       content:
@@ -954,6 +1229,83 @@ components:
           minimum: 0
           description: 库存，不小于 0（`@NotNull @Min(0)`）
           example: 2
+
+    RoleDetail:
+      type: object
+      description: 角色详情（`permissionCodes` 来自 `sys_role_permission`，按编码排序）
+      required: [id, code, name, permissionCodes]
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: 主键
+          example: 3
+        code:
+          type: string
+          maxLength: 64
+          description: 角色编码，全局唯一，`@HasRole` 注解使用该值
+          example: tester
+        name:
+          type: string
+          maxLength: 64
+          description: 角色名称
+          example: 测试角色
+        permissionCodes:
+          type: array
+          description: 绑定的权限编码
+          items:
+            type: string
+          example: ['book:read']
+
+    RoleForm:
+      type: object
+      description: 角色新增/修改请求体
+      required: [code, name]
+      properties:
+        code:
+          type: string
+          minLength: 1
+          maxLength: 64
+          pattern: '^[A-Za-z0-9_.:-]+$'
+          description: 角色编码（`@NotBlank @Size(max = 64) @Pattern`），全局唯一
+          example: tester
+        name:
+          type: string
+          minLength: 1
+          maxLength: 64
+          description: 角色名称（`@NotBlank @Size(max = 64)`）
+          example: 测试角色
+        permissionCodes:
+          type: array
+          default: []
+          description: |
+            绑定的权限编码，必须存在于 `sys_permission` 字典中，否则返回 400；
+            修改时整体覆盖，传空数组表示清空该角色的全部权限。
+          items:
+            type: string
+          example: ['book:read']
+
+    Permission:
+      type: object
+      description: 权限字典项（`sys_permission`，jOOQ 生成的 pojo）
+      required: [code, name]
+      properties:
+        id:
+          type: integer
+          format: int64
+          nullable: true
+          description: 主键
+          example: 1
+        code:
+          type: string
+          maxLength: 128
+          description: 权限编码，`@HasPermission` 注解使用该值
+          example: book:read
+        name:
+          type: string
+          maxLength: 64
+          description: 权限名称
+          example: 图书查看权限
 
     JsonSchema:
       type: object

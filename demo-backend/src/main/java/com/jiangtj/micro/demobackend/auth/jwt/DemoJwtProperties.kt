@@ -1,4 +1,4 @@
-package com.jiangtj.micro.demobackend.auth
+package com.jiangtj.micro.demobackend.auth.jwt
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Component
