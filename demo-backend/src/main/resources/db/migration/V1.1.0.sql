@@ -59,10 +59,10 @@ VALUES ('admin', '管理员'),
        ('reader', '读者');
 
 INSERT INTO sys_permission (code, name)
-VALUES ('book:*', '图书全部权限'),
-       ('book:read', '图书查看权限');
+VALUES ('book:read', '图书查看权限'),
+       ('book:write', '图书新增/修改权限');
 
--- 管理员：全部图书权限
+-- 管理员：全部图书权限（simple 匹配，需逐条关联具体权限点）
 INSERT INTO sys_user_role (user_id, role_id)
 SELECT u.id, r.id FROM sys_user u, sys_role r WHERE u.username = 'admin' AND r.code = 'admin';
 -- 普通读者：只能查看图书
@@ -70,6 +70,6 @@ INSERT INTO sys_user_role (user_id, role_id)
 SELECT u.id, r.id FROM sys_user u, sys_role r WHERE u.username = 'reader' AND r.code = 'reader';
 
 INSERT INTO sys_role_permission (role_id, permission_id)
-SELECT r.id, p.id FROM sys_role r, sys_permission p WHERE r.code = 'admin' AND p.code = 'book:*';
+SELECT r.id, p.id FROM sys_role r, sys_permission p WHERE r.code = 'admin';
 INSERT INTO sys_role_permission (role_id, permission_id)
 SELECT r.id, p.id FROM sys_role r, sys_permission p WHERE r.code = 'reader' AND p.code = 'book:read';

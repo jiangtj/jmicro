@@ -27,14 +27,14 @@ info:
     与 micro-sql-jooq（数据访问）的能力。
 
     内置演示账号（见 `db/migration/V1.1.0.sql`）：
-    - `admin` / `admin123`：角色 `admin`，权限 `book:*`
+    - `admin` / `admin123`：角色 `admin`，权限 `book:read`、`book:write`
     - `reader` / `reader123`：角色 `reader`，权限 `book:read`
 
     鉴权规则：
     - `book:read`：查看图书
     - `book:write`：新增/修改图书
     - `admin` 角色：删除图书、管理系统配置
-    - 权限匹配方式为 ant-style（`jmicro.auth.permission-match=ant`）
+    - 权限匹配方式为 simple（`jmicro.auth.permission-match=simple`），前后端权限点一一对应
   license:
     name: Apache-2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
@@ -89,7 +89,7 @@ paths:
                 username: admin
                 nickname: 管理员
                 roles: [admin]
-                permissions: ['book:*']
+                permissions: ['book:read', 'book:write']
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -852,7 +852,7 @@ components:
           description: 权限编码列表（角色间接拥有）
           items:
             type: string
-          example: ['book:*']
+          example: ['book:read', 'book:write']
 
     MeResult:
       type: object
