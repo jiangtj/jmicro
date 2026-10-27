@@ -26,7 +26,7 @@ info:
     jmicro 的 Servlet 栈演示服务，用于展示 micro-auth（登录/鉴权）、micro-business（图片上传、系统配置）
     与 micro-sql-jooq（数据访问）的能力。
 
-    内置演示账号（见 `db/migration/V1.1.0.sql`）：
+    内置演示账号（见 `db/migration/V1.1.0.sql`，权限点由可重复脚本 `db/migration/R__sys_permission.sql` 维护）：
     - `admin` / `admin123`：角色 `admin`，权限 `book:read`、`book:write`
     - `reader` / `reader123`：角色 `reader`，权限 `book:read`
 

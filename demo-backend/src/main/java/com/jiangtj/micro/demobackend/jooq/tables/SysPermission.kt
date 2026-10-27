@@ -5,10 +5,7 @@ package com.jiangtj.micro.demobackend.jooq.tables
 
 
 import com.jiangtj.micro.demobackend.jooq.keys.CONSTRAINT_C
-import com.jiangtj.micro.demobackend.jooq.keys.FK_SYS_ROLE_PERMISSION_PERMISSION
 import com.jiangtj.micro.demobackend.jooq.keys.UK_SYS_PERMISSION_CODE
-import com.jiangtj.micro.demobackend.jooq.tables.SysRole.SysRolePath
-import com.jiangtj.micro.demobackend.jooq.tables.SysRolePermission.SysRolePermissionPath
 import com.jiangtj.micro.demobackend.jooq.tables.records.SysPermissionRecord
 
 import kotlin.collections.Collection
@@ -20,7 +17,6 @@ import org.jooq.ForeignKey
 import org.jooq.Identity
 import org.jooq.InverseForeignKey
 import org.jooq.Name
-import org.jooq.Path
 import org.jooq.PlainSQL
 import org.jooq.QueryPart
 import org.jooq.Record
@@ -107,45 +103,9 @@ open class SysPermission(
      * Create a <code>sys_permission</code> table reference
      */
     constructor(): this(DSL.name("sys_permission"), null)
-
-    constructor(path: Table<out Record>, childPath: ForeignKey<out Record, SysPermissionRecord>?, parentPath: InverseForeignKey<out Record, SysPermissionRecord>?): this(Internal.createPathAlias(path, childPath, parentPath), path, childPath, parentPath, SYS_PERMISSION, null, null)
-
-    /**
-     * A subtype implementing {@link Path} for simplified path-based joins.
-     */
-    open class SysPermissionPath : SysPermission, Path<SysPermissionRecord> {
-        constructor(path: Table<out Record>, childPath: ForeignKey<out Record, SysPermissionRecord>?, parentPath: InverseForeignKey<out Record, SysPermissionRecord>?): super(path, childPath, parentPath)
-        private constructor(alias: Name, aliased: Table<SysPermissionRecord>): super(alias, aliased)
-        override fun `as`(alias: String): SysPermissionPath = SysPermissionPath(DSL.name(alias), this)
-        override fun `as`(alias: Name): SysPermissionPath = SysPermissionPath(alias, this)
-        override fun `as`(alias: Table<*>): SysPermissionPath = SysPermissionPath(alias.qualifiedName, this)
-    }
     override fun getIdentity(): Identity<SysPermissionRecord, Long?> = super.getIdentity() as Identity<SysPermissionRecord, Long?>
     override fun getPrimaryKey(): UniqueKey<SysPermissionRecord> = CONSTRAINT_C
     override fun getUniqueKeys(): List<UniqueKey<SysPermissionRecord>> = listOf(UK_SYS_PERMISSION_CODE)
-
-    private lateinit var _sysRolePermission: SysRolePermissionPath
-
-    /**
-     * Get the implicit to-many join path to the
-     * <code>sys_role_permission</code> table
-     */
-    fun sysRolePermission(): SysRolePermissionPath {
-        if (!this::_sysRolePermission.isInitialized)
-            _sysRolePermission = SysRolePermissionPath(this, null, FK_SYS_ROLE_PERMISSION_PERMISSION.inverseKey)
-
-        return _sysRolePermission;
-    }
-
-    val sysRolePermission: SysRolePermissionPath
-        get(): SysRolePermissionPath = sysRolePermission()
-
-    /**
-     * Get the implicit many-to-many join path to the <code>sys_role</code>
-     * table
-     */
-    val sysRole: SysRolePath
-        get(): SysRolePath = sysRolePermission().sysRole()
     override fun `as`(alias: String): SysPermission = SysPermission(DSL.name(alias), this)
     override fun `as`(alias: Name): SysPermission = SysPermission(alias, this)
     override fun `as`(alias: Table<*>): SysPermission = SysPermission(alias.qualifiedName, this)

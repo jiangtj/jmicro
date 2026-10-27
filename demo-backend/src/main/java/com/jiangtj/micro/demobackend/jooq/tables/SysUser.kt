@@ -5,10 +5,7 @@ package com.jiangtj.micro.demobackend.jooq.tables
 
 
 import com.jiangtj.micro.demobackend.jooq.keys.CONSTRAINT_7
-import com.jiangtj.micro.demobackend.jooq.keys.FK_SYS_USER_ROLE_USER
 import com.jiangtj.micro.demobackend.jooq.keys.UK_SYS_USER_USERNAME
-import com.jiangtj.micro.demobackend.jooq.tables.SysRole.SysRolePath
-import com.jiangtj.micro.demobackend.jooq.tables.SysUserRole.SysUserRolePath
 import com.jiangtj.micro.demobackend.jooq.tables.records.SysUserRecord
 
 import java.time.LocalDateTime
@@ -22,7 +19,6 @@ import org.jooq.ForeignKey
 import org.jooq.Identity
 import org.jooq.InverseForeignKey
 import org.jooq.Name
-import org.jooq.Path
 import org.jooq.PlainSQL
 import org.jooq.QueryPart
 import org.jooq.Record
@@ -124,45 +120,9 @@ open class SysUser(
      * Create a <code>sys_user</code> table reference
      */
     constructor(): this(DSL.name("sys_user"), null)
-
-    constructor(path: Table<out Record>, childPath: ForeignKey<out Record, SysUserRecord>?, parentPath: InverseForeignKey<out Record, SysUserRecord>?): this(Internal.createPathAlias(path, childPath, parentPath), path, childPath, parentPath, SYS_USER, null, null)
-
-    /**
-     * A subtype implementing {@link Path} for simplified path-based joins.
-     */
-    open class SysUserPath : SysUser, Path<SysUserRecord> {
-        constructor(path: Table<out Record>, childPath: ForeignKey<out Record, SysUserRecord>?, parentPath: InverseForeignKey<out Record, SysUserRecord>?): super(path, childPath, parentPath)
-        private constructor(alias: Name, aliased: Table<SysUserRecord>): super(alias, aliased)
-        override fun `as`(alias: String): SysUserPath = SysUserPath(DSL.name(alias), this)
-        override fun `as`(alias: Name): SysUserPath = SysUserPath(alias, this)
-        override fun `as`(alias: Table<*>): SysUserPath = SysUserPath(alias.qualifiedName, this)
-    }
     override fun getIdentity(): Identity<SysUserRecord, Long?> = super.getIdentity() as Identity<SysUserRecord, Long?>
     override fun getPrimaryKey(): UniqueKey<SysUserRecord> = CONSTRAINT_7
     override fun getUniqueKeys(): List<UniqueKey<SysUserRecord>> = listOf(UK_SYS_USER_USERNAME)
-
-    private lateinit var _sysUserRole: SysUserRolePath
-
-    /**
-     * Get the implicit to-many join path to the <code>sys_user_role</code>
-     * table
-     */
-    fun sysUserRole(): SysUserRolePath {
-        if (!this::_sysUserRole.isInitialized)
-            _sysUserRole = SysUserRolePath(this, null, FK_SYS_USER_ROLE_USER.inverseKey)
-
-        return _sysUserRole;
-    }
-
-    val sysUserRole: SysUserRolePath
-        get(): SysUserRolePath = sysUserRole()
-
-    /**
-     * Get the implicit many-to-many join path to the <code>sys_role</code>
-     * table
-     */
-    val sysRole: SysRolePath
-        get(): SysRolePath = sysUserRole().sysRole()
     override fun `as`(alias: String): SysUser = SysUser(DSL.name(alias), this)
     override fun `as`(alias: Name): SysUser = SysUser(alias, this)
     override fun `as`(alias: Table<*>): SysUser = SysUser(alias.qualifiedName, this)

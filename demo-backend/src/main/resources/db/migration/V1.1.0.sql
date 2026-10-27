@@ -31,22 +31,18 @@ CREATE TABLE sys_permission (
     CONSTRAINT uk_sys_permission_code UNIQUE (code)
 );
 
--- 用户 - 角色
+-- 用户 - 角色（不建外键，关系由应用层维护）
 CREATE TABLE sys_user_role (
     user_id BIGINT NOT NULL,
     role_id BIGINT NOT NULL,
-    PRIMARY KEY (user_id, role_id),
-    CONSTRAINT fk_sys_user_role_user FOREIGN KEY (user_id) REFERENCES sys_user (id),
-    CONSTRAINT fk_sys_user_role_role FOREIGN KEY (role_id) REFERENCES sys_role (id)
+    PRIMARY KEY (user_id, role_id)
 );
 
--- 角色 - 权限
+-- 角色 - 权限（直接保存权限编码，不建外键，关系由应用层维护）
 CREATE TABLE sys_role_permission (
-    role_id       BIGINT NOT NULL,
-    permission_id BIGINT NOT NULL,
-    PRIMARY KEY (role_id, permission_id),
-    CONSTRAINT fk_sys_role_permission_role FOREIGN KEY (role_id) REFERENCES sys_role (id),
-    CONSTRAINT fk_sys_role_permission_permission FOREIGN KEY (permission_id) REFERENCES sys_permission (id)
+    role_id         BIGINT       NOT NULL,
+    permission_code VARCHAR(128) NOT NULL,
+    PRIMARY KEY (role_id, permission_code)
 );
 
 -- 初始化账号：admin/admin123、reader/reader123（密码为 bcrypt 哈希）
@@ -58,18 +54,14 @@ INSERT INTO sys_role (code, name)
 VALUES ('admin', '管理员'),
        ('reader', '读者');
 
-INSERT INTO sys_permission (code, name)
-VALUES ('book:read', '图书查看权限'),
-       ('book:write', '图书新增/修改权限');
-
--- 管理员：全部图书权限（simple 匹配，需逐条关联具体权限点）
+-- 账号 - 角色
 INSERT INTO sys_user_role (user_id, role_id)
 SELECT u.id, r.id FROM sys_user u, sys_role r WHERE u.username = 'admin' AND r.code = 'admin';
--- 普通读者：只能查看图书
 INSERT INTO sys_user_role (user_id, role_id)
 SELECT u.id, r.id FROM sys_user u, sys_role r WHERE u.username = 'reader' AND r.code = 'reader';
 
-INSERT INTO sys_role_permission (role_id, permission_id)
-SELECT r.id, p.id FROM sys_role r, sys_permission p WHERE r.code = 'admin';
-INSERT INTO sys_role_permission (role_id, permission_id)
-SELECT r.id, p.id FROM sys_role r, sys_permission p WHERE r.code = 'reader' AND p.code = 'book:read';
+-- 角色 - 权限初始数据（admin 全部权限、reader 仅查看；权限 code 由 R__sys_permission.sql 维护）
+INSERT INTO sys_role_permission (role_id, permission_code)
+VALUES ((SELECT id FROM sys_role WHERE code = 'admin'), 'book:read'),
+       ((SELECT id FROM sys_role WHERE code = 'admin'), 'book:write'),
+       ((SELECT id FROM sys_role WHERE code = 'reader'), 'book:read');

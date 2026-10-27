@@ -5,6 +5,7 @@ package com.jiangtj.micro.demobackend.jooq.tables.pojos
 
 
 import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.Size
 
 import java.io.Serializable
 
@@ -17,7 +18,8 @@ data class SysRolePermission(
     @get:NotNull
     var roleId: Long? = null,
     @get:NotNull
-    var permissionId: Long? = null
+    @get:Size(max = 128)
+    var permissionCode: String? = null
 ): Serializable {
 
 }

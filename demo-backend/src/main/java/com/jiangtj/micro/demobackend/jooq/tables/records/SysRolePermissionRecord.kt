@@ -7,6 +7,7 @@ package com.jiangtj.micro.demobackend.jooq.tables.records
 import com.jiangtj.micro.demobackend.jooq.tables.SysRolePermission
 
 import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.Size
 
 import org.jooq.Record2
 import org.jooq.impl.UpdatableRecordImpl
@@ -24,22 +25,23 @@ open class SysRolePermissionRecord() : UpdatableRecordImpl<SysRolePermissionReco
         get(): Long? = get(0) as Long?
 
     @get:NotNull
-    open var permissionId: Long?
+    @get:Size(max = 128)
+    open var permissionCode: String?
         set(value): Unit = set(1, value)
-        get(): Long? = get(1) as Long?
+        get(): String? = get(1) as String?
 
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
 
-    override fun key(): Record2<Long?, Long?> = super.key() as Record2<Long?, Long?>
+    override fun key(): Record2<Long?, String?> = super.key() as Record2<Long?, String?>
 
     /**
      * Create a detached, initialised SysRolePermissionRecord
      */
-    constructor(roleId: Long? = null, permissionId: Long? = null): this() {
+    constructor(roleId: Long? = null, permissionCode: String? = null): this() {
         this.roleId = roleId
-        this.permissionId = permissionId
+        this.permissionCode = permissionCode
         resetTouchedOnNotNull()
     }
 
@@ -49,7 +51,7 @@ open class SysRolePermissionRecord() : UpdatableRecordImpl<SysRolePermissionReco
     constructor(value: com.jiangtj.micro.demobackend.jooq.tables.pojos.SysRolePermission?): this() {
         if (value != null) {
             this.roleId = value.roleId
-            this.permissionId = value.permissionId
+            this.permissionCode = value.permissionCode
             resetTouchedOnNotNull()
         }
     }

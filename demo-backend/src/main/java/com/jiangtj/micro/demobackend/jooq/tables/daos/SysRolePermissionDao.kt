@@ -20,14 +20,14 @@ import org.springframework.stereotype.Repository
  */
 @Suppress("warnings")
 @Repository
-open class SysRolePermissionDao(configuration: Configuration?) : DAOImpl<SysRolePermissionRecord, com.jiangtj.micro.demobackend.jooq.tables.pojos.SysRolePermission, Record2<Long?, Long?>>(SysRolePermission.SYS_ROLE_PERMISSION, com.jiangtj.micro.demobackend.jooq.tables.pojos.SysRolePermission::class.java, configuration) {
+open class SysRolePermissionDao(configuration: Configuration?) : DAOImpl<SysRolePermissionRecord, com.jiangtj.micro.demobackend.jooq.tables.pojos.SysRolePermission, Record2<Long?, String?>>(SysRolePermission.SYS_ROLE_PERMISSION, com.jiangtj.micro.demobackend.jooq.tables.pojos.SysRolePermission::class.java, configuration) {
 
     /**
      * Create a new SysRolePermissionDao without any configuration
      */
     constructor(): this(null)
 
-    override fun getId(o: com.jiangtj.micro.demobackend.jooq.tables.pojos.SysRolePermission): Record2<Long?, Long?> = compositeKeyRecord(o.roleId, o.permissionId)
+    override fun getId(o: com.jiangtj.micro.demobackend.jooq.tables.pojos.SysRolePermission): Record2<Long?, String?> = compositeKeyRecord(o.roleId, o.permissionCode)
 
     /**
      * Fetch records that have <code>role_id BETWEEN lowerInclusive AND
@@ -41,13 +41,13 @@ open class SysRolePermissionDao(configuration: Configuration?) : DAOImpl<SysRole
     fun fetchByRoleId(vararg values: Long): List<com.jiangtj.micro.demobackend.jooq.tables.pojos.SysRolePermission> = fetch(SysRolePermission.SYS_ROLE_PERMISSION.ROLE_ID, *values.toTypedArray())
 
     /**
-     * Fetch records that have <code>permission_id BETWEEN lowerInclusive AND
+     * Fetch records that have <code>permission_code BETWEEN lowerInclusive AND
      * upperInclusive</code>
      */
-    fun fetchRangeOfPermissionId(lowerInclusive: Long?, upperInclusive: Long?): List<com.jiangtj.micro.demobackend.jooq.tables.pojos.SysRolePermission> = fetchRange(SysRolePermission.SYS_ROLE_PERMISSION.PERMISSION_ID, lowerInclusive, upperInclusive)
+    fun fetchRangeOfPermissionCode(lowerInclusive: String?, upperInclusive: String?): List<com.jiangtj.micro.demobackend.jooq.tables.pojos.SysRolePermission> = fetchRange(SysRolePermission.SYS_ROLE_PERMISSION.PERMISSION_CODE, lowerInclusive, upperInclusive)
 
     /**
-     * Fetch records that have <code>permission_id IN (values)</code>
+     * Fetch records that have <code>permission_code IN (values)</code>
      */
-    fun fetchByPermissionId(vararg values: Long): List<com.jiangtj.micro.demobackend.jooq.tables.pojos.SysRolePermission> = fetch(SysRolePermission.SYS_ROLE_PERMISSION.PERMISSION_ID, *values.toTypedArray())
+    fun fetchByPermissionCode(vararg values: String): List<com.jiangtj.micro.demobackend.jooq.tables.pojos.SysRolePermission> = fetch(SysRolePermission.SYS_ROLE_PERMISSION.PERMISSION_CODE, *values)
 }

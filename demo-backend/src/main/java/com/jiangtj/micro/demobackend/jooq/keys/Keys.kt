@@ -22,11 +22,9 @@ import com.jiangtj.micro.demobackend.jooq.tables.records.SysRoleRecord
 import com.jiangtj.micro.demobackend.jooq.tables.records.SysUserRecord
 import com.jiangtj.micro.demobackend.jooq.tables.records.SysUserRoleRecord
 
-import org.jooq.ForeignKey
 import org.jooq.UniqueKey
 import org.jooq.impl.DSL
 import org.jooq.impl.Internal
-import org.jooq.impl.QOM.ForeignKeyRule
 
 
 
@@ -41,16 +39,7 @@ val CONSTRAINT_C: UniqueKey<SysPermissionRecord> = Internal.createUniqueKey(SysP
 val UK_SYS_PERMISSION_CODE: UniqueKey<SysPermissionRecord> = Internal.createUniqueKey(SysPermission.SYS_PERMISSION, DSL.name("uk_sys_permission_code"), arrayOf(SysPermission.SYS_PERMISSION.CODE), true)
 val CONSTRAINT_74: UniqueKey<SysRoleRecord> = Internal.createUniqueKey(SysRole.SYS_ROLE, DSL.name("CONSTRAINT_74"), arrayOf(SysRole.SYS_ROLE.ID), true)
 val UK_SYS_ROLE_CODE: UniqueKey<SysRoleRecord> = Internal.createUniqueKey(SysRole.SYS_ROLE, DSL.name("uk_sys_role_code"), arrayOf(SysRole.SYS_ROLE.CODE), true)
-val CONSTRAINT_F: UniqueKey<SysRolePermissionRecord> = Internal.createUniqueKey(SysRolePermission.SYS_ROLE_PERMISSION, DSL.name("CONSTRAINT_F"), arrayOf(SysRolePermission.SYS_ROLE_PERMISSION.ROLE_ID, SysRolePermission.SYS_ROLE_PERMISSION.PERMISSION_ID), true)
+val CONSTRAINT_F: UniqueKey<SysRolePermissionRecord> = Internal.createUniqueKey(SysRolePermission.SYS_ROLE_PERMISSION, DSL.name("CONSTRAINT_F"), arrayOf(SysRolePermission.SYS_ROLE_PERMISSION.ROLE_ID, SysRolePermission.SYS_ROLE_PERMISSION.PERMISSION_CODE), true)
 val CONSTRAINT_7: UniqueKey<SysUserRecord> = Internal.createUniqueKey(SysUser.SYS_USER, DSL.name("CONSTRAINT_7"), arrayOf(SysUser.SYS_USER.ID), true)
 val UK_SYS_USER_USERNAME: UniqueKey<SysUserRecord> = Internal.createUniqueKey(SysUser.SYS_USER, DSL.name("uk_sys_user_username"), arrayOf(SysUser.SYS_USER.USERNAME), true)
 val CONSTRAINT_6: UniqueKey<SysUserRoleRecord> = Internal.createUniqueKey(SysUserRole.SYS_USER_ROLE, DSL.name("CONSTRAINT_6"), arrayOf(SysUserRole.SYS_USER_ROLE.USER_ID, SysUserRole.SYS_USER_ROLE.ROLE_ID), true)
-
-// -------------------------------------------------------------------------
-// FOREIGN KEY definitions
-// -------------------------------------------------------------------------
-
-val FK_SYS_ROLE_PERMISSION_PERMISSION: ForeignKey<SysRolePermissionRecord, SysPermissionRecord> = Internal.createForeignKey(SysRolePermission.SYS_ROLE_PERMISSION, DSL.name("fk_sys_role_permission_permission"), arrayOf(SysRolePermission.SYS_ROLE_PERMISSION.PERMISSION_ID), com.jiangtj.micro.demobackend.jooq.keys.CONSTRAINT_C, arrayOf(SysPermission.SYS_PERMISSION.ID), true, ForeignKeyRule.NO_ACTION, ForeignKeyRule.NO_ACTION)
-val FK_SYS_ROLE_PERMISSION_ROLE: ForeignKey<SysRolePermissionRecord, SysRoleRecord> = Internal.createForeignKey(SysRolePermission.SYS_ROLE_PERMISSION, DSL.name("fk_sys_role_permission_role"), arrayOf(SysRolePermission.SYS_ROLE_PERMISSION.ROLE_ID), com.jiangtj.micro.demobackend.jooq.keys.CONSTRAINT_74, arrayOf(SysRole.SYS_ROLE.ID), true, ForeignKeyRule.NO_ACTION, ForeignKeyRule.NO_ACTION)
-val FK_SYS_USER_ROLE_ROLE: ForeignKey<SysUserRoleRecord, SysRoleRecord> = Internal.createForeignKey(SysUserRole.SYS_USER_ROLE, DSL.name("fk_sys_user_role_role"), arrayOf(SysUserRole.SYS_USER_ROLE.ROLE_ID), com.jiangtj.micro.demobackend.jooq.keys.CONSTRAINT_74, arrayOf(SysRole.SYS_ROLE.ID), true, ForeignKeyRule.NO_ACTION, ForeignKeyRule.NO_ACTION)
-val FK_SYS_USER_ROLE_USER: ForeignKey<SysUserRoleRecord, SysUserRecord> = Internal.createForeignKey(SysUserRole.SYS_USER_ROLE, DSL.name("fk_sys_user_role_user"), arrayOf(SysUserRole.SYS_USER_ROLE.USER_ID), com.jiangtj.micro.demobackend.jooq.keys.CONSTRAINT_7, arrayOf(SysUser.SYS_USER.ID), true, ForeignKeyRule.NO_ACTION, ForeignKeyRule.NO_ACTION)

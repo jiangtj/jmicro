@@ -5,13 +5,7 @@ package com.jiangtj.micro.demobackend.jooq.tables
 
 
 import com.jiangtj.micro.demobackend.jooq.keys.CONSTRAINT_74
-import com.jiangtj.micro.demobackend.jooq.keys.FK_SYS_ROLE_PERMISSION_ROLE
-import com.jiangtj.micro.demobackend.jooq.keys.FK_SYS_USER_ROLE_ROLE
 import com.jiangtj.micro.demobackend.jooq.keys.UK_SYS_ROLE_CODE
-import com.jiangtj.micro.demobackend.jooq.tables.SysPermission.SysPermissionPath
-import com.jiangtj.micro.demobackend.jooq.tables.SysRolePermission.SysRolePermissionPath
-import com.jiangtj.micro.demobackend.jooq.tables.SysUser.SysUserPath
-import com.jiangtj.micro.demobackend.jooq.tables.SysUserRole.SysUserRolePath
 import com.jiangtj.micro.demobackend.jooq.tables.records.SysRoleRecord
 
 import kotlin.collections.Collection
@@ -23,7 +17,6 @@ import org.jooq.ForeignKey
 import org.jooq.Identity
 import org.jooq.InverseForeignKey
 import org.jooq.Name
-import org.jooq.Path
 import org.jooq.PlainSQL
 import org.jooq.QueryPart
 import org.jooq.Record
@@ -110,68 +103,9 @@ open class SysRole(
      * Create a <code>sys_role</code> table reference
      */
     constructor(): this(DSL.name("sys_role"), null)
-
-    constructor(path: Table<out Record>, childPath: ForeignKey<out Record, SysRoleRecord>?, parentPath: InverseForeignKey<out Record, SysRoleRecord>?): this(Internal.createPathAlias(path, childPath, parentPath), path, childPath, parentPath, SYS_ROLE, null, null)
-
-    /**
-     * A subtype implementing {@link Path} for simplified path-based joins.
-     */
-    open class SysRolePath : SysRole, Path<SysRoleRecord> {
-        constructor(path: Table<out Record>, childPath: ForeignKey<out Record, SysRoleRecord>?, parentPath: InverseForeignKey<out Record, SysRoleRecord>?): super(path, childPath, parentPath)
-        private constructor(alias: Name, aliased: Table<SysRoleRecord>): super(alias, aliased)
-        override fun `as`(alias: String): SysRolePath = SysRolePath(DSL.name(alias), this)
-        override fun `as`(alias: Name): SysRolePath = SysRolePath(alias, this)
-        override fun `as`(alias: Table<*>): SysRolePath = SysRolePath(alias.qualifiedName, this)
-    }
     override fun getIdentity(): Identity<SysRoleRecord, Long?> = super.getIdentity() as Identity<SysRoleRecord, Long?>
     override fun getPrimaryKey(): UniqueKey<SysRoleRecord> = CONSTRAINT_74
     override fun getUniqueKeys(): List<UniqueKey<SysRoleRecord>> = listOf(UK_SYS_ROLE_CODE)
-
-    private lateinit var _sysRolePermission: SysRolePermissionPath
-
-    /**
-     * Get the implicit to-many join path to the
-     * <code>sys_role_permission</code> table
-     */
-    fun sysRolePermission(): SysRolePermissionPath {
-        if (!this::_sysRolePermission.isInitialized)
-            _sysRolePermission = SysRolePermissionPath(this, null, FK_SYS_ROLE_PERMISSION_ROLE.inverseKey)
-
-        return _sysRolePermission;
-    }
-
-    val sysRolePermission: SysRolePermissionPath
-        get(): SysRolePermissionPath = sysRolePermission()
-
-    private lateinit var _sysUserRole: SysUserRolePath
-
-    /**
-     * Get the implicit to-many join path to the <code>sys_user_role</code>
-     * table
-     */
-    fun sysUserRole(): SysUserRolePath {
-        if (!this::_sysUserRole.isInitialized)
-            _sysUserRole = SysUserRolePath(this, null, FK_SYS_USER_ROLE_ROLE.inverseKey)
-
-        return _sysUserRole;
-    }
-
-    val sysUserRole: SysUserRolePath
-        get(): SysUserRolePath = sysUserRole()
-
-    /**
-     * Get the implicit many-to-many join path to the
-     * <code>sys_permission</code> table
-     */
-    val sysPermission: SysPermissionPath
-        get(): SysPermissionPath = sysRolePermission().sysPermission()
-
-    /**
-     * Get the implicit many-to-many join path to the <code>sys_user</code>
-     * table
-     */
-    val sysUser: SysUserPath
-        get(): SysUserPath = sysUserRole().sysUser()
     override fun `as`(alias: String): SysRole = SysRole(DSL.name(alias), this)
     override fun `as`(alias: Name): SysRole = SysRole(alias, this)
     override fun `as`(alias: Table<*>): SysRole = SysRole(alias.qualifiedName, this)

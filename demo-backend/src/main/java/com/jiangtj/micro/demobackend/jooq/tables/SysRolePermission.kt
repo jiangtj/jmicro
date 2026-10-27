@@ -5,21 +5,15 @@ package com.jiangtj.micro.demobackend.jooq.tables
 
 
 import com.jiangtj.micro.demobackend.jooq.keys.CONSTRAINT_F
-import com.jiangtj.micro.demobackend.jooq.keys.FK_SYS_ROLE_PERMISSION_PERMISSION
-import com.jiangtj.micro.demobackend.jooq.keys.FK_SYS_ROLE_PERMISSION_ROLE
-import com.jiangtj.micro.demobackend.jooq.tables.SysPermission.SysPermissionPath
-import com.jiangtj.micro.demobackend.jooq.tables.SysRole.SysRolePath
 import com.jiangtj.micro.demobackend.jooq.tables.records.SysRolePermissionRecord
 
 import kotlin.collections.Collection
-import kotlin.collections.List
 
 import org.jooq.Condition
 import org.jooq.Field
 import org.jooq.ForeignKey
 import org.jooq.InverseForeignKey
 import org.jooq.Name
-import org.jooq.Path
 import org.jooq.PlainSQL
 import org.jooq.QueryPart
 import org.jooq.Record
@@ -79,9 +73,9 @@ open class SysRolePermission(
     val ROLE_ID: TableField<SysRolePermissionRecord, Long?> = createField(DSL.name("role_id"), SQLDataType.BIGINT.nullable(false), this, "")
 
     /**
-     * The column <code>sys_role_permission.permission_id</code>.
+     * The column <code>sys_role_permission.permission_code</code>.
      */
-    val PERMISSION_ID: TableField<SysRolePermissionRecord, Long?> = createField(DSL.name("permission_id"), SQLDataType.BIGINT.nullable(false), this, "")
+    val PERMISSION_CODE: TableField<SysRolePermissionRecord, String?> = createField(DSL.name("permission_code"), SQLDataType.VARCHAR(128).nullable(false), this, "")
 
     private constructor(alias: Name, aliased: Table<SysRolePermissionRecord>?): this(alias, null, null, null, aliased, null, null)
     private constructor(alias: Name, aliased: Table<SysRolePermissionRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)
@@ -101,33 +95,7 @@ open class SysRolePermission(
      * Create a <code>sys_role_permission</code> table reference
      */
     constructor(): this(DSL.name("sys_role_permission"), null)
-
-    constructor(path: Table<out Record>, childPath: ForeignKey<out Record, SysRolePermissionRecord>?, parentPath: InverseForeignKey<out Record, SysRolePermissionRecord>?): this(Internal.createPathAlias(path, childPath, parentPath), path, childPath, parentPath, SYS_ROLE_PERMISSION, null, null)
-
-    /**
-     * A subtype implementing {@link Path} for simplified path-based joins.
-     */
-    open class SysRolePermissionPath : SysRolePermission, Path<SysRolePermissionRecord> {
-        constructor(path: Table<out Record>, childPath: ForeignKey<out Record, SysRolePermissionRecord>?, parentPath: InverseForeignKey<out Record, SysRolePermissionRecord>?): super(path, childPath, parentPath)
-        private constructor(alias: Name, aliased: Table<SysRolePermissionRecord>): super(alias, aliased)
-        override fun `as`(alias: String): SysRolePermissionPath = SysRolePermissionPath(DSL.name(alias), this)
-        override fun `as`(alias: Name): SysRolePermissionPath = SysRolePermissionPath(alias, this)
-        override fun `as`(alias: Table<*>): SysRolePermissionPath = SysRolePermissionPath(alias.qualifiedName, this)
-    }
     override fun getPrimaryKey(): UniqueKey<SysRolePermissionRecord> = CONSTRAINT_F
-    override fun getReferences(): List<ForeignKey<SysRolePermissionRecord, *>> = listOf(FK_SYS_ROLE_PERMISSION_PERMISSION, FK_SYS_ROLE_PERMISSION_ROLE)
-
-    /**
-     * Get the implicit join path to the <code>sys_permission</code> table.
-     */
-    fun sysPermission(): SysPermissionPath = sysPermission
-    val sysPermission: SysPermissionPath by lazy { SysPermissionPath(this, FK_SYS_ROLE_PERMISSION_PERMISSION, null) }
-
-    /**
-     * Get the implicit join path to the <code>sys_role</code> table.
-     */
-    fun sysRole(): SysRolePath = sysRole
-    val sysRole: SysRolePath by lazy { SysRolePath(this, FK_SYS_ROLE_PERMISSION_ROLE, null) }
     override fun `as`(alias: String): SysRolePermission = SysRolePermission(DSL.name(alias), this)
     override fun `as`(alias: Name): SysRolePermission = SysRolePermission(alias, this)
     override fun `as`(alias: Table<*>): SysRolePermission = SysRolePermission(alias.qualifiedName, this)

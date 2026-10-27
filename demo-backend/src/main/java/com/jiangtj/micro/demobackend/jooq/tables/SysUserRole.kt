@@ -5,21 +5,15 @@ package com.jiangtj.micro.demobackend.jooq.tables
 
 
 import com.jiangtj.micro.demobackend.jooq.keys.CONSTRAINT_6
-import com.jiangtj.micro.demobackend.jooq.keys.FK_SYS_USER_ROLE_ROLE
-import com.jiangtj.micro.demobackend.jooq.keys.FK_SYS_USER_ROLE_USER
-import com.jiangtj.micro.demobackend.jooq.tables.SysRole.SysRolePath
-import com.jiangtj.micro.demobackend.jooq.tables.SysUser.SysUserPath
 import com.jiangtj.micro.demobackend.jooq.tables.records.SysUserRoleRecord
 
 import kotlin.collections.Collection
-import kotlin.collections.List
 
 import org.jooq.Condition
 import org.jooq.Field
 import org.jooq.ForeignKey
 import org.jooq.InverseForeignKey
 import org.jooq.Name
-import org.jooq.Path
 import org.jooq.PlainSQL
 import org.jooq.QueryPart
 import org.jooq.Record
@@ -101,33 +95,7 @@ open class SysUserRole(
      * Create a <code>sys_user_role</code> table reference
      */
     constructor(): this(DSL.name("sys_user_role"), null)
-
-    constructor(path: Table<out Record>, childPath: ForeignKey<out Record, SysUserRoleRecord>?, parentPath: InverseForeignKey<out Record, SysUserRoleRecord>?): this(Internal.createPathAlias(path, childPath, parentPath), path, childPath, parentPath, SYS_USER_ROLE, null, null)
-
-    /**
-     * A subtype implementing {@link Path} for simplified path-based joins.
-     */
-    open class SysUserRolePath : SysUserRole, Path<SysUserRoleRecord> {
-        constructor(path: Table<out Record>, childPath: ForeignKey<out Record, SysUserRoleRecord>?, parentPath: InverseForeignKey<out Record, SysUserRoleRecord>?): super(path, childPath, parentPath)
-        private constructor(alias: Name, aliased: Table<SysUserRoleRecord>): super(alias, aliased)
-        override fun `as`(alias: String): SysUserRolePath = SysUserRolePath(DSL.name(alias), this)
-        override fun `as`(alias: Name): SysUserRolePath = SysUserRolePath(alias, this)
-        override fun `as`(alias: Table<*>): SysUserRolePath = SysUserRolePath(alias.qualifiedName, this)
-    }
     override fun getPrimaryKey(): UniqueKey<SysUserRoleRecord> = CONSTRAINT_6
-    override fun getReferences(): List<ForeignKey<SysUserRoleRecord, *>> = listOf(FK_SYS_USER_ROLE_ROLE, FK_SYS_USER_ROLE_USER)
-
-    /**
-     * Get the implicit join path to the <code>sys_role</code> table.
-     */
-    fun sysRole(): SysRolePath = sysRole
-    val sysRole: SysRolePath by lazy { SysRolePath(this, FK_SYS_USER_ROLE_ROLE, null) }
-
-    /**
-     * Get the implicit join path to the <code>sys_user</code> table.
-     */
-    fun sysUser(): SysUserPath = sysUser
-    val sysUser: SysUserPath by lazy { SysUserPath(this, FK_SYS_USER_ROLE_USER, null) }
     override fun `as`(alias: String): SysUserRole = SysUserRole(DSL.name(alias), this)
     override fun `as`(alias: Name): SysUserRole = SysUserRole(alias, this)
     override fun `as`(alias: Table<*>): SysUserRole = SysUserRole(alias.qualifiedName, this)
