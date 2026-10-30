@@ -60,7 +60,7 @@
 
 17. **包扫描**：主类放在基础包根，`auth/`、`controller/`、`book/` 都是其子包；不要放到兄弟包。
 18. **图片上传报“provider 未注册”**：先查 `jmicro.config.enabled=true`，再查对应 provider 的配置项前缀。
-19. **上传大小 413**：`jmicro.pic.upload.max-file-size` 与 `spring.servlet.multipart.max-file-size` 需同时满足。
+19. **上传大小 413**：`jmicro.pic.upload.max-file-size` 与 `spring.servlet.multipart.max-file-size`（默认 1MB，请求体还要看 `max-request-size`）需同时满足。
 
 ## 权限模型相关（最新 demo 的做法）
 

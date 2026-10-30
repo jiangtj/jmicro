@@ -287,6 +287,13 @@ jmicroConfigService.updateConfig("jmicro.pic.upload.provider", "local")
 jmicroConfigService.updateMapEntry("jmicro.pic.upload.dirs", "avatar", mapOf("path" to "/avatar"))
 ```
 
+上传请求还会先经过 Spring MVC 的 multipart 限制（**默认单文件 1MB**，超限直接 413，不会进入 `PicUploadService` 的大小校验），所以 `jmicro.pic.upload.max-file-size` 与下面两项要同时放开（demo-backend 的取值）：
+
+```properties
+spring.servlet.multipart.max-file-size=10MB
+spring.servlet.multipart.max-request-size=20MB
+```
+
 各服务商（`local` / `ali` / `hw` / `minio` / `easyimages` / `rustfs`）的配置项统一由**系统配置（JMicroConfig）**提供，使用前需开启 `jmicro.config.enabled=true`；未开启时对应服务商的上传服务不会注册。配置项定义在各自的 `*ConfigItem` 枚举中（`jmicroConfigService.getValue(key)` 读取），可通过 `jmicro.config.kv.*` 提供值，也可在运行期通过 `JMicroConfigService.updateConfig(key, value)` 动态修改（上传时实时读取）。各服务商并可能需要引入对应 SDK：
 
 | Provider | 配置来源 | 说明 |

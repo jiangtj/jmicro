@@ -29,6 +29,14 @@
 
 `BaseException` 提供统一的异常模型（携带 `reason` 与 `status`），`BaseExceptionUtils` 提供从异常中提取信息的工具方法，业务侧可基于这些能力做统一异常处理并返回符合 RFC 9457 的 Problem Details 响应体。
 
+Spring MVC 默认不会把内置异常（参数校验失败、415、405 等）渲染成 Problem Details，需要应用侧开启（demo-backend 已开启）：
+
+```properties
+spring.mvc.problemdetails.enabled=true
+# 请求参数中的日期时间与 JSON 序列化保持一致
+spring.mvc.format.date-time=yyyy-MM-dd HH:mm:ss
+```
+
 ## JSON 初始化
 
 共享 JSON 行为由自动配置统一初始化（`JMicroCommonAutoConfiguration` → `JsonUtils.init(mapper)`），应用无需手动配置 `ObjectMapper`。

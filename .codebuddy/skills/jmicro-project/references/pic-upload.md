@@ -5,7 +5,7 @@
 - 依赖 `com.jiangtj.micro:micro-business`。
 - **必须开启系统配置**：`jmicro.config.enabled=true`，否则各 provider 上传服务不会注册（所有 provider 配置项都由 JMicroConfig 提供）。
 - 启动配置只有开关：`jmicro.pic.upload.enable`（默认 `true`）。
-- 需要 `spring-boot-starter-webmvc`（`MultipartFile`）与 multipart 配置（如 `spring.servlet.multipart.max-file-size`）。
+- 需要 `spring-boot-starter-webmvc`（`MultipartFile`）与 multipart 配置：`spring.servlet.multipart.max-file-size`（demo `10MB`）、`spring.servlet.multipart.max-request-size`（demo `20MB`）。Spring 默认单文件 1MB，超限直接 413，需与 `jmicro.pic.upload.max-file-size` 同时放开。
 
 ## 用法
 
