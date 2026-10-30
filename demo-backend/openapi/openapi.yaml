@@ -208,6 +208,56 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
 
+  /books/page:
+    get:
+      tags: [Books]
+      summary: 分页查询图书
+      description: |
+        需要权限 `book:read`。
+        分页参数使用 Spring Data 约定：`page` 从 0 开始、`size` 默认 20、
+        `sort` 使用 pojo 属性名（如 `sort=createTime,desc`），未指定排序时按主键倒序（新书在前）。
+        `keyword` 同时匹配书名与作者（忽略大小写）。
+      operationId: pageBooks
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Sort'
+        - name: keyword
+          in: query
+          required: false
+          description: 关键字，同时匹配书名与作者（忽略大小写）
+          schema:
+            type: string
+          example: 虚拟机
+      responses:
+        '200':
+          description: 图书分页结果
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookPage'
+              example:
+                content:
+                  - id: 3
+                    title: 代码整洁之道
+                    author: Robert C. Martin
+                    isbn: '9787115216878'
+                    price: 59.00
+                    stock: 8
+                    createTime: '2026-10-24T10:00:00'
+                page: 0
+                size: 20
+                totalElements: 3
+                totalPages: 1
+                first: true
+                last: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
   /books/form-schema:
     get:
       tags: [Books]
@@ -429,6 +479,44 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
 
+  /roles/page:
+    get:
+      tags: [Role]
+      summary: 分页查询角色
+      description: |
+        仅 `admin` 角色可访问。返回当前页角色及其绑定的权限编码（按编码排序）。
+        分页参数 `page`（从 0 开始）、`size`、`sort`；未指定排序时按主键升序。
+      operationId: pageRoles
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Sort'
+      responses:
+        '200':
+          description: 角色分页结果
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleDetailPage'
+              example:
+                content:
+                  - id: 1
+                    code: admin
+                    name: 管理员
+                    permissionCodes: ['book:read', 'book:write']
+                page: 0
+                size: 20
+                totalElements: 2
+                totalPages: 1
+                first: true
+                last: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
   /roles/{id}:
     parameters:
       - name: id
@@ -548,6 +636,50 @@ paths:
                 - id: 2
                   code: book:write
                   name: 图书新增/修改权限
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /permissions/page:
+    get:
+      tags: [Permission]
+      summary: 分页查询权限字典
+      description: |
+        仅 `admin` 角色可访问。字典内容由 `db/migration/R__sys_permission.sql` 维护。
+        分页参数 `page`（从 0 开始）、`size`、`sort`；未指定排序时按权限编码升序。
+      operationId: pagePermissions
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Sort'
+        - name: keyword
+          in: query
+          required: false
+          description: 关键字，同时匹配权限编码与名称（忽略大小写）
+          schema:
+            type: string
+          example: write
+      responses:
+        '200':
+          description: 权限分页结果
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionPage'
+              example:
+                content:
+                  - id: 1
+                    code: book:read
+                    name: 图书查看权限
+                page: 0
+                size: 20
+                totalElements: 2
+                totalPages: 1
+                first: true
+                last: true
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -703,6 +835,38 @@ paths:
                 status: 403
                 detail: "Don't have role<admin>."
                 instance: /system/configs
+
+  /system/configs/page:
+    get:
+      tags: [JMicroConfig]
+      summary: 分页查询系统配置项
+      description: |
+        仅 `admin` 角色可访问。配置项来自内存（`JMicroConfigService`），分页在内存中切片完成，
+        保持列表接口的排序（group.order、order）；`secret` 项的值已脱敏。
+      operationId: pageJMicroConfigs
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - name: tag
+          in: query
+          required: false
+          description: 按 tag 过滤（trim 后忽略大小写，匹配配置项 tag 列表中的任意一项）；为空则返回全部
+          schema:
+            type: string
+          example: pic
+      responses:
+        '200':
+          description: 配置项分页结果
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemItemInfoPage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
 
   /system/configs/refresh:
     post:
@@ -960,6 +1124,36 @@ components:
         `POST /login` 返回的 JWT，请求头格式：`Authorization: Bearer <token>`。
         签名、issuer 或有效期校验失败时按未登录处理（401）。
 
+  parameters:
+    Page:
+      name: page
+      in: query
+      required: false
+      description: 页码，从 0 开始（Spring Data `Pageable` 约定）
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    Size:
+      name: size
+      in: query
+      required: false
+      description: 每页条数，默认 20
+      schema:
+        type: integer
+        minimum: 1
+        default: 20
+    Sort:
+      name: sort
+      in: query
+      required: false
+      description: |
+        排序条件，格式 `属性名[,asc|desc]`；可重复传参（`sort=a,asc&sort=b,desc`）表示多字段排序。
+        属性名使用 pojo 的驼峰字段名（如 `createTime`），未指定时各接口有稳定的默认排序。
+      schema:
+        type: string
+      example: createTime,desc
+
   responses:
     BadRequest:
       description: 请求体格式错误或字段校验失败
@@ -1059,6 +1253,89 @@ components:
             instance: /pic/upload
 
   schemas:
+    PageMeta:
+      type: object
+      description: 分页元信息（分页接口响应统一包含这些字段）
+      required: [page, size, totalElements, totalPages, first, last]
+      properties:
+        page:
+          type: integer
+          description: 当前页码，从 0 开始
+          example: 0
+        size:
+          type: integer
+          description: 每页条数
+          example: 20
+        totalElements:
+          type: integer
+          format: int64
+          description: 总记录数
+          example: 3
+        totalPages:
+          type: integer
+          description: 总页数
+          example: 1
+        first:
+          type: boolean
+          description: 是否第一页
+          example: true
+        last:
+          type: boolean
+          description: 是否最后一页
+          example: true
+
+    BookPage:
+      description: 图书分页结果
+      allOf:
+        - $ref: '#/components/schemas/PageMeta'
+        - type: object
+          required: [content]
+          properties:
+            content:
+              type: array
+              description: 当前页图书
+              items:
+                $ref: '#/components/schemas/Book'
+
+    RoleDetailPage:
+      description: 角色分页结果
+      allOf:
+        - $ref: '#/components/schemas/PageMeta'
+        - type: object
+          required: [content]
+          properties:
+            content:
+              type: array
+              description: 当前页角色（含绑定的权限编码）
+              items:
+                $ref: '#/components/schemas/RoleDetail'
+
+    PermissionPage:
+      description: 权限分页结果
+      allOf:
+        - $ref: '#/components/schemas/PageMeta'
+        - type: object
+          required: [content]
+          properties:
+            content:
+              type: array
+              description: 当前页权限
+              items:
+                $ref: '#/components/schemas/Permission'
+
+    SystemItemInfoPage:
+      description: 系统配置项分页结果
+      allOf:
+        - $ref: '#/components/schemas/PageMeta'
+        - type: object
+          required: [content]
+          properties:
+            content:
+              type: array
+              description: 当前页配置项
+              items:
+                $ref: '#/components/schemas/SystemItemInfo'
+
     ProblemDetail:
       type: object
       description: RFC 7807 错误响应（Spring `ProblemDetail`）

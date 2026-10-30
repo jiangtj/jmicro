@@ -10,6 +10,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.PageRequest
 import org.springframework.transaction.annotation.Transactional
 
 /**
@@ -46,6 +47,23 @@ class RoleServiceTest {
         assertThat(roles.keys).contains("admin", "reader")
         assertThat(roles.getValue("admin").permissionCodes).containsExactly("book:read", "book:write")
         assertThat(roles.getValue("reader").permissionCodes).containsExactly("book:read")
+    }
+
+    @Test
+    fun `page returns roles with their permissions`() {
+        val first = roleService.page(PageRequest.of(0, 1))
+        assertThat(first.content).hasSize(1)
+        assertThat(first.totalElements).isGreaterThanOrEqualTo(2)
+        assertThat(first.totalPages).isGreaterThanOrEqualTo(2)
+        // 默认按主键升序：第二页的角色 id 更大
+        val second = roleService.page(PageRequest.of(1, 1))
+        assertThat(first.content.single().id).isLessThan(second.content.single().id)
+
+        val all = roleService.page(PageRequest.of(0, 100))
+        val byCode = all.content.associateBy { it.code }
+        assertThat(byCode.keys).contains("admin", "reader")
+        assertThat(byCode.getValue("admin").permissionCodes).containsExactly("book:read", "book:write")
+        assertThat(byCode.getValue("reader").permissionCodes).containsExactly("book:read")
     }
 
     @Test

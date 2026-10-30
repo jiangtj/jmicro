@@ -1,7 +1,9 @@
 package com.jiangtj.micro.demobackend.auth.role
 
 import com.jiangtj.micro.auth.annotations.HasRole
+import com.jiangtj.micro.demobackend.common.PageResult
 import jakarta.validation.Valid
+import org.springframework.data.domain.Pageable
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController
  * 用户角色管理接口（仅 admin 角色可访问）
  *
  * - `GET /roles`：角色列表（含绑定的权限编码）
+ * - `GET /roles/page`：角色分页查询
  * - `GET /roles/{id}`：角色详情
  * - `POST /roles`：新增角色
  * - `PUT /roles/{id}`：修改角色（权限绑定整体覆盖）
@@ -29,6 +32,13 @@ class RoleController(
 
     @GetMapping
     fun list(): List<RoleDetail> = roleService.list()
+
+    /**
+     * 角色分页查询（含绑定的权限编码）；
+     * 分页参数 `page`（从 0 开始）、`size`、`sort`（驼峰属性名，如 `sort=code,asc`）
+     */
+    @GetMapping("/page")
+    fun page(pageable: Pageable): PageResult<RoleDetail> = PageResult.of(roleService.page(pageable))
 
     @GetMapping("/{id}")
     fun get(@PathVariable id: Long): RoleDetail = roleService.get(id)

@@ -1,11 +1,16 @@
 package com.jiangtj.micro.demobackend.auth.role
 
 import com.jiangtj.micro.demobackend.auth.permission.RolePermissionResolver
+import com.jiangtj.micro.demobackend.common.withDefaultSort
 import com.jiangtj.micro.demobackend.dao.SysRoleRepository
 import com.jiangtj.micro.demobackend.jooq.tables.daos.SysPermissionDao
 import com.jiangtj.micro.demobackend.jooq.tables.daos.SysRoleDao
 import com.jiangtj.micro.demobackend.jooq.tables.pojos.SysRole
+import com.jiangtj.micro.sql.jooq.SortPropertyStyle
+import com.jiangtj.micro.sql.jooq.dao.kt.fetchPage
 import com.jiangtj.micro.web.BaseExceptionUtils
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -32,6 +37,20 @@ class RoleService(
         val roles = roleDao.findAll().sortedBy { it.id }
         val permissions = roleRepository.findPermissionCodesByRoleIds(roles.mapNotNull { it.id })
         return roles.map { role -> role.toDetail(permissions[role.id] ?: emptyList()) }
+    }
+
+    /**
+     * 角色分页查询（含各自绑定的权限编码）。
+     *
+     * 排序字段按驼峰属性名传入，如 `sort=code,desc`，未指定时按主键升序。
+     */
+    fun page(pageable: Pageable): Page<RoleDetail> {
+        val page = roleDao.fetchPage()
+            .pageable(pageable.withDefaultSort("id"), SortPropertyStyle.SNAKE_LOWER)
+            .fetchPage<SysRole>()
+        // 批量查询当前页角色的权限编码，避免 N+1 查询
+        val permissions = roleRepository.findPermissionCodesByRoleIds(page.content.mapNotNull { it.id })
+        return page.map { role -> role.toDetail(permissions[role.id] ?: emptyList()) }
     }
 
     fun get(id: Long): RoleDetail {

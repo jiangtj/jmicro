@@ -6,8 +6,10 @@ import com.jiangtj.micro.common.schema.JsonSchema
 import com.jiangtj.micro.common.schema.JsonSchemaGenerator
 import com.jiangtj.micro.demobackend.book.BookForm
 import com.jiangtj.micro.demobackend.book.BookService
+import com.jiangtj.micro.demobackend.common.PageResult
 import com.jiangtj.micro.demobackend.jooq.tables.pojos.Book
 import jakarta.validation.Valid
+import org.springframework.data.domain.Pageable
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 /**
@@ -32,6 +35,17 @@ class BookController(
     @HasPermission("book:read")
     @GetMapping
     fun list(): List<Book> = bookService.list()
+
+    /**
+     * 图书分页查询，`keyword` 同时匹配书名与作者；
+     * 分页参数 `page`（从 0 开始）、`size`、`sort`（驼峰属性名，如 `sort=createTime,desc`）
+     */
+    @HasPermission("book:read")
+    @GetMapping("/page")
+    fun page(
+        pageable: Pageable,
+        @RequestParam(required = false) keyword: String?,
+    ): PageResult<Book> = PageResult.of(bookService.page(pageable, keyword))
 
     @HasPermission("book:read")
     @GetMapping("/{id}")

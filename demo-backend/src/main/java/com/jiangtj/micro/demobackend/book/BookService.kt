@@ -1,8 +1,15 @@
 package com.jiangtj.micro.demobackend.book
 
+import com.jiangtj.micro.demobackend.common.withDefaultSort
+import com.jiangtj.micro.demobackend.jooq.tables.Book as BookTable
 import com.jiangtj.micro.demobackend.jooq.tables.daos.BookDao
 import com.jiangtj.micro.demobackend.jooq.tables.pojos.Book
+import com.jiangtj.micro.sql.jooq.SortPropertyStyle
+import com.jiangtj.micro.sql.jooq.dao.kt.fetchPage
 import com.jiangtj.micro.web.BaseExceptionUtils
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
@@ -15,6 +22,29 @@ class BookService(
 ) {
 
     fun list(): List<Book> = bookDao.findAll()
+
+    /**
+     * 图书分页查询。
+     *
+     * 排序字段按 pojo 属性名（驼峰）传入，如 `sort=createTime,desc`，未指定时按主键倒序（新书在前）。
+     * [keyword] 同时匹配书名与作者（忽略大小写）。
+     */
+    fun page(pageable: Pageable, keyword: String? = null): Page<Book> {
+        val kw = keyword?.trim()
+        val condition = if (kw.isNullOrEmpty()) {
+            null
+        } else {
+            BookTable.BOOK.TITLE.containsIgnoreCase(kw)
+                .or(BookTable.BOOK.AUTHOR.containsIgnoreCase(kw))
+        }
+        return bookDao.fetchPage()
+            .where(condition)
+            .pageable(
+                pageable.withDefaultSort(Sort.by(Sort.Direction.DESC, "id")),
+                SortPropertyStyle.SNAKE_LOWER,
+            )
+            .fetchPage()
+    }
 
     fun get(id: Long): Book = bookDao.fetchOneById(id)
         ?: throw BaseExceptionUtils.notFound("图书不存在：$id")

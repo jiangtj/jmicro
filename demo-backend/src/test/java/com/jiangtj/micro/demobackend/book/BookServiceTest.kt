@@ -7,6 +7,8 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 
@@ -54,6 +56,31 @@ class BookServiceTest {
         val ex = assertThrows<BaseException> { bookService.get(id) }
         assertThat(ex.statusCode.value()).isEqualTo(404)
         assertThat(ex.body.detail).isEqualTo("图书不存在：$id")
+    }
+
+    @Test
+    fun `page returns books with default order and no overlap between pages`() {
+        val first = bookService.page(PageRequest.of(0, 2))
+        assertThat(first.content).hasSize(2)
+        assertThat(first.totalElements).isGreaterThanOrEqualTo(3)
+        // 未指定排序时按主键倒序
+        assertThat(first.content.mapNotNull { it.id }).isSortedAccordingTo(Comparator.reverseOrder<Long>())
+
+        val second = bookService.page(PageRequest.of(1, 2))
+        assertThat(second.content.mapNotNull { it.id })
+            .doesNotContainAnyElementsOf(first.content.mapNotNull { it.id })
+    }
+
+    @Test
+    fun `page supports keyword filter and client sort`() {
+        val byTitle = bookService.page(PageRequest.of(0, 10), "虚拟机")
+        assertThat(byTitle.content.map { it.title }).containsExactly("深入理解 Java 虚拟机")
+
+        val byAuthor = bookService.page(PageRequest.of(0, 10), "  martin  ")
+        assertThat(byAuthor.content.map { it.title }).containsExactly("代码整洁之道")
+
+        val sorted = bookService.page(PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "id")))
+        assertThat(sorted.content.mapNotNull { it.id }).isSorted
     }
 
     @Test
