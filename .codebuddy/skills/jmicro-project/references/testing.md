@@ -40,6 +40,53 @@ class DemoTest {
 
 上下文通过 `TestAuthContextHolder` 在线程内生效；Service 层测试可自行取值注入。
 
+## Service 层集成测试（demo 风格）
+
+demo 的测试以 Service 为入口（不经过 Controller），用 `@JMicroTest` + `@Transactional` + `@WithMockUser`：
+
+```kotlin
+@JMicroTest
+@Transactional
+@WithMockUser(roles = ["admin"])
+class RoleServiceTest {
+
+    @Autowired lateinit var roleService: RoleService
+    @Autowired lateinit var rolePermissionResolver: RolePermissionResolver
+
+    /**
+     * 事务回滚只回滚数据库，内存缓存（Caffeine）必须显式清理，否则影响其它用例。
+     */
+    @AfterEach
+    fun clearPermissionCache() {
+        listOf("admin", "reader", "tester").forEach(rolePermissionResolver::invalidate)
+    }
+
+    @Test
+    fun `create update delete`() {
+        val created = roleService.create(RoleForm("tester", "测试角色", listOf("book:read")))
+        assertThat(roleService.get(created.id).permissionCodes).containsExactly("book:read")
+        roleService.delete(created.id)
+        assertThat(roleService.list().map { it.code }).doesNotContain("tester")
+    }
+}
+```
+
+带鉴权注解的 Service/Controller 在 `@WithMockUser` 下才不会被 401/403 拦住；
+权限变更的缓存失效、关联数据清理这类副作用，用这类测试覆盖最省事。
+
+## 权限变更即时生效
+
+JWT 只带角色，权限按角色解析并缓存，所以"改角色权限 → 已签发 token 立即拿到新权限"是可直接断言的：
+
+```kotlin
+@Test
+fun `permission change takes effect without new token`() {
+    val reader = roleService.list().first { it.code == "reader" }
+    roleService.update(reader.id, RoleForm("reader", reader.name, listOf("book:read", "book:write")))
+    assertThat(rolePermissionResolver.resolve(listOf("reader"))).containsExactly("book:read", "book:write")
+}
+```
+
 ## 断言 ProblemDetail
 
 ```java

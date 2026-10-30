@@ -110,13 +110,16 @@ class AuthFlowTest {
             .exchange()
             .expectStatus().isForbidden()
 
+        // token 只带角色，权限按角色解析后通过 AuthService.authorization 暴露
         client.get().uri("/me")
             .header(HttpHeaders.AUTHORIZATION, bearer)
             .exchange()
             .expectStatus().isOk()
             .expectBody()
             .jsonPath("$.username").isEqualTo("reader")
+            .jsonPath("$.nickname").isEqualTo("读者")
             .jsonPath("$.roles[0]").isEqualTo("reader")
+            .jsonPath("$.permissions[0]").isEqualTo("book:read")
     }
 
     @Test

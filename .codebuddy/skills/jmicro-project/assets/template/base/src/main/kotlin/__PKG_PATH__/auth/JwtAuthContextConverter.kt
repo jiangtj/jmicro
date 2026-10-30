@@ -4,7 +4,6 @@ import com.jiangtj.micro.auth.AuthRequestAttributes
 import com.jiangtj.micro.auth.context.AuthContext
 import com.jiangtj.micro.auth.context.AuthContextConverter
 import com.jiangtj.micro.auth.context.AuthRequest
-import com.jiangtj.micro.auth.context.Authorization
 import com.jiangtj.micro.auth.context.Subject
 import io.jsonwebtoken.Claims
 import org.springframework.core.Ordered
@@ -15,10 +14,14 @@ import org.springframework.stereotype.Component
  *
  * 这是**新项目必须自己提供的 Bean**：没有它，所有请求都会被视为未登录。
  * token 由 `POST /login` 签发；签名或有效期校验失败时视为未登录。
+ *
+ * token 里只有角色，权限由 [RolePermissionResolver] 按角色惰性解析（带缓存），
+ * 因此这里构造的是 [RoleBasedAuthorization] 而不是 `Authorization.create(roles, permissions)`。
  */
 @Component
 class JwtAuthContextConverter(
     private val jwtService: JwtService,
+    private val rolePermissionResolver: RolePermissionResolver,
 ) : AuthContextConverter, Ordered {
 
     override fun getOrder(): Int = 0
@@ -41,7 +44,7 @@ class JwtAuthContextConverter(
             .build()
         return AuthContext.create(
             subject,
-            Authorization.create(jwtService.roles(claims), jwtService.permissions(claims)),
+            RoleBasedAuthorization(jwtService.roles(claims), rolePermissionResolver::resolve),
         )
     }
 

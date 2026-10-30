@@ -62,11 +62,27 @@
 18. **图片上传报“provider 未注册”**：先查 `jmicro.config.enabled=true`，再查对应 provider 的配置项前缀。
 19. **上传大小 413**：`jmicro.pic.upload.max-file-size` 与 `spring.servlet.multipart.max-file-size` 需同时满足。
 
+## 权限模型相关（最新 demo 的做法）
+
+20. **把权限写进 JWT claims**
+    现象：权限调整后必须等 token 过期/重新登录才生效；权限点一多 token 明显变大。
+    demo 已改为 token 只存角色、权限由 `RolePermissionResolver` 按角色解析（带缓存），`AuthContext` 用 `RoleBasedAuthorization` 承载。除非确实需要"签发即冻结权限"，否则不要把权限放进 token。
+
+21. **改完角色权限不生效**
+    `RolePermissionResolver` 按角色编码缓存（demo 是 Caffeine，5 分钟过期），`RoleService.update/delete` 必须调用 `invalidate`；改角色编码时新旧编码都要失效。
+    测试里同样要清缓存：`@Transactional` 只回滚数据库，清不掉内存缓存。
+
+22. **角色/权限表关联数据残留**
+    `sys_user_role`、`sys_role_permission` 没建外键，删角色前要显式删除关联（demo 的 `SysRoleRepository.deleteRelations`），否则出现孤立记录。
+
+23. **主代码引用 `*.jooq.*` 生成类导致编译失败**
+    生成类来自真实库结构，必须先 `./gradlew test --tests "*DBGenerateTest*"` 生成后再改主代码（模板默认给内存实现，正是为了首次编译能过）。
+
 ## 排查顺序
 
-1. `./gradlew compileKotlin` → 编译/依赖问题（11–13）
+1. `./gradlew compileKotlin` → 编译/依赖问题（11–13、23）
 2. 启动日志 `APPLICATION FAILED TO START` → 属性绑定、Bean 缺失（7–9、17）
 3. 请求 401 → 转换器（1–2）
-4. 请求 403 → 权限匹配与角色数据（3）
+4. 请求 403 → 权限匹配与角色数据（3、20–22）
 5. 请求 5xx 无响应体 → ControllerAdvice（4）
-6. 数据/迁移 → 14–16
+6. 数据/迁移 → 14–16、22

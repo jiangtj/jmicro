@@ -8,6 +8,7 @@ description: 从零创建基于 JMicro（com.jiangtj.micro）的 Spring Boot 4 �
 ## 用途
 
 以 jmicro 官方 demo 后端为参考实现（等价结构已内置在 `assets/template`），生成一个可运行、可测试的 JMicro 后端项目，并按需接入各模块能力。
+模板与最新 demo 保持一致的关键约定：JWT 只签角色、权限按角色解析并缓存、系统配置覆盖值可落 `sys_config` 表、权限字典用 `R__` 可重复迁移维护。
 技能自带项目模板与 Gradle wrapper，**无需克隆 jmicro 仓库**：依赖来自 Maven Central，所有 API 细节以本 skill 的 `references/` 为准。不要凭记忆编造类名、属性名或版本号。
 
 ## 前置确认
@@ -34,8 +35,8 @@ description: 从零创建基于 JMicro（com.jiangtj.micro）的 Spring Boot 4 �
 
 | 取值 | 追加内容 | 参考 |
 | --- | --- | --- |
-| `db` | Flyway + jOOQ + H2、jOOQ 代码生成测试、迁移脚本目录 | `references/database.md` |
-| `config` | `micro-business`、`jmicro.config.enabled=true`、系统配置 Loader 示例 | `references/system-config.md` |
+| `db` | Flyway + jOOQ + H2、jOOQ 代码生成测试、迁移脚本（`book` / `sys_user` 等账号表 / `sys_config` / `R__sys_permission`） | `references/database.md` |
+| `config` | `micro-business`、`jmicro.config.enabled=true`、系统配置 Loader 示例（TEXT/TEXTAREA/SWITCH/JSON）、与 `db` 组合时附带落库 Saver | `references/system-config.md` |
 | `pic` | `micro-business`、`jmicro.config.enabled=true`、`PicUploadController` | `references/pic-upload.md` |
 
 ## 步骤 2：生成骨架
@@ -70,7 +71,8 @@ python scripts/init_project.py --path <目录> --package <包名> --name <项目
 ├── gradlew / gradle/wrapper/   # 技能内置，无需联网安装
 └── src/main/kotlin/<pkg>/
     ├── <App>Application.kt
-    ├── auth/                   # JwtProperties / JwtService / AuthContextConverter / UserStore
+    ├── auth/                   # JwtProperties / JwtService / AuthContextConverter(只带角色)
+    │                           # AppUserStore / RolePermissionResolver / RoleBasedAuthorization
     ├── controller/             # AuthController(login,me) / BookController
     ├── book/                   # BookForm / BookService（内存实现，替换为真实持久层）
     └── common/                 # ApiExceptionHandler / WebConfig(CORS)
@@ -79,6 +81,7 @@ python scripts/init_project.py --path <目录> --package <包名> --name <项目
 ## 步骤 3：必做接线（缺一不可）
 
 1. **必须自己提供 `AuthContextConverter` Bean**。`AuthContextFactory` 不做任何兜底：没有转换器时所有请求都是未登录。模板中的 `auth/JwtAuthContextConverter.kt` 是最小范式，契约见 `references/auth.md`。
+   token 中只放角色，权限由 `RolePermissionResolver` 按角色解析（`RoleBasedAuthorization` 惰性求值）；不要把权限塞进 claims，否则改权限就要用户重新登录。
 2. **注册 `BaseException` → RFC 9457 ProblemDetail 的转换**。模板 `common/ApiExceptionHandler.kt` 继承 `ResponseEntityExceptionHandler` 并把 `RuntimeException` 交给 `BaseException.toProblemDetail()`，否则 `@HasLogin` 拒绝时拿不到 401 响应体。
 3. **不要写** `@EnableXxx`、`ObjectMapper`/`JsonMapper` 配置、鉴权拦截器注册——自动配置已处理（`micro-web` 初始化 `JsonUtils`，`micro-auth` 注册 `@HasLogin/@HasSubject/@HasRole/@HasPermission` 四个 Advisor）。
 4. 主类放在基础包根（`@SpringBootApplication` 扫描所有子包），Kotlin 组件类需要 `kotlin("plugin.spring")` 插件才能被 AOP 代理。
@@ -87,40 +90,46 @@ python scripts/init_project.py --path <目录> --package <包名> --name <项目
 
 按 `--features` 阅读对应 reference 后再改代码，不要凭印象添加属性：
 
-- `db` → `references/database.md`（Flyway 迁移目录、jOOQ 代码生成、`PageUtils` 分页）
-- `config` → `references/system-config.md`（`JMicroConfigLoader`/`Saver`、`SystemItemInfo`、`JMicroConfigService`）
+- `db` → `references/database.md`（Flyway 迁移目录、`R__` 可重复脚本、jOOQ 代码生成、`PageUtils` 分页）。
+  账号/角色/权限表已随迁移建好，落库版 `UserStore` / `RoleService` / `RolePermissionResolver` 按 `references/auth.md` 的 demo 结构替换；
+  **先生成 jOOQ 代码再改主代码**，否则 `compileKotlin` 会因缺少生成类失败。
+- `config` → `references/system-config.md`（`JMicroConfigLoader`/`Saver`、`SystemItemInfo`、`JMicroConfigService`）。
+  与 `db` 组合时自带 `sys_config` 落库 Saver，管理接口含 `/{key}/properties` 与公开的 `/system/configs/public`。
 - `pic` → `references/pic-upload.md`（`PicUploadService`、各 provider 配置项、`jmicro.config.enabled` 前置）
 - 测试 → `references/testing.md`；模块坐标与自动配置全表 → `references/modules.md`
 
 ## 步骤 5：验证（必须真实执行并报告结果）
 
-1. `./gradlew compileKotlin` 通过。
-2. `./gradlew test` 通过（模板自带 `AuthFlowTest`，覆盖登录、401、403、JSON Schema）。
+1. `./gradlew compileKotlin` 通过（启用 `db` 时主代码不引用生成类，首次编译即可通过）。
+2. `./gradlew test` 通过（模板自带 `AuthFlowTest` 与 `auth/AppUserStoreTest`：覆盖登录、401、403、JSON Schema、token 只带角色、按角色解析权限）。
+   启用 `db` 时用 `./gradlew test -Pai` 跳过需要生成代码的 `db-generate` 标签。
 3. `./gradlew bootRun` 启动无异常后（模板内置账号 `admin/admin123`、`reader/reader123`）：
    - `POST /login` 取 token；
    - 不带 token 访问受保护接口应返回 401 且响应体为 ProblemDetail；
-   - 带 token 访问成功；
+   - 带 token 访问成功，`GET /me` 返回由角色解析出的 `roles` / `permissions`；
    - `reader` 删除接口返回 403。
-4. 任一失败按 `references/pitfalls.md` 排查；仍失败时如实报告错误输出，不要声称已通过。
+4. 启用 `db` 时再跑 `./gradlew test --tests "*DBGenerateTest*"` 生成 jOOQ 代码（需要可连数据库）。
+5. 任一失败按 `references/pitfalls.md` 排查；仍失败时如实报告错误输出，不要声称已通过。
 
 ## 常见失败速查
 
 | 现象 | 原因 |
 | --- | --- |
 | 所有请求都未登录 / 401 | 缺少 `AuthContextConverter`，或返回 `AuthContext.unLogin()` 中断了转换链 |
-| 403 但账号权限看起来正确 | `jmicro.auth.permission-match` 为默认 `Simple` 时通配符不生效，用 `ant` |
+| 403 但账号权限看起来正确 | `jmicro.auth.permission-match` 为 `Simple` 时通配符不生效，用 `ant`；或角色到权限的映射没配上 |
+| 改完角色权限不生效 | `RolePermissionResolver` 按角色缓存，变更后要 `invalidate`（改编码时新旧都清）；测试里要清缓存 |
 | 401/403 无响应体 | 未注册 `BaseException` 的 ControllerAdvice |
 | `jmicro.config.enabled` 不生效 | 默认 `false`，必须显式开启；图片上传、provider 配置都依赖它 |
 | 找不到 `spring-boot-starter-web` | Boot 4 改名为 `spring-boot-starter-webmvc` |
-| jOOQ 生成的类不存在 | 生成代码需先跑 `db-generate` 标签的测试（需要可连的数据库） |
+| jOOQ 生成的类不存在 | 生成代码需先跑 `db-generate` 标签的测试（需要可连的数据库）；主代码不要先引用生成类 |
 | `Could not find com.jiangtj.micro:micro-*` | 该版本未发布到 Maven Central；改用已发布版本，或 `--local-repo` + 本地发布 |
 
 ## 参考文件
 
 - `references/modules.md` — 模块职责、Maven 坐标、自动配置清单、必配属性
-- `references/auth.md` — 认证上下文契约、注解、`AuthService`、JWT 登录实现
-- `references/database.md` — Flyway 扩展、jOOQ 生成与分页
-- `references/system-config.md` — 系统配置能力与表单类型
+- `references/auth.md` — 认证上下文契约、注解、`AuthService`、角色/权限分离的 JWT 登录与落库结构
+- `references/database.md` — Flyway 扩展、迁移脚本（含 `R__`）、jOOQ 生成与落库改造顺序、分页
+- `references/system-config.md` — 系统配置能力、表单类型、`sys_config` 落库 Saver
 - `references/pic-upload.md` — 图片上传与各 provider 配置
-- `references/testing.md` — `@JMicroTest`、`@WithMockUser`、ProblemDetail 断言
+- `references/testing.md` — `@JMicroTest`、`@WithMockUser`、Service 集成测试、ProblemDetail 断言
 - `references/pitfalls.md` — 易错点与排查顺序

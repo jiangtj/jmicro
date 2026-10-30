@@ -23,7 +23,18 @@ spring.flyway.enabled=true
 spring.flyway.locations=classpath:/db/migration
 ```
 
-迁移脚本放 `src/main/resources/db/migration/V1.0.0__init.sql`（Spring Boot 4 下 `V<版本>__<描述>.sql`）。
+迁移脚本放 `src/main/resources/db/migration/`。两种命名都可用：`V1.0.0__init.sql`（`V<版本>__<描述>.sql`）或 demo 的 `V1.0.0.sql`（不带描述）；**可重复执行的字典数据用 `R__` 前缀**（如 `R__sys_permission.sql`），内容改了就按校验和重跑。
+
+`--features db` 生成的脚本（与最新 demo 一致）：
+
+| 脚本 | 内容 |
+| --- | --- |
+| `V1.0.0.sql` | `book` 表 + 3 条种子数据（含 `create_time`） |
+| `V1.1.0.sql` | `sys_user` / `sys_role` / `sys_permission` / `sys_user_role` / `sys_role_permission` + `admin/admin123`、`reader/reader123`（bcrypt） |
+| `V1.2.0.sql` | `sys_config`（系统配置覆盖值，配合 `config` 特性） |
+| `R__sys_permission.sql` | 权限字典，脚本内容即权威列表（先 `DELETE` 再 `INSERT`） |
+
+关联表（`sys_user_role` / `sys_role_permission`）**不建外键**，关系由应用层维护，删角色时要显式清理。
 
 开发环境可追加 profile：
 
@@ -111,6 +122,41 @@ PageUtils.selectFrom(create, BOOK)
 List<Book> list = PageUtils.selectLimitList(create.select(BOOK).from(BOOK), pageable, condition);
 int total = PageUtils.selectCount(create.selectCount().from(BOOK), condition);
 ```
+
+## 落库改造顺序（重要）
+
+demo 的 Service 直接用生成的 DAO：
+
+```kotlin
+@Service
+class BookService(private val bookDao: BookDao) {
+
+    fun list(): List<Book> = bookDao.findAll()
+
+    fun get(id: Long): Book = bookDao.fetchOneById(id)
+        ?: throw BaseExceptionUtils.notFound("图书不存在：$id")
+
+    fun create(form: BookForm): Book {
+        val book = Book(null, form.title, form.author, form.isbn, form.price, form.stock, LocalDateTime.now())
+        bookDao.insert(book)   // 插入后回填主键
+        return book
+    }
+
+    fun update(id: Long, form: BookForm): Book { /* 改字段 → bookDao.update(book) */ }
+
+    fun delete(id: Long) {
+        get(id)                // 不存在时返回 404
+        bookDao.deleteById(id)
+    }
+}
+```
+
+这里的 `Book` 是 `*.jooq.tables.pojos.Book`（Kotlin data class）。**顺序不能反**：
+
+1. 先 `./gradlew test --tests "*DBGenerateTest*"` 生成 `*.jooq.*`（需要有可连的数据库，Flyway 已迁移）。
+2. 再把主代码（`BookService`、`UserStore`、`RoleService` 等）换成引用生成类的实现。
+
+主代码在生成之前引用 `*.jooq.tables.daos.*` 会让 `compileKotlin` 直接失败——模板因此默认给内存实现，`db` 特性只提供迁移脚本与 `DBGenerateTest`，落库代码按 `references/auth.md` 的 demo 结构替换。
 
 ## 无数据库时的替代
 

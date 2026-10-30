@@ -21,9 +21,10 @@ import org.springframework.web.bind.annotation.RestController
  * 系统配置管理接口（仅 admin 角色）。
  *
  * - `GET /system/configs`：配置项列表，可按 tag 过滤（secret 项已脱敏）
- * - `GET /system/configs/{key}`：单个配置项
+ * - `GET /system/configs/{key}`：单个配置项（含前端渲染用的 `schema`）
  * - `PUT /system/configs/{key}`：写入覆盖值
  * - `DELETE /system/configs/{key}`：删除覆盖值，回退默认值
+ * - `GET /system/configs/{key}/properties`：生成可粘贴到 application.properties 的配置行
  * - `POST /system/configs/refresh`：清缓存并发布刷新事件
  */
 @HasRole("admin")
@@ -57,6 +58,13 @@ class ConfigController(
         jmicroConfigService.deleteConfig(key)
         return findItem(key)
     }
+
+    /**
+     * 生成 `jmicro.config.kv.*` 形式的配置行，方便前端提供「复制配置」能力
+     */
+    @GetMapping("/{key}/properties")
+    fun properties(@PathVariable key: String): String =
+        jmicroConfigService.generateConfig(key, jmicroConfigService.getValue(key))
 
     @PostMapping("/refresh")
     fun refresh() {
