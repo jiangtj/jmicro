@@ -1,5 +1,7 @@
 package com.jiangtj.micro.demobackend.common
 
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
@@ -21,3 +23,15 @@ fun Pageable.withDefaultSort(defaultSort: Sort): Pageable {
  */
 fun Pageable.withDefaultSort(vararg defaultProperties: String): Pageable =
     withDefaultSort(Sort.by(*defaultProperties))
+
+/**
+ * 内存列表分页，用于系统配置项这类非数据库来源的数据。
+ */
+fun <T : Any> List<T>.toPage(pageable: Pageable): Page<T> {
+    if (pageable.isUnpaged) {
+        return PageImpl(this)
+    }
+    val from = pageable.offset.coerceAtMost(size.toLong()).toInt()
+    val to = (from + pageable.pageSize).coerceAtMost(size)
+    return PageImpl(subList(from, to), pageable, size.toLong())
+}

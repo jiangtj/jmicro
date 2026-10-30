@@ -10,8 +10,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPat
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 /**
- * 分页接口的 MVC 层测试：验证 `page`/`size`/`sort` 参数绑定与统一分页响应结构
- * （`content`/`page`/`size`/`totalElements`/`totalPages`/`first`/`last`）。
+ * 分页接口的 MVC 层测试：验证 `page`/`size`/`sort` 参数绑定与 Spring Data `Page` 的响应结构
+ * （`spring.data.web.pageable.serialization-mode=VIA_DTO`：`content` + `page.size`/`page.number`/
+ * `page.totalElements`/`page.totalPages`）。
  */
 @JMicroMvcTest
 class PaginationEndpointTest {
@@ -21,7 +22,7 @@ class PaginationEndpointTest {
 
     @Test
     @WithMockUser(roles = ["admin"], permissions = ["book:read"])
-    fun `books page binds pageable and returns page result`() {
+    fun `books page binds pageable and returns page`() {
         mockMvc.perform(
             get("/books/page")
                 .param("page", "0")
@@ -29,13 +30,11 @@ class PaginationEndpointTest {
                 .param("sort", "id,asc"),
         )
             .andExpect(status().isOk)
-            .andExpect(jsonPath("$.page").value(0))
-            .andExpect(jsonPath("$.size").value(1))
+            .andExpect(jsonPath("$.page.number").value(0))
+            .andExpect(jsonPath("$.page.size").value(1))
             .andExpect(jsonPath("$.content.length()").value(1))
-            .andExpect(jsonPath("$.totalElements").value(3))
-            .andExpect(jsonPath("$.totalPages").value(3))
-            .andExpect(jsonPath("$.first").value(true))
-            .andExpect(jsonPath("$.last").value(false))
+            .andExpect(jsonPath("$.page.totalElements").value(3))
+            .andExpect(jsonPath("$.page.totalPages").value(3))
     }
 
     @Test
@@ -43,7 +42,7 @@ class PaginationEndpointTest {
     fun `books page filters by keyword`() {
         mockMvc.perform(get("/books/page").param("keyword", "虚拟机"))
             .andExpect(status().isOk)
-            .andExpect(jsonPath("$.totalElements").value(1))
+            .andExpect(jsonPath("$.page.totalElements").value(1))
             .andExpect(jsonPath("$.content[0].title").value("深入理解 Java 虚拟机"))
     }
 
@@ -53,8 +52,8 @@ class PaginationEndpointTest {
         mockMvc.perform(get("/roles/page").param("size", "1"))
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.content.length()").value(1))
-            .andExpect(jsonPath("$.totalElements").value(2))
-            .andExpect(jsonPath("$.totalPages").value(2))
+            .andExpect(jsonPath("$.page.totalElements").value(2))
+            .andExpect(jsonPath("$.page.totalPages").value(2))
             .andExpect(jsonPath("$.content[0].permissionCodes").isArray)
     }
 
@@ -63,10 +62,10 @@ class PaginationEndpointTest {
     fun `permissions page returns permissions`() {
         mockMvc.perform(get("/permissions/page").param("page", "1").param("size", "1"))
             .andExpect(status().isOk)
-            .andExpect(jsonPath("$.page").value(1))
-            .andExpect(jsonPath("$.totalElements").value(2))
+            .andExpect(jsonPath("$.page.number").value(1))
+            .andExpect(jsonPath("$.page.totalElements").value(2))
+            .andExpect(jsonPath("$.page.totalPages").value(2))
             .andExpect(jsonPath("$.content[0].code").value("book:write"))
-            .andExpect(jsonPath("$.last").value(true))
     }
 
     @Test
@@ -75,6 +74,6 @@ class PaginationEndpointTest {
         mockMvc.perform(get("/system/configs/page").param("size", "1"))
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.content.length()").value(1))
-            .andExpect(jsonPath("$.totalElements").isNumber)
+            .andExpect(jsonPath("$.page.totalElements").isNumber)
     }
 }

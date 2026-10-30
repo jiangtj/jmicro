@@ -1,8 +1,8 @@
 package com.jiangtj.micro.demobackend.auth.role
 
 import com.jiangtj.micro.auth.annotations.HasRole
-import com.jiangtj.micro.demobackend.common.PageResult
 import jakarta.validation.Valid
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -38,7 +38,7 @@ class RoleController(
      * 分页参数 `page`（从 0 开始）、`size`、`sort`（驼峰属性名，如 `sort=code,asc`）
      */
     @GetMapping("/page")
-    fun page(pageable: Pageable): PageResult<RoleDetail> = PageResult.of(roleService.page(pageable))
+    fun page(pageable: Pageable): Page<RoleDetail> = roleService.page(pageable)
 
     @GetMapping("/{id}")
     fun get(@PathVariable id: Long): RoleDetail = roleService.get(id)

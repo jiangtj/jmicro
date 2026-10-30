@@ -1,8 +1,8 @@
 package com.jiangtj.micro.demobackend.auth.permission
 
 import com.jiangtj.micro.auth.annotations.HasRole
-import com.jiangtj.micro.demobackend.common.PageResult
 import com.jiangtj.micro.demobackend.jooq.tables.pojos.SysPermission
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -35,7 +35,7 @@ class PermissionController(
     fun page(
         pageable: Pageable,
         @RequestParam(required = false) keyword: String?,
-    ): PageResult<SysPermission> = PageResult.of(permissionService.page(keyword, pageable))
+    ): Page<SysPermission> = permissionService.page(keyword, pageable)
 
     @GetMapping("/{code}")
     fun get(@PathVariable code: String): SysPermission = permissionService.get(code)

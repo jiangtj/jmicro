@@ -6,8 +6,9 @@ import com.jiangtj.micro.business.config.JMicroConfigService
 import com.jiangtj.micro.business.config.SystemItem
 import com.jiangtj.micro.business.config.SystemItemInfo
 import com.jiangtj.micro.business.config.trimKey
-import com.jiangtj.micro.demobackend.common.PageResult
+import com.jiangtj.micro.demobackend.common.toPage
 import com.jiangtj.micro.web.BaseExceptionUtils
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -55,7 +56,7 @@ class JMicroConfigController(
     fun page(
         pageable: Pageable,
         @RequestParam(required = false) tag: String?,
-    ): PageResult<SystemItemInfo> = PageResult.of(list(tag), pageable)
+    ): Page<SystemItemInfo> = list(tag).toPage(pageable)
 
     @GetMapping("/{key}")
     fun get(@PathVariable key: String): SystemItemInfo = findItem(key)
