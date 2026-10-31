@@ -5,19 +5,20 @@ import com.jiangtj.micro.auth.annotations.HasRole
 import com.jiangtj.micro.common.schema.JsonSchema
 import com.jiangtj.micro.common.schema.JsonSchemaGenerator
 import com.jiangtj.micro.demobackend.book.BookForm
+import com.jiangtj.micro.demobackend.book.BookQuery
 import com.jiangtj.micro.demobackend.book.BookService
 import com.jiangtj.micro.demobackend.jooq.tables.pojos.Book
 import jakarta.validation.Valid
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 /**
@@ -37,7 +38,8 @@ class BookController(
     fun list(): List<Book> = bookService.list()
 
     /**
-     * 图书分页查询，`keyword` 同时匹配书名与作者；
+     * 图书分页查询：过滤参数按 [BookQuery] 声明（`title` 模糊匹配，`author`/`isbn`/`stock` 精确匹配，
+     * `minPrice`/`maxPrice` 价格区间）；
      * 分页参数 `page`（从 1 开始）、`size`、`sortQ`（驼峰属性名，如 `sortQ=createTime,desc`）
      *
      * 直接返回 Spring Data 的 `Page`，由 `spring.data.web.pageable.serialization-mode=VIA_DTO`
@@ -47,8 +49,8 @@ class BookController(
     @GetMapping("/page")
     fun page(
         pageable: Pageable,
-        @RequestParam(required = false) keyword: String?,
-    ): Page<Book> = bookService.page(pageable, keyword)
+        @ModelAttribute query: BookQuery,
+    ): Page<Book> = bookService.page(pageable, query)
 
     @HasPermission("book:read")
     @GetMapping("/{id}")

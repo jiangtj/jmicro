@@ -72,15 +72,29 @@ class BookServiceTest {
     }
 
     @Test
-    fun `page supports keyword filter and client sort`() {
-        val byTitle = bookService.page(PageRequest.of(0, 10), "虚拟机")
+    fun `page supports fuzzy and exact filter and client sort`() {
+        val byTitle = bookService.page(PageRequest.of(0, 10), BookQuery(title = "虚拟机"))
         assertThat(byTitle.content.map { it.title }).containsExactly("深入理解 Java 虚拟机")
 
-        val byAuthor = bookService.page(PageRequest.of(0, 10), "  martin  ")
+        val byAuthor = bookService.page(PageRequest.of(0, 10), BookQuery(author = "Robert C. Martin"))
         assertThat(byAuthor.content.map { it.title }).containsExactly("代码整洁之道")
 
         val sorted = bookService.page(PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "id")))
         assertThat(sorted.content.mapNotNull { it.id }).isSorted
+    }
+
+    @Test
+    fun `page filters by exact and range query conditions`() {
+        // isbn 走 conditionByExample 的等值条件
+        val byIsbn = bookService.page(PageRequest.of(0, 10), BookQuery(isbn = "9787115216878"))
+        assertThat(byIsbn.content.map { it.title }).containsExactly("代码整洁之道")
+
+        // price 被忽略后单独追加区间条件
+        val byPrice = bookService.page(
+            PageRequest.of(0, 10),
+            BookQuery(minPrice = BigDecimal("60"), maxPrice = BigDecimal("100")),
+        )
+        assertThat(byPrice.content.map { it.title }).containsExactly("Spring Boot 编程思想")
     }
 
     @Test

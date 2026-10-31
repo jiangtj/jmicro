@@ -27,18 +27,18 @@ class BookService(
      * 图书分页查询。
      *
      * 排序字段按 pojo 属性名（驼峰）传入，如 `sortQ=createTime,desc`，未指定时按主键倒序（新书在前）。
-     * [keyword] 同时匹配书名与作者（忽略大小写）。
+     *
+     * 查询条件优先交给 `conditionByExample`：它与 [BookQuery] 中同名的 pojo 属性（如 `author`、`isbn`、`stock`）
+     * 自动生成等值条件。书名需要模糊匹配，价格需要区间匹配，因此把它们作为忽略字段传入，
+     * 再用 `and` 追加对应的条件。
      */
-    fun page(pageable: Pageable, keyword: String? = null): Page<Book> {
-        val kw = keyword?.trim()
-        val condition = if (kw.isNullOrEmpty()) {
-            null
-        } else {
-            BookTable.BOOK.TITLE.containsIgnoreCase(kw)
-                .or(BookTable.BOOK.AUTHOR.containsIgnoreCase(kw))
-        }
+    fun page(pageable: Pageable, query: BookQuery = BookQuery()): Page<Book> {
+        val table = BookTable.BOOK
         return bookDao.fetchPage()
-            .where(condition)
+            .conditionByExample(query, table.TITLE, table.PRICE)
+            .and(query.title?.trim()?.takeIf { it.isNotEmpty() }?.let { table.TITLE.containsIgnoreCase(it) })
+            .and(query.minPrice?.let { table.PRICE.ge(it) })
+            .and(query.maxPrice?.let { table.PRICE.le(it) })
             .pageable(
                 pageable.withDefaultSort(Sort.by(Sort.Direction.DESC, "id")),
                 SortPropertyStyle.SNAKE_LOWER,

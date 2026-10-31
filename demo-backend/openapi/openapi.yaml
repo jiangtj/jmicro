@@ -216,7 +216,8 @@ paths:
         需要权限 `book:read`。
         分页参数使用 Spring Data 约定：`page` 从 1 开始、`size` 默认 20、
         排序参数名为 `sortQ`，使用 pojo 属性名（如 `sortQ=createTime,desc`），未指定排序时按主键倒序（新书在前）。
-        `keyword` 同时匹配书名与作者（忽略大小写）。
+        过滤参数按 `BookQuery` 声明：`title` 模糊匹配（忽略大小写），`author`/`isbn`/`stock` 精确匹配，
+        `minPrice`/`maxPrice` 为闭区间价格过滤。
       operationId: pageBooks
       security:
         - bearerAuth: []
@@ -224,13 +225,51 @@ paths:
         - $ref: '#/components/parameters/Page'
         - $ref: '#/components/parameters/Size'
         - $ref: '#/components/parameters/SortQ'
-        - name: keyword
+        - name: title
           in: query
           required: false
-          description: 关键字，同时匹配书名与作者（忽略大小写）
+          description: 书名，模糊匹配（忽略大小写）
           schema:
             type: string
           example: 虚拟机
+        - name: author
+          in: query
+          required: false
+          description: 作者，精确匹配
+          schema:
+            type: string
+          example: Robert C. Martin
+        - name: isbn
+          in: query
+          required: false
+          description: ISBN，精确匹配
+          schema:
+            type: string
+          example: '9787115216878'
+        - name: stock
+          in: query
+          required: false
+          description: 库存，精确匹配
+          schema:
+            type: integer
+            format: int32
+          example: 8
+        - name: minPrice
+          in: query
+          required: false
+          description: 价格下限（含）
+          schema:
+            type: number
+            format: bigdecimal
+          example: 60
+        - name: maxPrice
+          in: query
+          required: false
+          description: 价格上限（含）
+          schema:
+            type: number
+            format: bigdecimal
+          example: 100
       responses:
         '200':
           description: 图书分页结果

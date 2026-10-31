@@ -45,8 +45,8 @@ class PaginationEndpointTest {
 
     @Test
     @WithMockUser(roles = ["admin"], permissions = ["book:read"])
-    fun `books page filters by keyword`() {
-        mockMvc.perform(get("/books/page").param("keyword", "虚拟机"))
+    fun `books page filters by title`() {
+        mockMvc.perform(get("/books/page").param("title", "虚拟机"))
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.page.totalElements").value(1))
             .andExpect(jsonPath("$.content[0].title").value("深入理解 Java 虚拟机"))
