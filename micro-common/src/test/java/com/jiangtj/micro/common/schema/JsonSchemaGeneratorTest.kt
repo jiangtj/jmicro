@@ -88,6 +88,25 @@ class JsonSchemaGeneratorTest {
         Assertions.assertEquals(mutableListOf<Any>("ENABLED", "DISABLED"), status.enumValues)
     }
 
+    data class Ids(
+        val bookIds: List<Long>,
+        val counts: List<Int>,
+    )
+
+    @Test
+    fun testBoxedGenericItems() {
+        // 泛型实参只会以装箱类型（java.lang.Long / java.lang.Integer）出现，不能被当成对象展开
+        val schema = JsonSchemaGenerator.generate<Ids>()
+        Assertions.assertEquals(
+            """{"type":"array","items":{"type":"integer"}}""",
+            toJson(schema.properties!!["bookIds"])
+        )
+        Assertions.assertEquals(
+            """{"type":"array","items":{"type":"integer"}}""",
+            toJson(schema.properties!!["counts"])
+        )
+    }
+
     @Test
     fun testCache() {
         JsonSchemaGenerator.generate<BookForm>()

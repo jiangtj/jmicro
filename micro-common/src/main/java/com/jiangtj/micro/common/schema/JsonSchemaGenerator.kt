@@ -186,19 +186,22 @@ object JsonSchemaGenerator {
         if (javaType is WildcardType) javaType.upperBounds.firstOrNull() ?: Any::class.java else javaType
 
     private fun primitiveSchema(clazz: Class<*>): JsonSchema? = when {
-        clazz == String::class.java || clazz == Char::class.java || CharSequence::class.java.isAssignableFrom(clazz) ->
-            JsonSchema(type = "string")
+        // 注意：Kotlin 的 `Int::class.java` 取到的是原始类型 int，泛型实参（如 `List<Long>` 的元素）
+        // 只会以装箱类型出现，因此这里同时匹配原始类型与装箱类型
+        clazz == String::class.java || clazz == Char::class.java || clazz == Char::class.javaObjectType
+            || CharSequence::class.java.isAssignableFrom(clazz) -> JsonSchema(type = "string")
 
-        clazz == Boolean::class.javaPrimitiveType || clazz == Boolean::class.java -> JsonSchema(type = "boolean")
+        clazz == Boolean::class.javaPrimitiveType || clazz == Boolean::class.javaObjectType ->
+            JsonSchema(type = "boolean")
 
-        clazz == Int::class.javaPrimitiveType || clazz == Int::class.java
-            || clazz == Short::class.javaPrimitiveType || clazz == Short::class.java
-            || clazz == Byte::class.javaPrimitiveType || clazz == Byte::class.java
-            || clazz == Long::class.javaPrimitiveType || clazz == Long::class.java
+        clazz == Int::class.javaPrimitiveType || clazz == Int::class.javaObjectType
+            || clazz == Short::class.javaPrimitiveType || clazz == Short::class.javaObjectType
+            || clazz == Byte::class.javaPrimitiveType || clazz == Byte::class.javaObjectType
+            || clazz == Long::class.javaPrimitiveType || clazz == Long::class.javaObjectType
             || clazz == BigInteger::class.java -> JsonSchema(type = "integer")
 
-        clazz == Float::class.javaPrimitiveType || clazz == Float::class.java
-            || clazz == Double::class.javaPrimitiveType || clazz == Double::class.java
+        clazz == Float::class.javaPrimitiveType || clazz == Float::class.javaObjectType
+            || clazz == Double::class.javaPrimitiveType || clazz == Double::class.javaObjectType
             || clazz == BigDecimal::class.java -> JsonSchema(type = "number")
 
         clazz == LocalDate::class.java -> JsonSchema(type = "string", format = "date")

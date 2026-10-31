@@ -1,6 +1,8 @@
 package com.jiangtj.micro.demobackend.controller
 
 import com.jiangtj.micro.auth.annotations.HasRole
+import com.jiangtj.micro.common.schema.JsonSchema
+import com.jiangtj.micro.common.schema.JsonSchemaGenerator
 import com.jiangtj.micro.demobackend.auth.role.RoleOption
 import com.jiangtj.micro.demobackend.auth.role.RoleService
 import com.jiangtj.micro.demobackend.auth.user.UserDetail
@@ -61,6 +63,15 @@ class UserController(
 
     @GetMapping("/{id}")
     fun get(@PathVariable id: Long): UserDetail = userService.get(id)
+
+    /**
+     * 返回 [UserForm] 的 JSON Schema，供前端动态生成新增/修改表单
+     *
+     * schema 中 `password` 不在 `required` 内：新增时必填（`minLength=6`）、修改时留空表示不修改密码，
+     * 该差异由前端根据场景（新增/修改）补充校验。
+     */
+    @GetMapping("/form-schema")
+    fun formSchema(): JsonSchema = JsonSchemaGenerator.generate<UserForm>()
 
     @PostMapping
     fun create(@Valid @RequestBody form: UserForm): UserDetail = userService.create(form)

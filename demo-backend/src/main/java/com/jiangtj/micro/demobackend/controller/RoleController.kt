@@ -1,6 +1,8 @@
 package com.jiangtj.micro.demobackend.controller
 
 import com.jiangtj.micro.auth.annotations.HasRole
+import com.jiangtj.micro.common.schema.JsonSchema
+import com.jiangtj.micro.common.schema.JsonSchemaGenerator
 import com.jiangtj.micro.demobackend.auth.role.RoleDetail
 import com.jiangtj.micro.demobackend.auth.role.RoleForm
 import com.jiangtj.micro.demobackend.auth.role.RoleQuery
@@ -49,6 +51,12 @@ class RoleController(
 
     @GetMapping("/{id}")
     fun get(@PathVariable id: Long): RoleDetail = roleService.get(id)
+
+    /**
+     * 返回 [RoleForm] 的 JSON Schema，供前端动态生成新增/修改表单
+     */
+    @GetMapping("/form-schema")
+    fun formSchema(): JsonSchema = JsonSchemaGenerator.generate<RoleForm>()
 
     @PostMapping
     fun create(@Valid @RequestBody form: RoleForm): RoleDetail = roleService.create(form)
