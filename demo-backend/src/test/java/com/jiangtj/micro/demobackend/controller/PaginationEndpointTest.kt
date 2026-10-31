@@ -64,6 +64,17 @@ class PaginationEndpointTest {
     }
 
     @Test
+    @WithMockUser(roles = ["admin"])
+    fun `users page returns users with roles`() {
+        mockMvc.perform(get("/users/page").param("size", "1"))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.content.length()").value(1))
+            .andExpect(jsonPath("$.page.totalElements").value(2))
+            .andExpect(jsonPath("$.page.totalPages").value(2))
+            .andExpect(jsonPath("$.content[0].roleIds").isArray)
+    }
+
+    @Test
     @WithMockUser(roles = ["admin"], permissions = ["book:read"])
     fun `legacy sort parameter is ignored`() {
         mockMvc.perform(
