@@ -66,7 +66,8 @@ paths:
   # ------------------------------------------------------------------
   /login:
     post:
-      tags: [Auth]
+      tags:
+        - Auth
       summary: 登录并签发 JWT
       description: |
         校验 `sys_user` 表中的账号与 bcrypt 密码，成功后用 HS256 签发 JWT
@@ -95,8 +96,11 @@ paths:
                 token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiJ9.demo-signature
                 username: admin
                 nickname: 管理员
-                roles: [admin]
-                permissions: ['book:read', 'book:write']
+                roles:
+                  - admin
+                permissions:
+                  - 'book:read'
+                  - 'book:write'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -114,7 +118,8 @@ paths:
 
   /me:
     get:
-      tags: [Auth]
+      tags:
+        - Auth
       summary: 获取当前登录用户
       description: 需要登录（`@HasLogin`），返回 token 中的主体信息与角色、权限。
       operationId: getCurrentUser
@@ -130,8 +135,10 @@ paths:
               example:
                 username: reader
                 nickname: 读者
-                roles: [reader]
-                permissions: ['book:read']
+                roles:
+                  - reader
+                permissions:
+                  - 'book:read'
         '401':
           $ref: '#/components/responses/Unauthorized'
 
@@ -140,7 +147,8 @@ paths:
   # ------------------------------------------------------------------
   /books:
     post:
-      tags: [Books]
+      tags:
+        - Books
       summary: 新增图书
       description: 需要权限 `book:write`。返回插入后的完整记录（含数据库生成的主键与创建时间）。
       operationId: createBook
@@ -182,7 +190,8 @@ paths:
 
   /books/page:
     get:
-      tags: [Books]
+      tags:
+        - Books
       summary: 分页查询图书
       description: |
         需要权限 `book:read`。
@@ -270,7 +279,8 @@ paths:
 
   /books/form-schema:
     get:
-      tags: [Books]
+      tags:
+        - Books
       summary: 获取图书表单 JSON Schema
       description: |
         返回 `BookForm` 的 JSON Schema（draft 2020-12），供前端动态生成表单。
@@ -304,7 +314,11 @@ paths:
                   stock:
                     type: integer
                     minimum: 0
-                required: [title, author, price, stock]
+                required:
+                  - title
+                  - author
+                  - price
+                  - stock
 
   /books/{id}:
     parameters:
@@ -318,7 +332,8 @@ paths:
           minimum: 1
         example: 1
     get:
-      tags: [Books]
+      tags:
+        - Books
       summary: 查询单本图书
       description: 需要权限 `book:read`。
       operationId: getBook
@@ -338,7 +353,8 @@ paths:
         '404':
           $ref: '#/components/responses/BookNotFound'
     put:
-      tags: [Books]
+      tags:
+        - Books
       summary: 修改图书
       description: 需要权限 `book:write`。全量覆盖 `title`、`author`、`isbn`、`price`、`stock`。
       operationId: updateBook
@@ -372,7 +388,8 @@ paths:
         '404':
           $ref: '#/components/responses/BookNotFound'
     delete:
-      tags: [Books]
+      tags:
+        - Books
       summary: 删除图书
       description: 需要 `admin` 角色。删除前会先校验记录是否存在。
       operationId: deleteBook
@@ -403,7 +420,8 @@ paths:
   # ------------------------------------------------------------------
   /roles:
     post:
-      tags: [Role]
+      tags:
+        - Role
       summary: 新增角色
       description: |
         仅 `admin` 角色可访问。角色编码 `code` 全局唯一，重复时返回 400；
@@ -420,7 +438,8 @@ paths:
             example:
               code: tester
               name: 测试角色
-              permissionCodes: ['book:read']
+              permissionCodes:
+                - 'book:read'
       responses:
         '200':
           description: 创建成功，返回含主键的角色详情
@@ -432,7 +451,8 @@ paths:
                 id: 3
                 code: tester
                 name: 测试角色
-                permissionCodes: ['book:read']
+                permissionCodes:
+                  - 'book:read'
         '400':
           description: 字段校验失败、角色编码重复或权限编码不存在
           content:
@@ -452,7 +472,8 @@ paths:
 
   /roles/page:
     get:
-      tags: [Role]
+      tags:
+        - Role
       summary: 分页查询角色
       description: |
         仅 `admin` 角色可访问。返回当前页角色及其绑定的权限编码。
@@ -491,7 +512,9 @@ paths:
                   - id: 1
                     code: admin
                     name: 管理员
-                    permissionCodes: ['book:read', 'book:write']
+                    permissionCodes:
+                      - 'book:read'
+                      - 'book:write'
                 page:
                   size: 20
                   number: 0
@@ -514,7 +537,8 @@ paths:
           minimum: 1
         example: 3
     get:
-      tags: [Role]
+      tags:
+        - Role
       summary: 查询单个角色
       description: 仅 `admin` 角色可访问，返回角色绑定的权限编码。
       operationId: getRole
@@ -534,7 +558,8 @@ paths:
         '404':
           $ref: '#/components/responses/RoleNotFound'
     put:
-      tags: [Role]
+      tags:
+        - Role
       summary: 修改角色
       description: |
         仅 `admin` 角色可访问。`permissionCodes` 整体覆盖该角色的权限绑定，传空数组表示清空。
@@ -551,7 +576,9 @@ paths:
             example:
               code: tester
               name: 测试角色（改）
-              permissionCodes: ['book:read', 'book:write']
+              permissionCodes:
+                - 'book:read'
+                - 'book:write'
       responses:
         '200':
           description: 修改成功
@@ -568,7 +595,8 @@ paths:
         '404':
           $ref: '#/components/responses/RoleNotFound'
     delete:
-      tags: [Role]
+      tags:
+        - Role
       summary: 删除角色
       description: |
         仅 `admin` 角色可访问。同时清理 `sys_user_role` / `sys_role_permission` 中该角色的关联记录
@@ -591,7 +619,8 @@ paths:
   # ------------------------------------------------------------------
   /permissions:
     get:
-      tags: [Permission]
+      tags:
+        - Permission
       summary: 查询权限字典
       description: 仅 `admin` 角色可访问。字典内容由 `db/migration/R__sys_permission.sql` 维护。
       operationId: listPermissions
@@ -636,7 +665,8 @@ paths:
           type: string
         example: book:read
     get:
-      tags: [Permission]
+      tags:
+        - Permission
       summary: 按编码查询权限
       description: 仅 `admin` 角色可访问。
       operationId: getPermission
@@ -661,7 +691,8 @@ paths:
   # ------------------------------------------------------------------
   /pic/upload:
     post:
-      tags: [PicUpload]
+      tags:
+        - PicUpload
       summary: 上传图片
       description: |
         上传到指定目录，实际存储服务商、允许的扩展名、大小限制与目录映射均来自系统配置项
@@ -676,7 +707,9 @@ paths:
           multipart/form-data:
             schema:
               type: object
-              required: [target, file]
+              required:
+                - target
+                - file
               properties:
                 target:
                   type: string
@@ -737,7 +770,8 @@ paths:
   # ------------------------------------------------------------------
   /system/configs:
     get:
-      tags: [JMicroConfig]
+      tags:
+        - JMicroConfig
       summary: 查询系统配置项列表
       description: |
         仅 `admin` 角色可访问。返回按 group.order、order 排序的配置项；
@@ -779,7 +813,8 @@ paths:
 
   /system/configs/refresh:
     post:
-      tags: [JMicroConfig]
+      tags:
+        - JMicroConfig
       summary: 刷新系统配置缓存
       description: 清空配置缓存并发布配置刷新事件，仅 `admin` 角色可访问。
       operationId: refreshJMicroConfig
@@ -808,7 +843,8 @@ paths:
   # ------------------------------------------------------------------
   /system/configs/public:
     get:
-      tags: [JMicroConfig]
+      tags:
+        - JMicroConfig
       summary: 查询公开配置项
       description: |
         公开接口，无需登录与权限。返回 `tag` 含 `public` 的配置项（如站点名称、站点描述、主题），
@@ -845,7 +881,8 @@ paths:
           type: string
         example: demo.site.name
     get:
-      tags: [JMicroConfig]
+      tags:
+        - JMicroConfig
       summary: 查询单个配置项
       description: 仅 `admin` 角色可访问。返回值包含默认值、当前值、是否被覆盖以及前端渲染用的 `schema`。
       operationId: getJMicroConfig
@@ -872,7 +909,8 @@ paths:
                 provider: []
                 order: 0
                 isModified: false
-                tag: [public]
+                tag:
+                  - public
                 secretPaths: []
         '401':
           $ref: '#/components/responses/Unauthorized'
@@ -891,7 +929,8 @@ paths:
         '404':
           $ref: '#/components/responses/ConfigNotFound'
     put:
-      tags: [JMicroConfig]
+      tags:
+        - JMicroConfig
       summary: 写入配置项覆盖值
       description: |
         仅 `admin` 角色可访问。值会按配置项类型校验/规范化后持久化到 `sys_config`
@@ -952,7 +991,8 @@ paths:
                     detail: 配置项不存在
                     instance: /system/configs/not.exists
     delete:
-      tags: [JMicroConfig]
+      tags:
+        - JMicroConfig
       summary: 删除配置项覆盖值（恢复默认）
       description: 仅 `admin` 角色可访问。删除 `sys_config` 中的覆盖值并发布刷新事件，返回恢复默认值后的配置项。
       operationId: resetJMicroConfig
@@ -992,7 +1032,8 @@ paths:
           type: string
         example: demo.site.name
     get:
-      tags: [JMicroConfig]
+      tags:
+        - JMicroConfig
       summary: 生成可粘贴到 application.properties 的配置行
       description: |
         仅 `admin` 角色可访问。返回 `jmicro.config.kv.<key>=<value>` 形式的纯文本，
@@ -1168,7 +1209,11 @@ components:
     PageMeta:
       type: object
       description: 分页元信息（Spring Data `PagedModel` 的 `page` 字段，由 `spring.data.web.pageable.serialization-mode=VIA_DTO` 生成）
-      required: [size, number, totalElements, totalPages]
+      required:
+        - size
+        - number
+        - totalElements
+        - totalPages
       properties:
         size:
           type: integer
@@ -1191,7 +1236,9 @@ components:
     BookPage:
       type: object
       description: 图书分页结果（直接返回 Spring Data `Page`）
-      required: [content, page]
+      required:
+        - content
+        - page
       properties:
         content:
           type: array
@@ -1204,7 +1251,9 @@ components:
     RoleDetailPage:
       type: object
       description: 角色分页结果（直接返回 Spring Data `Page`）
-      required: [content, page]
+      required:
+        - content
+        - page
       properties:
         content:
           type: array
@@ -1243,7 +1292,9 @@ components:
     LoginRequest:
       type: object
       description: 登录表单
-      required: [username, password]
+      required:
+        - username
+        - password
       properties:
         username:
           type: string
@@ -1259,7 +1310,12 @@ components:
     LoginResult:
       type: object
       description: 登录结果
-      required: [token, username, nickname, roles, permissions]
+      required:
+        - token
+        - username
+        - nickname
+        - roles
+        - permissions
       properties:
         token:
           type: string
@@ -1280,18 +1336,25 @@ components:
           description: 角色编码列表
           items:
             type: string
-          example: [admin]
+          example:
+            - admin
         permissions:
           type: array
           description: 权限编码列表（角色间接拥有）
           items:
             type: string
-          example: ['book:read', 'book:write']
+          example:
+            - 'book:read'
+            - 'book:write'
 
     MeResult:
       type: object
       description: 当前登录用户信息
-      required: [username, nickname, roles, permissions]
+      required:
+        - username
+        - nickname
+        - roles
+        - permissions
       properties:
         username:
           type: string
@@ -1315,7 +1378,10 @@ components:
     Book:
       type: object
       description: 图书（jOOQ 生成的 pojo，`null` 字段不会出现在响应中）
-      required: [title, author, createTime]
+      required:
+        - title
+        - author
+        - createTime
       properties:
         id:
           type: integer
@@ -1357,7 +1423,11 @@ components:
     BookForm:
       type: object
       description: 图书新增/修改请求体
-      required: [title, author, price, stock]
+      required:
+        - title
+        - author
+        - price
+        - stock
       properties:
         title:
           type: string
@@ -1392,7 +1462,11 @@ components:
     RoleDetail:
       type: object
       description: 角色详情（`permissionCodes` 来自 `sys_role_permission`，按编码排序）
-      required: [id, code, name, permissionCodes]
+      required:
+        - id
+        - code
+        - name
+        - permissionCodes
       properties:
         id:
           type: integer
@@ -1414,12 +1488,15 @@ components:
           description: 绑定的权限编码
           items:
             type: string
-          example: ['book:read']
+          example:
+            - 'book:read'
 
     RoleForm:
       type: object
       description: 角色新增/修改请求体
-      required: [code, name]
+      required:
+        - code
+        - name
       properties:
         code:
           type: string
@@ -1442,12 +1519,15 @@ components:
             修改时整体覆盖，传空数组表示清空该角色的全部权限。
           items:
             type: string
-          example: ['book:read']
+          example:
+            - 'book:read'
 
     Permission:
       type: object
       description: 权限字典项（`sys_permission`，jOOQ 生成的 pojo）
-      required: [code, name]
+      required:
+        - code
+        - name
       properties:
         id:
           type: integer
@@ -1577,7 +1657,20 @@ components:
     SystemItemInfo:
       type: object
       description: 系统配置项信息（由 `JMicroConfigLoader` 注册，覆盖值持久化在 `sys_config` 表）
-      required: [key, name, description, value, secret, needRefresh, group, type, provider, order, isModified, tag, secretPaths]
+      required:
+        - key
+        - name
+        - description
+        - value
+        - secret
+        - needRefresh
+        - group
+        - type
+        - provider
+        - order
+        - isModified
+        - tag
+        - secretPaths
       properties:
         key:
           type: string
@@ -1632,7 +1725,8 @@ components:
             `GET /system/configs/public` 匿名暴露给前端
           items:
             type: string
-          example: [public]
+          example:
+            - public
         secretPaths:
           type: array
           description: JSON 类型下需要局部脱敏的字段路径，如 `a.b.c` 或 `/a/b/c`
@@ -1648,7 +1742,9 @@ components:
     SystemGroup:
       type: object
       description: 配置项分组
-      required: [name, order]
+      required:
+        - name
+        - order
       properties:
         name:
           type: string
@@ -1663,12 +1759,20 @@ components:
     SystemItemType:
       type: string
       description: 前端渲染类型
-      enum: [TEXT, TEXTAREA, SWITCH, SELECT, MULTI_SELECT, JSON]
+      enum:
+        - TEXT
+        - TEXTAREA
+        - SWITCH
+        - SELECT
+        - MULTI_SELECT
+        - JSON
 
     ProviderEntry:
       type: object
       description: 可选值，`first` 为值、`second` 为显示文本
-      required: [first, second]
+      required:
+        - first
+        - second
       properties:
         first:
           type: string
@@ -1680,7 +1784,10 @@ components:
     JMicroConfigItem:
       type: object
       description: 公开配置项（`SystemItem`），仅包含 key / name / value
-      required: [key, name, value]
+      required:
+        - key
+        - name
+        - value
       properties:
         key:
           type: string
