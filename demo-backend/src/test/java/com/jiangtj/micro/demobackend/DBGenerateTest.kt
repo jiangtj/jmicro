@@ -10,13 +10,28 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.jdbc.autoconfigure.DataSourceProperties
 import org.springframework.boot.test.context.SpringBootTest
+import java.io.File
+import java.nio.file.Files
+import java.nio.file.Paths
 
 @SpringBootTest
 @Tag("db-generate")
 class DBGenerateTest(@Autowired private val properties: DataSourceProperties) {
 
     val packagePath: String = this::class.java.`package`.name
-    val outputDirectory: String = "src/main/java"
+    val outputDirectory: String = detectOutputDirectory()
+
+    /**
+     * 自动识别生成目录：优先选择已存在当前包路径的源码目录，其次选择存在的 src/main/java 或 src/main/kotlin
+     */
+    private fun detectOutputDirectory(): String {
+        val projectDir = Paths.get(System.getProperty("user.dir")).toAbsolutePath()
+        val packageDir = packagePath.replace('.', File.separatorChar)
+        val candidates = listOf("src/main/java", "src/main/kotlin")
+        return candidates.firstOrNull { Files.isDirectory(projectDir.resolve(it).resolve(packageDir)) }
+            ?: candidates.firstOrNull { Files.isDirectory(projectDir.resolve(it)) }
+            ?: "src/main/java"
+    }
 
     @Test
     fun generate() {
