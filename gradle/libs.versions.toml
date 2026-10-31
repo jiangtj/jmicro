@@ -16,7 +16,7 @@ jsr305 = "3.0.2"
 # 需高于 kotlin-stdlib 传递的 13.0（该版本没有 UnknownNullability 等类型注解）
 jetbrainsAnnotations = "26.1.0"
 libphonenumber = "9.0.36"
-casdoor = "1.15.0"
+casdoor = "2.0.2"
 jjwt = "0.13.0"
 mockitoKotlin = "6.3.0"
 lombok = "1.18.44"
