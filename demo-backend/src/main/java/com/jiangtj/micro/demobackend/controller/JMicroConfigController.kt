@@ -6,10 +6,7 @@ import com.jiangtj.micro.business.config.JMicroConfigService
 import com.jiangtj.micro.business.config.SystemItem
 import com.jiangtj.micro.business.config.SystemItemInfo
 import com.jiangtj.micro.business.config.trimKey
-import com.jiangtj.micro.demobackend.common.toPage
 import com.jiangtj.micro.web.BaseExceptionUtils
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -24,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController
  * 系统配置管理接口（仅 admin 角色可访问）
  *
  * - `GET /system/configs`：配置项列表，可按 `tag` 过滤，`secret` 项已脱敏
- * - `GET /system/configs/page`：配置项分页查询，同样支持 `tag` 过滤
  * - `GET /system/configs/{key}`：单个配置项（含前端渲染用的 `schema`）
  * - `PUT /system/configs/{key}`：写入覆盖值并持久化到 `sys_config`
  * - `DELETE /system/configs/{key}`：删除覆盖值，回退到默认值
@@ -47,16 +43,6 @@ class JMicroConfigController(
         val target = tag.trim().lowercase()
         return configs.filter { config -> config.tag.any { it.trim().lowercase() == target } }
     }
-
-    /**
-     * 配置项分页查询：配置项来自内存（`JMicroConfigService`），因此在内存中切片分页，
-     * 保持列表接口的排序（group.order、order）；分页参数 `page`（从 1 开始）、`size`
-     */
-    @GetMapping("/page")
-    fun page(
-        pageable: Pageable,
-        @RequestParam(required = false) tag: String?,
-    ): Page<SystemItemInfo> = list(tag).toPage(pageable)
 
     @GetMapping("/{key}")
     fun get(@PathVariable key: String): SystemItemInfo = findItem(key)

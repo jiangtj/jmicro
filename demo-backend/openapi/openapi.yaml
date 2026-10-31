@@ -872,38 +872,6 @@ paths:
                 detail: "Don't have role<admin>."
                 instance: /system/configs
 
-  /system/configs/page:
-    get:
-      tags: [JMicroConfig]
-      summary: 分页查询系统配置项
-      description: |
-        仅 `admin` 角色可访问。配置项来自内存（`JMicroConfigService`），分页在内存中切片完成，
-        分页参数 `page`（从 1 开始）、`size`；保持列表接口的排序（group.order、order）；`secret` 项的值已脱敏。
-      operationId: pageJMicroConfigs
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/Page'
-        - $ref: '#/components/parameters/Size'
-        - name: tag
-          in: query
-          required: false
-          description: 按 tag 过滤（trim 后忽略大小写，匹配配置项 tag 列表中的任意一项）；为空则返回全部
-          schema:
-            type: string
-          example: pic
-      responses:
-        '200':
-          description: 配置项分页结果
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SystemItemInfoPage'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-
   /system/configs/refresh:
     post:
       tags: [JMicroConfig]
@@ -1351,19 +1319,6 @@ components:
           description: 当前页权限
           items:
             $ref: '#/components/schemas/Permission'
-        page:
-          $ref: '#/components/schemas/PageMeta'
-
-    SystemItemInfoPage:
-      type: object
-      description: 系统配置项分页结果（直接返回 Spring Data `Page`）
-      required: [content, page]
-      properties:
-        content:
-          type: array
-          description: 当前页配置项
-          items:
-            $ref: '#/components/schemas/SystemItemInfo'
         page:
           $ref: '#/components/schemas/PageMeta'
 

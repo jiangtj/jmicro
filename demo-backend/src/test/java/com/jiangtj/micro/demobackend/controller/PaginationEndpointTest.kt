@@ -86,13 +86,4 @@ class PaginationEndpointTest {
             .andExpect(jsonPath("$.page.totalPages").value(2))
             .andExpect(jsonPath("$.content[0].code").value("book:write"))
     }
-
-    @Test
-    @WithMockUser(roles = ["admin"])
-    fun `system configs page slices config items`() {
-        mockMvc.perform(get("/system/configs/page").param("size", "1"))
-            .andExpect(status().isOk)
-            .andExpect(jsonPath("$.content.length()").value(1))
-            .andExpect(jsonPath("$.page.totalElements").isNumber)
-    }
 }
