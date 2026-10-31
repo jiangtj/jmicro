@@ -1,6 +1,8 @@
 package com.jiangtj.micro.demobackend.controller
 
 import com.jiangtj.micro.auth.annotations.HasRole
+import com.jiangtj.micro.demobackend.auth.role.RoleOption
+import com.jiangtj.micro.demobackend.auth.role.RoleService
 import com.jiangtj.micro.demobackend.auth.user.UserDetail
 import com.jiangtj.micro.demobackend.auth.user.UserForm
 import com.jiangtj.micro.demobackend.auth.user.UserQuery
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController
  * 用户管理接口（仅 admin 角色可访问），密码只入不出
  *
  * - `GET /users/page`：用户分页查询（含绑定的角色 id）
+ * - `GET /users/roles`：角色下拉选项（筛选框用，仅 id/code/name）
  * - `GET /users/{id}`：用户详情
  * - `POST /users`：新增用户（密码必填）
  * - `PUT /users/{id}`：修改用户（密码留空表示不修改，角色绑定整体覆盖）
@@ -32,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/users")
 class UserController(
     private val userService: UserService,
+    private val roleService: RoleService,
 ) {
 
     /**
@@ -46,6 +50,14 @@ class UserController(
         pageable: Pageable,
         @ModelAttribute query: UserQuery,
     ): Page<UserDetail> = userService.page(pageable, query)
+
+    /**
+     * 角色下拉选项：供前端筛选框/选择器使用，按 id 升序返回，不含权限明细
+     */
+    @GetMapping("/roles")
+    fun roles(): List<RoleOption> = roleService.list().map { role ->
+        RoleOption(id = role.id, code = role.code, name = role.name)
+    }
 
     @GetMapping("/{id}")
     fun get(@PathVariable id: Long): UserDetail = userService.get(id)

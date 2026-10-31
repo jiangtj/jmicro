@@ -4,7 +4,7 @@
 #   LoginController.kt        -> POST /login、GET /me
 #   BookController.kt         -> /books、/books/{id}、/books/form-schema
 #   RoleController.kt         -> /roles、/roles/{id}
-#   UserController.kt         -> /users、/users/{id}
+#   UserController.kt         -> /users、/users/roles、/users/{id}
 #   PermissionController.kt   -> /permissions、/permissions/{code}
 #   PicUploadController.kt    -> POST /pic/upload
 #   JMicroConfigController.kt -> /system/configs/**
@@ -737,6 +737,39 @@ paths:
                   number: 0
                   totalElements: 2
                   totalPages: 1
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /users/roles:
+    get:
+      tags:
+        - User
+      summary: 查询角色下拉选项
+      description: |
+        仅 `admin` 角色可访问。返回全量角色（按 id 升序），只包含 `id`、`code`、`name`，
+        供用户列表的角色筛选框/选择器使用；需要权限明细时请使用 `GET /roles/page`。
+        该接口为字面量路径，优先于 `/users/{id}` 匹配。
+      operationId: listUserRoleOptions
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 角色选项列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RoleOption'
+              example:
+                - id: 1
+                  code: admin
+                  name: 管理员
+                - id: 2
+                  code: reader
+                  name: 读者
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -1762,6 +1795,30 @@ components:
             type: string
           example:
             - 'book:read'
+
+    RoleOption:
+      type: object
+      description: 角色下拉选项（`GET /users/roles` 返回，不含权限明细）
+      required:
+        - id
+        - code
+        - name
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: 角色主键，用于 `UserQuery` 筛选与 `UserForm.roleIds`
+          example: 2
+        code:
+          type: string
+          maxLength: 64
+          description: 角色编码，全局唯一，`@HasRole` 注解使用该值
+          example: reader
+        name:
+          type: string
+          maxLength: 64
+          description: 角色名称，用于下拉框展示
+          example: 读者
 
     RoleForm:
       type: object

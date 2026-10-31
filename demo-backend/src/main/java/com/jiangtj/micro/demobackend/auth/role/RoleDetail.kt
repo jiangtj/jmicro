@@ -9,3 +9,12 @@ data class RoleDetail(
     val name: String,
     val permissionCodes: List<String>,
 )
+
+/**
+ * 角色下拉选项，供前端筛选框/选择器使用，不携带权限明细
+ */
+data class RoleOption(
+    val id: Long,
+    val code: String,
+    val name: String,
+)
