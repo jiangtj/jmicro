@@ -7,7 +7,6 @@ dependencies {
     implementation(project(":micro-business"))
     implementation(project(":micro-sql-jooq"))
     implementation("com.github.ben-manes.caffeine:caffeine")
-    implementation("io.github.oshai:kotlin-logging-jvm:8.0.4")
 
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-configuration-processor")
