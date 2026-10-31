@@ -1,24 +1,13 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-buildscript {
-    repositories {
-        gradlePluginPortal()
-        mavenCentral()
-        maven { url = uri("https://repo.spring.io/milestone") }
-        maven { url = uri("https://repo.spring.io/snapshot") }
-    }
-    dependencies {
-        // Make the dependency-management plugin's types available to this build script
-        // so we can type-safely configure the Spring Boot BOM import in the subprojects block.
-        // Version catalog (libs) is not available in buildscript, so version is hardcoded here.
-        classpath("io.spring.gradle:dependency-management-plugin:1.1.7")
-        // Workaround: kotlin-build-statistics is needed by Kotlin Gradle plugin's
-        // ClasspathEntrySnapshotTransform but isn't always resolved automatically.
-        classpath("org.jetbrains.kotlin:kotlin-build-statistics:2.4.21")
-    }
-}
-
+// Plugins are declared (but not applied) here so that:
+// - versions come from the version catalog instead of being hardcoded, and
+// - the plugin classes are on this script's classpath, which makes
+//   io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
+//   type-safe to use in the subprojects block below.
+// Plugin repositories are configured in settings.gradle.kts (pluginManagement).
+// No buildscript {} block is needed.
 plugins {
     alias(libs.plugins.spring.boot) apply false
     alias(libs.plugins.spring.dependency.management) apply false
