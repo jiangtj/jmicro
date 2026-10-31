@@ -3,12 +3,14 @@ package com.jiangtj.micro.demobackend.controller
 import com.jiangtj.micro.auth.annotations.HasRole
 import com.jiangtj.micro.demobackend.auth.role.RoleDetail
 import com.jiangtj.micro.demobackend.auth.role.RoleForm
+import com.jiangtj.micro.demobackend.auth.role.RoleQuery
 import com.jiangtj.micro.demobackend.auth.role.RoleService
 import jakarta.validation.Valid
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
@@ -33,11 +35,17 @@ class RoleController(
 ) {
 
     /**
-     * 角色分页查询（含绑定的权限编码）；
+     * 角色分页查询（含绑定的权限编码）：过滤参数按 [RoleQuery] 声明（`code` 精确匹配，`name` 模糊匹配）；
      * 分页参数 `page`（从 1 开始）、`size`、`sortQ`（驼峰属性名，如 `sortQ=code,asc`）
+     *
+     * 直接返回 Spring Data 的 `Page`，由 `spring.data.web.pageable.serialization-mode=VIA_DTO`
+     * 序列化为 `{content, page:{size, number, totalElements, totalPages}}`。
      */
     @GetMapping("/page")
-    fun page(pageable: Pageable): Page<RoleDetail> = roleService.page(pageable)
+    fun page(
+        pageable: Pageable,
+        @ModelAttribute query: RoleQuery,
+    ): Page<RoleDetail> = roleService.page(pageable, query)
 
     @GetMapping("/{id}")
     fun get(@PathVariable id: Long): RoleDetail = roleService.get(id)

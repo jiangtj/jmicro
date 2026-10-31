@@ -55,15 +55,28 @@ class RoleServiceTest {
         assertThat(first.content).hasSize(1)
         assertThat(first.totalElements).isGreaterThanOrEqualTo(2)
         assertThat(first.totalPages).isGreaterThanOrEqualTo(2)
-        // 默认按主键升序：第二页的角色 id 更大
+        // 默认按主键倒序：第二页的角色 id 更小
         val second = roleService.page(PageRequest.of(1, 1))
-        assertThat(first.content.single().id).isLessThan(second.content.single().id)
+        assertThat(first.content.single().id).isGreaterThan(second.content.single().id)
 
         val all = roleService.page(PageRequest.of(0, 100))
         val byCode = all.content.associateBy { it.code }
         assertThat(byCode.keys).contains("admin", "reader")
         assertThat(byCode.getValue("admin").permissionCodes).containsExactly("book:read", "book:write")
         assertThat(byCode.getValue("reader").permissionCodes).containsExactly("book:read")
+    }
+
+    @Test
+    fun `page filters by code or name`() {
+        val byCode = roleService.page(PageRequest.of(0, 10), RoleQuery(code = "reader"))
+        assertThat(byCode.content.map { it.code }).containsExactly("reader")
+        assertThat(byCode.totalElements).isEqualTo(1)
+
+        val byName = roleService.page(PageRequest.of(0, 10), RoleQuery(name = "管理"))
+        assertThat(byName.content.map { it.code }).containsExactly("admin")
+
+        assertThat(roleService.page(PageRequest.of(0, 10), RoleQuery(name = "  ")).totalElements)
+            .isGreaterThanOrEqualTo(2)
     }
 
     @Test

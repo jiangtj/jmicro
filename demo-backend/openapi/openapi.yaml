@@ -455,8 +455,9 @@ paths:
       tags: [Role]
       summary: 分页查询角色
       description: |
-        仅 `admin` 角色可访问。返回当前页角色及其绑定的权限编码（按编码排序）。
-        分页参数 `page`（从 1 开始）、`size`、`sortQ`；未指定排序时按主键升序。
+        仅 `admin` 角色可访问。返回当前页角色及其绑定的权限编码。
+        分页参数 `page`（从 1 开始）、`size`、`sortQ`（pojo 属性名，如 `sortQ=code,asc`）；未指定排序时按主键倒序。
+        过滤参数按 `RoleQuery` 声明：`code` 精确匹配，`name` 模糊匹配（忽略大小写）。
       operationId: pageRoles
       security:
         - bearerAuth: []
@@ -464,6 +465,20 @@ paths:
         - $ref: '#/components/parameters/Page'
         - $ref: '#/components/parameters/Size'
         - $ref: '#/components/parameters/SortQ'
+        - name: code
+          in: query
+          required: false
+          description: 角色编码，精确匹配
+          schema:
+            type: string
+          example: admin
+        - name: name
+          in: query
+          required: false
+          description: 角色名称，模糊匹配（忽略大小写）
+          schema:
+            type: string
+          example: 管理员
       responses:
         '200':
           description: 角色分页结果

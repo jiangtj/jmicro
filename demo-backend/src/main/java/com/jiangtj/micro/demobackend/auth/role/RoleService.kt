@@ -1,12 +1,12 @@
 package com.jiangtj.micro.demobackend.auth.role
 
 import com.jiangtj.micro.demobackend.auth.permission.RolePermissionResolver
-import com.jiangtj.micro.demobackend.common.withDefaultSort
+import com.jiangtj.micro.demobackend.common.withPageable
 import com.jiangtj.micro.demobackend.dao.SysRoleRepository
+import com.jiangtj.micro.demobackend.jooq.tables.SysRole as SysRoleTable
 import com.jiangtj.micro.demobackend.jooq.tables.daos.SysPermissionDao
 import com.jiangtj.micro.demobackend.jooq.tables.daos.SysRoleDao
 import com.jiangtj.micro.demobackend.jooq.tables.pojos.SysRole
-import com.jiangtj.micro.sql.jooq.SortPropertyStyle
 import com.jiangtj.micro.sql.jooq.dao.kt.fetchPage
 import com.jiangtj.micro.web.BaseExceptionUtils
 import org.springframework.data.domain.Page
@@ -42,11 +42,17 @@ class RoleService(
     /**
      * 角色分页查询（含各自绑定的权限编码）。
      *
-     * 排序字段按驼峰属性名传入，如 `sortQ=code,desc`，未指定时按主键升序。
+     * 排序字段按 pojo 属性名（驼峰）传入，如 `sortQ=code,desc`，未指定时按主键倒序。
+     *
+     * 查询条件优先交给 `conditionByExample`：[RoleQuery] 中同名的 pojo 属性（如 [RoleQuery.code]）自动生成等值条件。
+     * 角色名称需要模糊匹配，因此把它作为忽略字段传入，再用 `and` 追加忽略大小写的模糊条件。
      */
-    fun page(pageable: Pageable): Page<RoleDetail> {
+    fun page(pageable: Pageable, query: RoleQuery = RoleQuery()): Page<RoleDetail> {
+        val table = SysRoleTable.SYS_ROLE
         val page = roleDao.fetchPage()
-            .pageable(pageable.withDefaultSort("id"), SortPropertyStyle.SNAKE_LOWER)
+            .conditionByExample(query, table.NAME)
+            .and(query.name?.trim()?.takeIf { it.isNotEmpty() }?.let { table.NAME.containsIgnoreCase(it) })
+            .withPageable(pageable)
             .fetchPage<SysRole>()
         // 批量查询当前页角色的权限编码，避免 N+1 查询
         val permissions = roleRepository.findPermissionCodesByRoleIds(page.content.mapNotNull { it.id })
