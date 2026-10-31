@@ -622,7 +622,11 @@ paths:
       tags:
         - Permission
       summary: 查询权限字典
-      description: 仅 `admin` 角色可访问。字典内容由 `db/migration/R__sys_permission.sql` 维护。
+      description: |
+        仅 `admin` 角色可访问。字典内容由 `db/migration/R__sys_permission.sql` 维护。
+
+        权限编码以 `:` 分层，前端可按 `:` 拆分成树：不含 `:` 的编码是分组节点（如 `book`），
+        用于整组勾选或菜单组展示；含 `:` 的编码是具体权限点（如 `book:read`），对应后端鉴权。
       operationId: listPermissions
       security:
         - bearerAuth: []
@@ -645,9 +649,12 @@ paths:
                   $ref: '#/components/schemas/Permission'
               example:
                 - id: 1
+                  code: book
+                  name: 图书模块
+                - id: 2
                   code: book:read
                   name: 图书查看权限
-                - id: 2
+                - id: 3
                   code: book:write
                   name: 图书新增/修改权限
         '401':

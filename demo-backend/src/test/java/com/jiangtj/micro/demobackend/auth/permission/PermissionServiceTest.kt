@@ -21,7 +21,7 @@ class PermissionServiceTest {
     @Test
     fun `list returns permissions ordered by code`() {
         assertThat(permissionService.list(null).map { it.code })
-            .containsExactly("book:read", "book:write")
+            .containsExactly("book", "book:read", "book:write")
     }
 
     @Test
@@ -29,7 +29,7 @@ class PermissionServiceTest {
         assertThat(permissionService.list("write").map { it.code }).containsExactly("book:write")
         assertThat(permissionService.list("查看").map { it.code }).containsExactly("book:read")
         assertThat(permissionService.list("  ").map { it.code })
-            .containsExactly("book:read", "book:write")
+            .containsExactly("book", "book:read", "book:write")
     }
 
     @Test
