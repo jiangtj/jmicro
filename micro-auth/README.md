@@ -81,7 +81,7 @@ class ExampleService {
 
 ### 处理授权上下文
 
-常见场景：认证与授权过程分离（如 Casdoor 集成），认证后需补全授权信息，此时使用 `AuthContextHandler`：
+常见场景：认证与授权过程分离，认证后需补全授权信息，此时使用 `AuthContextHandler`：
 
 ```java
 @Order(Number)
@@ -124,7 +124,7 @@ public class AuthService extends DefaultAuthService {
 
 ### 多账号体系
 
-`AuthContextConverter` 的返回值可以为 `null`：返回 `null` 时会继续使用下一个转换器。因此很容易实现多账号体系——编写多个转换器各自处理授权上下文，不支持的返回 `null` 交由后续处理。建议通过 `Subject` 的 `issuer` 与 `type` 区分，例如 Casdoor 模块中 `issuer` 为授权服务器地址、`type` 为固定的 `casdoor`。
+`AuthContextConverter` 的返回值可以为 `null`：返回 `null` 时会继续使用下一个转换器。因此很容易实现多账号体系——编写多个转换器各自处理授权上下文，不支持的返回 `null` 交由后续处理。建议通过 `Subject` 的 `issuer` 与 `type` 区分，例如 `issuer` 使用授权服务器地址、`type` 使用固定的账号体系标识。
 
 ### 自定义注解
 

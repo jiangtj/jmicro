@@ -16,7 +16,6 @@ jsr305 = "3.0.2"
 # 需高于 kotlin-stdlib 传递的 13.0（该版本没有 UnknownNullability 等类型注解）
 jetbrainsAnnotations = "26.1.0"
 libphonenumber = "9.0.36"
-casdoor = "1.15.0"
 jjwt = "0.13.0"
 mockitoKotlin = "6.3.0"
 lombok = "1.18.44"
@@ -41,7 +40,6 @@ jetbrains-annotations = { module = "org.jetbrains:annotations", version.ref = "j
 
 # Tools
 libphonenumber = { module = "com.googlecode.libphonenumber:libphonenumber", version.ref = "libphonenumber" }
-casdoorStarter = { module = "org.casbin:casdoor-spring-boot-starter", version.ref = "casdoor" }
 
 # JWT
 jjwt-api = { module = "io.jsonwebtoken:jjwt-api", version.ref = "jjwt" }

@@ -27,7 +27,6 @@ J Micro 是一个基于 Spring Boot 的轻量级基础工具集，帮助开发�
     - [micro-dependencies 依赖对齐（BOM）](#micro-dependencies-依赖对齐bom)
 - [Demo 应用](#demo-应用)
     - [运行 Demo](#运行-demo)
-    - [配置 Casdoor](#配置-casdoor)
 - [构建与发布](#构建与发布)
 
 ## 模块总览
@@ -291,25 +290,6 @@ Flyway 为可选能力，需自行引入依赖：
 ```shell
 ./gradlew :demo-backend:bootRun
 ```
-
-### 配置 Casdoor
-
-Demo 的认证与鉴权由 [Casdoor](https://casdoor.org/) 提供，需先准备一个 Casdoor 实例。
-
-1. 运行以下命令创建体验版 Casdoor（线上部署请参考官方文档配置数据库）：
-
-    ```shell
-    docker run -p 28000:8000 -d casbin/casdoor-all-in-one
-    ```
-
-   > 开发环境 `demo-backend` 使用端口 `28000`（而非 `8000`），以避免端口冲突。
-
-2. 在「身份认证 → 应用」中添加应用：
-    - 应用名：`application_he3oml`
-    - client-id：`a1f9883530433d009fb1`
-    - client-secret：`a7b03bfdb051d1e6115dad3ec304995f975900eb`
-
-配置完成后运行后端与前端的 Demo 项目即可体验。详见根目录 [docker-compose.yml](./docker-compose.yml)。
 
 ## 构建与发布
 

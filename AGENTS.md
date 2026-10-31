@@ -16,7 +16,6 @@
 ## Config and Integration Hotspots
 - Property namespaces are module-specific and important: `jmicro.auth.*`, `jmicro.jwt.*`, `jmicro.flyway.*`, `jmicro.pic.upload.*` (picture upload, lives in `micro-business`). 各图片上传服务商（ali/hw/minio/easyimages/local/rustfs）的具体配置已改为系统配置项（各自包下的 `*ConfigItem` + `*ConfigLoader`，需 `jmicro.config.enabled=true`），原属性命名空间（`ali.oss.*`、`hw.obs.*`、`minio.*`、`easyimages.api.*`、`jmicro.rustfs.*`、`jmicro.pic.upload.local.*`）仅作为系统配置项的键名使用。图片上传通用配置（`jmicro.pic.upload.provider`、`jmicro.pic.upload.allowed-extensions`、`jmicro.pic.upload.max-file-size`、`jmicro.pic.upload.dirs`）同样注册为系统配置项（`PicUploadBaseConfigItem` + `PicUploadConfigLoader`，由 `PicUploadAutoConfiguration` 启动时加载）；启动配置只保留开关 `jmicro.pic.upload.enable`。
 - OIDC/JWT support is in `micro-auth` (package `com.jiangtj.micro.auth.oidc`); the optional OIDC server (Cas) support is in `micro-business` (package `com.jiangtj.micro.business.oidc.cas`) and is opt-in.
-- Demo auth integration depends on Casdoor (`docker-compose.yml` and root `README.md` Casdoor setup).
 
 ## Developer Workflows (Project-Specific)
 - Local library install (recommended by maintainers, publishes to Maven Local):
