@@ -75,15 +75,4 @@ class PaginationEndpointTest {
             // `sort` 不再是排序参数名，落入默认排序（id 倒序），首条为 id=3
             .andExpect(jsonPath("$.content[0].id").value(3))
     }
-
-    @Test
-    @WithMockUser(roles = ["admin"])
-    fun `permissions page returns permissions`() {
-        mockMvc.perform(get("/permissions/page").param("page", "2").param("size", "1"))
-            .andExpect(status().isOk)
-            .andExpect(jsonPath("$.page.number").value(1))
-            .andExpect(jsonPath("$.page.totalElements").value(2))
-            .andExpect(jsonPath("$.page.totalPages").value(2))
-            .andExpect(jsonPath("$.content[0].code").value("book:write"))
-    }
 }

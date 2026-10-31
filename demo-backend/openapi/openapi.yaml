@@ -678,49 +678,6 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
 
-  /permissions/page:
-    get:
-      tags: [Permission]
-      summary: 分页查询权限字典
-      description: |
-        仅 `admin` 角色可访问。字典内容由 `db/migration/R__sys_permission.sql` 维护。
-        分页参数 `page`（从 1 开始）、`size`、`sortQ`；未指定排序时按权限编码升序。
-      operationId: pagePermissions
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/Page'
-        - $ref: '#/components/parameters/Size'
-        - $ref: '#/components/parameters/SortQ'
-        - name: keyword
-          in: query
-          required: false
-          description: 关键字，同时匹配权限编码与名称（忽略大小写）
-          schema:
-            type: string
-          example: write
-      responses:
-        '200':
-          description: 权限分页结果
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PermissionPage'
-              example:
-                content:
-                  - id: 1
-                    code: book:read
-                    name: 图书查看权限
-                page:
-                  size: 20
-                  number: 0
-                  totalElements: 2
-                  totalPages: 1
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-
   /permissions/{code}:
     parameters:
       - name: code
@@ -1306,19 +1263,6 @@ components:
           description: 当前页角色（含绑定的权限编码）
           items:
             $ref: '#/components/schemas/RoleDetail'
-        page:
-          $ref: '#/components/schemas/PageMeta'
-
-    PermissionPage:
-      type: object
-      description: 权限分页结果（直接返回 Spring Data `Page`）
-      required: [content, page]
-      properties:
-        content:
-          type: array
-          description: 当前页权限
-          items:
-            $ref: '#/components/schemas/Permission'
         page:
           $ref: '#/components/schemas/PageMeta'
 
