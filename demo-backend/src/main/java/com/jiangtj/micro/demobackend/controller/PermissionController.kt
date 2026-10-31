@@ -1,6 +1,7 @@
-package com.jiangtj.micro.demobackend.auth.permission
+package com.jiangtj.micro.demobackend.controller
 
 import com.jiangtj.micro.auth.annotations.HasRole
+import com.jiangtj.micro.demobackend.auth.permission.PermissionService
 import com.jiangtj.micro.demobackend.jooq.tables.pojos.SysPermission
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable

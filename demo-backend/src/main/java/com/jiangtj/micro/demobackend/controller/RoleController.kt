@@ -1,6 +1,9 @@
-package com.jiangtj.micro.demobackend.auth.role
+package com.jiangtj.micro.demobackend.controller
 
 import com.jiangtj.micro.auth.annotations.HasRole
+import com.jiangtj.micro.demobackend.auth.role.RoleDetail
+import com.jiangtj.micro.demobackend.auth.role.RoleForm
+import com.jiangtj.micro.demobackend.auth.role.RoleService
 import jakarta.validation.Valid
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
