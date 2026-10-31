@@ -1,6 +1,7 @@
 package com.jiangtj.micro.demobackend.book
 
 import com.jiangtj.micro.demobackend.common.withDefaultSort
+import com.jiangtj.micro.demobackend.common.withPageable
 import com.jiangtj.micro.demobackend.jooq.tables.Book as BookTable
 import com.jiangtj.micro.demobackend.jooq.tables.daos.BookDao
 import com.jiangtj.micro.demobackend.jooq.tables.pojos.Book
@@ -39,10 +40,7 @@ class BookService(
             .and(query.title?.trim()?.takeIf { it.isNotEmpty() }?.let { table.TITLE.containsIgnoreCase(it) })
             .and(query.minPrice?.let { table.PRICE.ge(it) })
             .and(query.maxPrice?.let { table.PRICE.le(it) })
-            .pageable(
-                pageable.withDefaultSort(Sort.by(Sort.Direction.DESC, "id")),
-                SortPropertyStyle.SNAKE_LOWER,
-            )
+            .withPageable(pageable)
             .fetchPage()
     }
 

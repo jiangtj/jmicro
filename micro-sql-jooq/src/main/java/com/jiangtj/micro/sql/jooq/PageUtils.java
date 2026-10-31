@@ -120,7 +120,7 @@ public interface PageUtils {
      * 将Spring Data排序字段名转换为指定风格。
      */
     static String convertSortProperty(String property, SortPropertyStyle style) {
-        if (style == null || style == SortPropertyStyle.ORIGINAL) {
+        if (style == SortPropertyStyle.ORIGINAL) {
             return property;
         }
         List<String> words = splitSortPropertyWords(property);
@@ -128,7 +128,7 @@ public interface PageUtils {
             return property;
         }
         return switch (style) {
-            case CAMEL -> words.get(0) + words.stream().skip(1).map(PageUtils::capitalizeWord).reduce("", String::concat);
+            case CAMEL -> words.getFirst() + words.stream().skip(1).map(PageUtils::capitalizeWord).reduce("", String::concat);
             case PASCAL -> words.stream().map(PageUtils::capitalizeWord).reduce("", String::concat);
             case SNAKE_LOWER -> String.join("_", words);
             case SNAKE_UPPER -> String.join("_", words).toUpperCase(Locale.ROOT);

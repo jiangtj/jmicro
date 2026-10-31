@@ -1,5 +1,8 @@
 package com.jiangtj.micro.demobackend.common
 
+import com.jiangtj.micro.sql.jooq.SortPropertyStyle
+import com.jiangtj.micro.sql.jooq.dao.kt.PageableStep
+import org.jooq.Record
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
@@ -35,3 +38,12 @@ fun <T : Any> List<T>.toPage(pageable: Pageable): Page<T> {
     val to = (from + pageable.pageSize).coerceAtMost(size)
     return PageImpl(subList(from, to), pageable, size.toLong())
 }
+
+/**
+ * 将 Spring Data 的 Pageable 转换为 jOOQ 的 PageableStep。
+ */
+fun <T : Record> PageableStep<T>.withPageable(pageable: Pageable) =
+    this.pageable(
+        pageable.withDefaultSort(Sort.by(Sort.Direction.DESC, "id")),
+        SortPropertyStyle.SNAKE_LOWER,
+    )
