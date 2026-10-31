@@ -18,7 +18,7 @@ jetbrainsAnnotations = "26.1.0"
 libphonenumber = "9.0.36"
 casdoor = "1.15.0"
 jjwt = "0.13.0"
-mockitoKotlin = "6.3.0"
+mockitoKotlin = "6.4.0"
 lombok = "1.18.44"
 
 # Pic upload providers
