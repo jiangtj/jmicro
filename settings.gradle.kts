@@ -1,4 +1,7 @@
 pluginManagement {
+    // Convention plugins (jmicro.*-conventions) live in the build-logic included build,
+    // so subprojects can use them by id without declaring a version.
+    includeBuild("build-logic")
     repositories {
         gradlePluginPortal()
         mavenCentral()
