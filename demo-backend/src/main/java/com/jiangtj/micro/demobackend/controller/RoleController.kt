@@ -19,8 +19,7 @@ import org.springframework.web.bind.annotation.RestController
 /**
  * 用户角色管理接口（仅 admin 角色可访问）
  *
- * - `GET /roles`：角色列表（含绑定的权限编码）
- * - `GET /roles/page`：角色分页查询
+ * - `GET /roles/page`：角色分页查询（含绑定的权限编码）
  * - `GET /roles/{id}`：角色详情
  * - `POST /roles`：新增角色
  * - `PUT /roles/{id}`：修改角色（权限绑定整体覆盖）
@@ -32,9 +31,6 @@ import org.springframework.web.bind.annotation.RestController
 class RoleController(
     private val roleService: RoleService,
 ) {
-
-    @GetMapping
-    fun list(): List<RoleDetail> = roleService.list()
 
     /**
      * 角色分页查询（含绑定的权限编码）；

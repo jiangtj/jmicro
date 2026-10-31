@@ -33,10 +33,6 @@ class BookController(
     private val bookService: BookService,
 ) {
 
-    @HasPermission("book:read")
-    @GetMapping
-    fun list(): List<Book> = bookService.list()
-
     /**
      * 图书分页查询：过滤参数按 [BookQuery] 声明（`title` 模糊匹配，`author`/`isbn`/`stock` 精确匹配，
      * `minPrice`/`maxPrice` 价格区间）；
