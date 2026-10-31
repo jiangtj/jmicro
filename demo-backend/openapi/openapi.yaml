@@ -4,6 +4,7 @@
 #   LoginController.kt        -> POST /login、GET /me
 #   BookController.kt         -> /books、/books/{id}、/books/form-schema
 #   RoleController.kt         -> /roles、/roles/{id}
+#   UserController.kt         -> /users、/users/{id}
 #   PermissionController.kt   -> /permissions、/permissions/{code}
 #   PicUploadController.kt    -> POST /pic/upload
 #   JMicroConfigController.kt -> /system/configs/**
@@ -35,7 +36,7 @@ info:
     鉴权规则：
     - `book:read`：查看图书
     - `book:write`：新增/修改图书
-    - `admin` 角色：删除图书、管理系统配置、管理角色与查询权限
+    - `admin` 角色：删除图书、管理系统配置、管理角色、管理用户与查询权限
     - 权限匹配方式为 simple（`jmicro.auth.permission-match=simple`），前后端权限点一一对应
     - JWT 只保存角色，不保存权限；权限在鉴权/读取当前用户时按角色解析（Caffeine 缓存，角色权限变更即时失效）
   license:
@@ -53,6 +54,8 @@ tags:
     description: 图书增删改查与表单 Schema（BookController）
   - name: Role
     description: 用户角色增删改查（RoleController），仅 admin 角色可访问
+  - name: User
+    description: 用户增删改查（UserController），仅 admin 角色可访问
   - name: Permission
     description: 权限字典查询（PermissionController），仅 admin 角色可访问
   - name: PicUpload
@@ -615,6 +618,241 @@ paths:
           $ref: '#/components/responses/RoleNotFound'
 
   # ------------------------------------------------------------------
+  # UserController
+  # ------------------------------------------------------------------
+  /users:
+    post:
+      tags:
+        - User
+      summary: 新增用户
+      description: |
+        仅 `admin` 角色可访问。用户主体写入 `sys_user`，密码使用 bcrypt 哈希后存储（只入不出）。
+        `username` 全局唯一，重复时返回 400；新增时 `password` 必填，为空返回 400。
+        `roleIds` 必须存在于 `sys_role`（见 `GET /roles/page`），否则返回 400；传入重复 id 会去重。
+        返回的用户详情不包含密码。
+      operationId: createUser
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserForm'
+            example:
+              username: tester
+              password: tester123
+              nickname: 测试用户
+              enabled: true
+              roleIds:
+                - 2
+      responses:
+        '200':
+          description: 创建成功，返回含主键的用户详情
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetail'
+              example:
+                id: 3
+                username: tester
+                nickname: 测试用户
+                enabled: true
+                roleIds:
+                  - 2
+                createTime: '2026-10-31T10:00:00'
+        '400':
+          description: 字段校验失败、用户名重复、密码为空或角色 id 不存在
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              example:
+                type: 'about:blank'
+                title: Bad Request
+                status: 400
+                detail: 用户名已存在：admin
+                instance: /users
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /users/page:
+    get:
+      tags:
+        - User
+      summary: 分页查询用户
+      description: |
+        仅 `admin` 角色可访问。返回当前页用户及其绑定的角色 id（按角色 id 升序）。
+        分页参数 `page`（从 1 开始）、`size`、`sortQ`（pojo 属性名，如 `sortQ=createTime,desc`）；未指定排序时按主键倒序。
+        过滤参数按 `UserQuery` 声明：`username`、`enabled` 精确匹配，`nickname` 模糊匹配（忽略大小写）。
+        响应中不包含密码。
+      operationId: pageUsers
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/SortQ'
+        - name: username
+          in: query
+          required: false
+          description: 用户名，精确匹配
+          schema:
+            type: string
+          example: admin
+        - name: nickname
+          in: query
+          required: false
+          description: 昵称，模糊匹配（忽略大小写）
+          schema:
+            type: string
+          example: 管理
+        - name: enabled
+          in: query
+          required: false
+          description: 是否启用，精确匹配
+          schema:
+            type: boolean
+          example: true
+      responses:
+        '200':
+          description: 用户分页结果
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetailPage'
+              example:
+                content:
+                  - id: 1
+                    username: admin
+                    nickname: 管理员
+                    enabled: true
+                    roleIds:
+                      - 1
+                    createTime: '2026-10-24T10:00:00'
+                page:
+                  size: 20
+                  number: 0
+                  totalElements: 2
+                  totalPages: 1
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /users/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: 用户主键
+        schema:
+          type: integer
+          format: int64
+          minimum: 1
+        example: 3
+    get:
+      tags:
+        - User
+      summary: 查询单个用户
+      description: 仅 `admin` 角色可访问，返回用户绑定的角色 id，不包含密码。
+      operationId: getUser
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 用户详情
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetail'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/UserNotFound'
+    put:
+      tags:
+        - User
+      summary: 修改用户
+      description: |
+        仅 `admin` 角色可访问。`password` 留空（或传 null）表示保留原密码，否则按 bcrypt 重新哈希。
+        `roleIds` 整体覆盖该用户的角色绑定，传空数组表示清空；`username` 需保持全局唯一（排除自身）。
+        `nickname` 留空时回退为 `username`。
+      operationId: updateUser
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserForm'
+            example:
+              username: tester
+              nickname: 测试用户（改）
+              enabled: false
+              roleIds:
+                - 1
+                - 2
+      responses:
+        '200':
+          description: 修改成功，返回更新后的用户详情
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetail'
+              example:
+                id: 3
+                username: tester
+                nickname: 测试用户（改）
+                enabled: false
+                roleIds:
+                  - 1
+                  - 2
+                createTime: '2026-10-31T10:00:00'
+        '400':
+          description: 字段校验失败、用户名重复或角色 id 不存在
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              example:
+                type: 'about:blank'
+                title: Bad Request
+                status: 400
+                detail: 未知的角色 id：99
+                instance: /users/3
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/UserNotFound'
+    delete:
+      tags:
+        - User
+      summary: 删除用户
+      description: |
+        仅 `admin` 角色可访问。同时清理 `sys_user_role` 中该用户的角色关联记录
+        （关联表未建外键，由应用层维护）。
+      operationId: deleteUser
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 删除成功（无响应体）
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/UserNotFound'
+
+  # ------------------------------------------------------------------
   # PermissionController
   # ------------------------------------------------------------------
   /permissions:
@@ -1175,6 +1413,18 @@ components:
             status: 404
             detail: 角色不存在：3
             instance: /roles/3
+    UserNotFound:
+      description: 用户不存在
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+          example:
+            type: 'about:blank'
+            title: Not Found
+            status: 404
+            detail: 用户不存在：3
+            instance: /users/3
     PermissionNotFound:
       description: 权限编码不存在
       content:
@@ -1267,6 +1517,21 @@ components:
           description: 当前页角色（含绑定的权限编码）
           items:
             $ref: '#/components/schemas/RoleDetail'
+        page:
+          $ref: '#/components/schemas/PageMeta'
+
+    UserDetailPage:
+      type: object
+      description: 用户分页结果（直接返回 Spring Data `Page`）
+      required:
+        - content
+        - page
+      properties:
+        content:
+          type: array
+          description: 当前页用户（含绑定的角色 id）
+          items:
+            $ref: '#/components/schemas/UserDetail'
         page:
           $ref: '#/components/schemas/PageMeta'
 
@@ -1528,6 +1793,95 @@ components:
             type: string
           example:
             - 'book:read'
+
+    UserDetail:
+      type: object
+      description: 用户详情（不含密码），`roleIds` 来自 `sys_user_role`，按角色 id 升序
+      required:
+        - id
+        - username
+        - nickname
+        - enabled
+        - roleIds
+        - createTime
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: 主键
+          example: 3
+        username:
+          type: string
+          maxLength: 64
+          description: 用户名，全局唯一，也是登录名与 JWT subject
+          example: tester
+        nickname:
+          type: string
+          maxLength: 64
+          description: 昵称，提交时留空则回退为用户名
+          example: 测试用户
+        enabled:
+          type: boolean
+          description: 是否启用，禁用后无法登录
+          example: true
+        roleIds:
+          type: array
+          description: 绑定的角色 id（取自 `sys_role` 主键）
+          items:
+            type: integer
+            format: int64
+          example:
+            - 2
+        createTime:
+          type: string
+          format: date-time
+          description: 创建时间（服务端 `LocalDateTime.now()`，入库前截断到秒）
+          example: '2026-10-31T10:00:00'
+
+    UserForm:
+      type: object
+      description: 用户新增/修改请求体（密码只入不出）
+      required:
+        - username
+      properties:
+        username:
+          type: string
+          minLength: 1
+          maxLength: 64
+          pattern: '^[A-Za-z0-9_.-]+$'
+          description: 用户名（`@NotBlank @Size(max = 64) @Pattern`），全局唯一
+          example: tester
+        password:
+          type: string
+          minLength: 6
+          maxLength: 64
+          nullable: true
+          description: |
+            明文密码，服务端 bcrypt 哈希后存储。新增时必填（为空返回 400）；
+            修改时留空或传 null 表示保留原密码。
+          example: tester123
+        nickname:
+          type: string
+          maxLength: 64
+          nullable: true
+          description: 昵称，留空时使用用户名
+          example: 测试用户
+        enabled:
+          type: boolean
+          default: true
+          description: 是否启用，禁用后无法登录
+          example: true
+        roleIds:
+          type: array
+          default: []
+          description: |
+            绑定的角色 id，必须存在于 `sys_role` 中，否则返回 400，重复 id 会被去重；
+            修改时整体覆盖，传空数组表示清空该用户的全部角色。
+          items:
+            type: integer
+            format: int64
+          example:
+            - 2
 
     Permission:
       type: object
