@@ -38,7 +38,7 @@ class BookController(
 
     /**
      * 图书分页查询，`keyword` 同时匹配书名与作者；
-     * 分页参数 `page`（从 0 开始）、`size`、`sort`（驼峰属性名，如 `sort=createTime,desc`）
+     * 分页参数 `page`（从 1 开始）、`size`、`sortQ`（驼峰属性名，如 `sortQ=createTime,desc`）
      *
      * 直接返回 Spring Data 的 `Page`，由 `spring.data.web.pageable.serialization-mode=VIA_DTO`
      * 序列化为 `{content, page:{size, number, totalElements, totalPages}}`。

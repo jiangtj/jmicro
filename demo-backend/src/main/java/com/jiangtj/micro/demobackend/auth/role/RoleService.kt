@@ -42,7 +42,7 @@ class RoleService(
     /**
      * 角色分页查询（含各自绑定的权限编码）。
      *
-     * 排序字段按驼峰属性名传入，如 `sort=code,desc`，未指定时按主键升序。
+     * 排序字段按驼峰属性名传入，如 `sortQ=code,desc`，未指定时按主键升序。
      */
     fun page(pageable: Pageable): Page<RoleDetail> {
         val page = roleDao.fetchPage()

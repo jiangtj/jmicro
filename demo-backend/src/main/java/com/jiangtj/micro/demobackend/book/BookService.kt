@@ -26,7 +26,7 @@ class BookService(
     /**
      * 图书分页查询。
      *
-     * 排序字段按 pojo 属性名（驼峰）传入，如 `sort=createTime,desc`，未指定时按主键倒序（新书在前）。
+     * 排序字段按 pojo 属性名（驼峰）传入，如 `sortQ=createTime,desc`，未指定时按主键倒序（新书在前）。
      * [keyword] 同时匹配书名与作者（忽略大小写）。
      */
     fun page(pageable: Pageable, keyword: String? = null): Page<Book> {

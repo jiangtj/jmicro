@@ -50,7 +50,7 @@ class JMicroConfigController(
 
     /**
      * 配置项分页查询：配置项来自内存（`JMicroConfigService`），因此在内存中切片分页，
-     * 保持列表接口的排序（group.order、order）；分页参数 `page`（从 0 开始）、`size`
+     * 保持列表接口的排序（group.order、order）；分页参数 `page`（从 1 开始）、`size`
      */
     @GetMapping("/page")
     fun page(

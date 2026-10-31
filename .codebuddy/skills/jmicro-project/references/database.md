@@ -106,10 +106,11 @@ class DBGenerateTest(@Autowired private val properties: DataSourceProperties) {
 
 分页参数由 Spring Data Web 自动解析（demo 的 `common/Pageables.kt`）：
 
-- `page` **从 0 开始**、`size` 默认 20、`sort=属性名[,asc|desc]`（pojo 驼峰字段，可重复传参做多字段排序）。
+- 页码与排序参数名可定制：demo 配置了 `spring.data.web.pageable.one-indexed-parameters=true`（`page` **从 1 开始**）和 `spring.data.web.sort.sort-parameter=sortQ`（排序参数名为 `sortQ=属性名[,asc|desc]`，pojo 驼峰字段，可重复传参做多字段排序）；不配置时 Spring Data 默认 `page` 从 0 开始、参数名为 `sort`。
+- `one-indexed-parameters` 只影响请求解析，响应中的 `page.number` 仍从 0 开始（请求 `page=1` 对应 `page.number=0`）。
 - 未指定排序时用 `Pageable.withDefaultSort(...)` 补稳定排序，否则翻页可能出现重复或遗漏记录。
 - 接口直接返回 Spring Data `Page`/`PageImpl`，不包一层自定义 DTO；必须配置 `spring.data.web.pageable.serialization-mode=VIA_DTO`，响应才是稳定的 `{content, page:{size, number, totalElements, totalPages}}`（默认 `DIRECT` 会带 `pageable`、`sort` 等冗余字段且结构不稳定）。
-- 非数据库来源的数据（如系统配置项）用 `List<T>.toPage(pageable)` 在内存切片；不要开启 `spring.data.web.pageable.one-indexed-parameters`，否则请求 `page=1` 返回的 `page.number` 是 0，与接口文档/前端页码错位。
+- 非数据库来源的数据（如系统配置项）用 `List<T>.toPage(pageable)` 在内存切片；若开启 `spring.data.web.pageable.one-indexed-parameters`，接口文档需同时写明"请求 `page` 从 1 开始、响应 `page.number` 从 0 开始"，避免前端页码错位。
 
 生成 DAO 继承 jOOQ `DAOImpl`，`micro-sql-jooq` 的 `PageDAOImpl`/`KtDao` 额外提供 `fetchPage`：
 

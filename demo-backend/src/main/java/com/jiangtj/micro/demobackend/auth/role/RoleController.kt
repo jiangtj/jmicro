@@ -35,7 +35,7 @@ class RoleController(
 
     /**
      * 角色分页查询（含绑定的权限编码）；
-     * 分页参数 `page`（从 0 开始）、`size`、`sort`（驼峰属性名，如 `sort=code,asc`）
+     * 分页参数 `page`（从 1 开始）、`size`、`sortQ`（驼峰属性名，如 `sortQ=code,asc`）
      */
     @GetMapping("/page")
     fun page(pageable: Pageable): Page<RoleDetail> = roleService.page(pageable)

@@ -10,9 +10,13 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPat
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 /**
- * 分页接口的 MVC 层测试：验证 `page`/`size`/`sort` 参数绑定与 Spring Data `Page` 的响应结构
+ * 分页接口的 MVC 层测试：验证 `page`/`size`/`sortQ` 参数绑定与 Spring Data `Page` 的响应结构
  * （`spring.data.web.pageable.serialization-mode=VIA_DTO`：`content` + `page.size`/`page.number`/
  * `page.totalElements`/`page.totalPages`）。
+ *
+ * 请求参数约定来自 `application.properties`：
+ * - `spring.data.web.pageable.one-indexed-parameters=true`：`page` 从 1 开始，响应 `page.number` 仍从 0 开始
+ * - `spring.data.web.sort.sort-parameter=sortQ`：排序参数名为 `sortQ`（默认的 `sort` 不再生效）
  */
 @JMicroMvcTest
 class PaginationEndpointTest {
@@ -22,17 +26,19 @@ class PaginationEndpointTest {
 
     @Test
     @WithMockUser(roles = ["admin"], permissions = ["book:read"])
-    fun `books page binds pageable and returns page`() {
+    fun `books page binds one-indexed page and sortQ`() {
         mockMvc.perform(
             get("/books/page")
-                .param("page", "0")
+                .param("page", "1")
                 .param("size", "1")
-                .param("sort", "id,asc"),
+                .param("sortQ", "id,asc"),
         )
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.page.number").value(0))
             .andExpect(jsonPath("$.page.size").value(1))
             .andExpect(jsonPath("$.content.length()").value(1))
+            // sortQ 生效：按 id 升序时首条为 id=1（默认排序为 id 倒序，会是 id=3）
+            .andExpect(jsonPath("$.content[0].id").value(1))
             .andExpect(jsonPath("$.page.totalElements").value(3))
             .andExpect(jsonPath("$.page.totalPages").value(3))
     }
@@ -58,9 +64,22 @@ class PaginationEndpointTest {
     }
 
     @Test
+    @WithMockUser(roles = ["admin"], permissions = ["book:read"])
+    fun `legacy sort parameter is ignored`() {
+        mockMvc.perform(
+            get("/books/page")
+                .param("size", "1")
+                .param("sort", "id,asc"),
+        )
+            .andExpect(status().isOk)
+            // `sort` 不再是排序参数名，落入默认排序（id 倒序），首条为 id=3
+            .andExpect(jsonPath("$.content[0].id").value(3))
+    }
+
+    @Test
     @WithMockUser(roles = ["admin"])
     fun `permissions page returns permissions`() {
-        mockMvc.perform(get("/permissions/page").param("page", "1").param("size", "1"))
+        mockMvc.perform(get("/permissions/page").param("page", "2").param("size", "1"))
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.page.number").value(1))
             .andExpect(jsonPath("$.page.totalElements").value(2))

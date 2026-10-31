@@ -29,7 +29,7 @@ class PermissionController(
         permissionService.list(keyword)
 
     /**
-     * 权限分页查询；分页参数 `page`（从 0 开始）、`size`、`sort`（驼峰属性名）
+     * 权限分页查询；分页参数 `page`（从 1 开始）、`size`、`sortQ`（驼峰属性名）
      */
     @GetMapping("/page")
     fun page(
