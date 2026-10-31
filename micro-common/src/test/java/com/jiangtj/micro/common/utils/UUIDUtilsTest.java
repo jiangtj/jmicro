@@ -1,5 +1,6 @@
 package com.jiangtj.micro.common.utils;
 
+import kotlin.uuid.Uuid;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
@@ -28,5 +29,15 @@ class UUIDUtilsTest {
         log.info("base64Compressed: {}", base64Compressed);
         // 验证Base64编码字符集
         assertTrue(base64Compressed.matches("^[A-Za-z0-9_-]+$"));
+    }
+
+    @Test
+    void testKotlinUuid() {
+        log.info("generateV4 toString: {}", Uuid.Companion.generateV4());
+        log.info("generateV4 toHexString: {}", Uuid.Companion.generateV4().toHexString());
+        log.info("generateV4 toHexDashString: {}", Uuid.Companion.generateV4().toHexDashString());
+        log.info("generateV7 toString: {}", Uuid.Companion.generateV7());
+        log.info("generateV7 toHexString: {}", Uuid.Companion.generateV7().toHexString());
+        log.info("generateV7 toHexDashString: {}", Uuid.Companion.generateV7().toHexDashString());
     }
 }
