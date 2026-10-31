@@ -2,10 +2,10 @@
 
 ![status](https://img.shields.io/badge/status-developing-yellow.svg)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/1d836355f32d423cb487081709b5890d)](https://app.codacy.com/gh/jiangtj/jmicro/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
-![Maven Central Version](https://img.shields.io/maven-central/v/com.jiangtj.micro/parent)
+![Maven Central Version](https://img.shields.io/maven-central/v/com.jiangtj.micro/micro-dependencies)
 ![Java](https://img.shields.io/badge/java-21-007396?logo=openjdk)
-![Kotlin](https://img.shields.io/badge/kotlin-2.2-7F52FF?logo=kotlin)
-![Spring Boot](https://img.shields.io/badge/spring%20boot-4.x-6DB33F?logo=springboot)
+![Kotlin](https://img.shields.io/badge/kotlin-2.4-7F52FF?logo=kotlin)
+![Spring Boot](https://img.shields.io/badge/spring%20boot-4.1-6DB33F?logo=springboot)
 
 J Micro 是一个基于 Spring Boot 的轻量级基础工具集，帮助开发者更轻松地构建应用（提供基于 Vue 的前后端分离 Demo）。它由 [JCPlatform](https://github.com/JiangTJ/jc-platform) 拆分而来，专注于基础应用能力；后续也将支撑另一个面向微服务的项目。
 
