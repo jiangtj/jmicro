@@ -13,6 +13,9 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.jdbc.autoconfigure.DataSourceProperties
 import org.springframework.boot.test.context.SpringBootTest
+import java.io.File
+import java.nio.file.Files
+import java.nio.file.Paths
 
 /**
  * 从数据库生成 jOOQ 代码到 `<base-package>.jooq`。
@@ -26,11 +29,20 @@ class DBGenerateTest(@Autowired private val properties: DataSourceProperties) {
 
     private val packagePath: String = this::class.java.`package`.name
 
+    private val outputDirectory: String = detectOutputDirectory()
+
     /**
-     * 生成目录必须与源集一致：Kotlin 项目为 `src/main/kotlin`，Java 项目才是 `src/main/java`。
-     * jmicro demo 使用 `src/main/java` 是早期 Java 项目的历史遗留，不要照搬。
+     * 自动识别生成目录，避免 Kotlin 项目的生成代码落到 `src/main/java`：
+     * 优先选择已存在当前包路径的源码目录，其次选择存在的 `src/main/java` 或 `src/main/kotlin`。
      */
-    private val outputDirectory: String = "src/main/kotlin"
+    private fun detectOutputDirectory(): String {
+        val projectDir = Paths.get(System.getProperty("user.dir")).toAbsolutePath()
+        val packageDir = packagePath.replace('.', File.separatorChar)
+        val candidates = listOf("src/main/java", "src/main/kotlin")
+        return candidates.firstOrNull { Files.isDirectory(projectDir.resolve(it).resolve(packageDir)) }
+            ?: candidates.firstOrNull { Files.isDirectory(projectDir.resolve(it)) }
+            ?: "src/main/java"
+    }
 
     @Test
     fun generate() {

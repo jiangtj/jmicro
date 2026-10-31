@@ -8,12 +8,12 @@ description: 从零创建基于 JMicro（com.jiangtj.micro）的 Spring Boot 4 �
 ## 用途
 
 以 jmicro 官方 demo 后端为参考实现（等价结构已内置在 `assets/template`），生成一个可运行、可测试的 JMicro 后端项目，并按需接入各模块能力。
-模板与最新 demo 保持一致的关键约定：JWT 只签角色、权限按角色解析并缓存、系统配置覆盖值可落 `sys_config` 表、权限字典用 `R__` 可重复迁移维护。
+模板与最新 demo 保持一致的关键约定：JWT 只签角色、权限按角色解析并缓存、列表统一走 `GET .../page` 返回 Spring Data `Page`（请求 `page` 从 1 开始、排序参数 `sortQ`）、表单接口用 `JsonSchemaGenerator` 出 schema、系统配置覆盖值可落 `sys_config` 表、权限字典用 `R__` 可重复迁移维护（含 `book` 这类分组节点）。
 技能自带项目模板与 Gradle wrapper，**无需克隆 jmicro 仓库**：依赖来自 Maven Central，所有 API 细节以本 skill 的 `references/` 为准。不要凭记忆编造类名、属性名或版本号。
 
 ## 前置确认
 
-1. 版本必须对齐（不匹配会导致依赖解析失败或自动配置不生效）：jmicro `0.4.0`、Spring Boot `4.1.1`、Kotlin `2.4.20`、Java 21。
+1. 版本必须对齐（不匹配会导致依赖解析失败或自动配置不生效）：jmicro `0.4.0`、Spring Boot `4.1.1`、Kotlin `2.4.21`、Java 21。
    - 本技能的模板与 references 对应 `0.4.0`；改用更旧版本时须自行核对 API（0.3.x 可能没有 `BCryptUtils`、`com.jiangtj.micro.common.schema` 等模板用到的能力）。
    - 需要确认是否有更新版本时，读 Maven Central 元数据 `https://repo1.maven.org/maven2/com/jiangtj/micro/micro-dependencies/maven-metadata.xml`（脚本 `--latest` 也是读它）。
    - 用户指定版本则以用户为准。
@@ -35,7 +35,7 @@ description: 从零创建基于 JMicro（com.jiangtj.micro）的 Spring Boot 4 �
 
 | 取值 | 追加内容 | 参考 |
 | --- | --- | --- |
-| `db` | Flyway + jOOQ + H2、jOOQ 代码生成测试、迁移脚本（`book` / `sys_user` 等账号表 / `sys_config` / `R__sys_permission`） | `references/database.md` |
+| `db` | Flyway + jOOQ + H2、jOOQ 代码生成测试（自动探测生成目录）、`JooqPageables`、迁移脚本（`book` / `sys_user` 等账号表 / `sys_config` / `R__sys_permission`） | `references/database.md` |
 | `config` | `micro-business`、`jmicro.config.enabled=true`、系统配置 Loader 示例（TEXT/TEXTAREA/SWITCH/JSON）、与 `db` 组合时附带落库 Saver | `references/system-config.md` |
 | `pic` | `micro-business`、`jmicro.config.enabled=true`、`PicUploadController` | `references/pic-upload.md` |
 
@@ -73,10 +73,14 @@ python scripts/init_project.py --path <目录> --package <包名> --name <项目
     ├── <App>Application.kt
     ├── auth/                   # JwtProperties / JwtService / AuthContextConverter(只带角色)
     │                           # AppUserStore / RolePermissionResolver / RoleBasedAuthorization
-    ├── controller/             # AuthController(login,me) / BookController
-    ├── book/                   # BookForm / BookService（内存实现，替换为真实持久层）
-    └── common/                 # ApiExceptionHandler / WebConfig(CORS)
+    ├── controller/             # AuthController(login,me) / BookController(page, form-schema, CRUD)
+    ├── book/                   # Book / BookForm / BookQuery / BookService（内存实现，替换为真实持久层）
+    └── common/                 # ApiExceptionHandler / WebConfig(CORS) / Pageables(withDefaultSort、toPage)
 ```
+
+启用 `db` 后追加 `common/JooqPageables.kt`（`PageableStep.withPageable`）与 `DBGenerateTest`；
+用户/角色/权限管理的落库实现（`UserService`/`RoleService`/`PermissionService` + 3 个 Controller + `dao/*Repository`）
+按 `references/auth.md` 的 demo 结构补，接口与分页/表单 schema 约定照 demo。
 
 ## 步骤 3：必做接线（缺一不可）
 
@@ -85,30 +89,36 @@ python scripts/init_project.py --path <目录> --package <包名> --name <项目
 2. **注册 `BaseException` → RFC 9457 ProblemDetail 的转换**。模板 `common/ApiExceptionHandler.kt` 继承 `ResponseEntityExceptionHandler` 并把 `RuntimeException` 交给 `BaseException.toProblemDetail()`，否则 `@HasLogin` 拒绝时拿不到 401 响应体。
 3. **不要写** `@EnableXxx`、`ObjectMapper`/`JsonMapper` 配置、鉴权拦截器注册——自动配置已处理（`micro-web` 初始化 `JsonUtils`，`micro-auth` 注册 `@HasLogin/@HasSubject/@HasRole/@HasPermission` 四个 Advisor）。
 4. 主类放在基础包根（`@SpringBootApplication` 扫描所有子包），Kotlin 组件类需要 `kotlin("plugin.spring")` 插件才能被 AOP 代理。
+5. **列表接口统一 `GET .../page`**：方法参数 `Pageable` + `@ModelAttribute Query`，直接返回 Spring Data `Page`（不要自己切片、不要包 DTO）；表单接口用 `JsonSchemaGenerator.generate<XxxForm>()`。这两点依赖模板 `application.properties` 里的三项 `spring.data.web.*` 配置（`VIA_DTO`、`one-indexed-parameters`、`sort-parameter=sortQ`），删掉会改变对外契约。
 
 ## 步骤 4：接入可选能力
 
 按 `--features` 阅读对应 reference 后再改代码，不要凭印象添加属性：
 
-- `db` → `references/database.md`（Flyway 迁移目录、`R__` 可重复脚本、jOOQ 代码生成、`PageUtils` 分页）。
-  账号/角色/权限表已随迁移建好，落库版 `UserStore` / `RoleService` / `RolePermissionResolver` 按 `references/auth.md` 的 demo 结构替换；
+- `db` → `references/database.md`（Flyway 迁移目录、`R__` 可重复脚本、jOOQ 代码生成、`conditionByExample` + `withPageable` 分页）。
+  账号/角色/权限表已随迁移建好，落库版 `UserStore` / `UserService` / `RoleService` / `PermissionService` / `RolePermissionResolver`
+  与三个管理 Controller 按 `references/auth.md` 的 demo 结构补齐；
   **先生成 jOOQ 代码再改主代码**，否则 `compileKotlin` 会因缺少生成类失败。
 - `config` → `references/system-config.md`（`JMicroConfigLoader`/`Saver`、`SystemItemInfo`、`JMicroConfigService`）。
   与 `db` 组合时自带 `sys_config` 落库 Saver，管理接口含 `/{key}/properties` 与公开的 `/system/configs/public`。
 - `pic` → `references/pic-upload.md`（`PicUploadService`、各 provider 配置项、`jmicro.config.enabled` 前置）
 - 测试 → `references/testing.md`；模块坐标与自动配置全表 → `references/modules.md`
+- 需要对外 API 文档时，参照 demo 的手写 `openapi/openapi.yaml`（按 controller 维护，用 `npx @redocly/cli lint` 校验），不必引入 springdoc
 
 ## 步骤 5：验证（必须真实执行并报告结果）
 
 1. `./gradlew compileKotlin` 通过（启用 `db` 时主代码不引用生成类，首次编译即可通过）。
-2. `./gradlew test` 通过（模板自带 `AuthFlowTest` 与 `auth/AppUserStoreTest`：覆盖登录、401、403、JSON Schema、token 只带角色、按角色解析权限）。
+2. `./gradlew test` 通过（模板自带 `AuthFlowTest` 与 `auth/AppUserStoreTest`：覆盖登录、401、403、`/books/page` 的 page/sortQ 绑定、表单 schema、token 只带角色、按角色解析权限）。
    启用 `db` 时用 `./gradlew test -Pai` 跳过需要生成代码的 `db-generate` 标签。
 3. `./gradlew bootRun` 启动无异常后（模板内置账号 `admin/admin123`、`reader/reader123`）：
    - `POST /login` 取 token；
    - 不带 token 访问受保护接口应返回 401 且响应体为 ProblemDetail；
    - 带 token 访问成功，`GET /me` 返回由角色解析出的 `roles` / `permissions`；
+   - `GET /books/page?page=1&size=10&sortQ=id,asc` 返回 `{content, page:{number, size, totalElements, totalPages}}`（`page.number` 从 0 开始）；
+   - `GET /books/form-schema` 返回带 `title`/`properties`/`required` 的 JSON Schema；
    - `reader` 删除接口返回 403。
-4. 启用 `db` 时再跑 `./gradlew test --tests "*DBGenerateTest*"` 生成 jOOQ 代码（需要可连数据库）。
+4. 启用 `db` 时再跑 `./gradlew test --tests "*DBGenerateTest*"` 生成 jOOQ 代码（需要可连数据库）；
+   落库版管理接口补齐后验证 `GET /users/page`、`GET /users/roles`、`GET /roles/page`、`GET /permissions`（均需 admin）。
 5. 任一失败按 `references/pitfalls.md` 排查；仍失败时如实报告错误输出，不要声称已通过。
 
 ## 常见失败速查
@@ -121,6 +131,7 @@ python scripts/init_project.py --path <目录> --package <包名> --name <项目
 | 401/403 无响应体 | 未注册 `BaseException` 的 ControllerAdvice |
 | `jmicro.config.enabled` 不生效 | 默认 `false`，必须显式开启；图片上传、provider 配置都依赖它 |
 | 找不到 `spring-boot-starter-web` | Boot 4 改名为 `spring-boot-starter-webmvc` |
+| 传 `sort` 不排序 / 页码错一位 / 响应结构带 `pageable` | 缺 `spring.data.web.sort.sort-parameter=sortQ`、`spring.data.web.pageable.one-indexed-parameters=true`、`spring.data.web.pageable.serialization-mode=VIA_DTO` |
 | jOOQ 生成的类不存在 | 生成代码需先跑 `db-generate` 标签的测试（需要可连的数据库）；主代码不要先引用生成类 |
 | `Could not find com.jiangtj.micro:micro-*` | 该版本未发布到 Maven Central；改用已发布版本，或 `--local-repo` + 本地发布 |
 

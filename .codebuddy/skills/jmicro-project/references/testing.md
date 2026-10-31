@@ -28,7 +28,7 @@ class DemoTest {
     @Test
     @WithMockUser(subject = "1", roles = {"admin"}, permissions = {"book:read"})
     void shouldPass() {
-        client.get().uri("/books").exchange().expectStatus().isOk();
+        client.get().uri("/books/page").exchange().expectStatus().isOk();
     }
 }
 ```
@@ -87,10 +87,58 @@ fun `permission change takes effect without new token`() {
 }
 ```
 
+## MVC 层：分页与表单 schema（demo 的 `PaginationEndpointTest` / `FormSchemaEndpointTest`）
+
+分页参数绑定与响应结构只能在 MVC 层验证（`@JMicroMvcTest` + `MockMvc`），
+表单 schema 则验证 `JsonSchemaGenerator` 的输出：
+
+```kotlin
+@JMicroMvcTest
+class PaginationEndpointTest {
+
+    @Autowired lateinit var mockMvc: MockMvc
+
+    @Test
+    @WithMockUser(roles = ["admin"], permissions = ["book:read"])
+    fun `page binds one-indexed page and sortQ`() {
+        mockMvc.perform(get("/books/page").param("page", "1").param("size", "1").param("sortQ", "id,asc"))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.page.number").value(0))       // 请求 page=1 → 响应 number=0
+            .andExpect(jsonPath("$.page.size").value(1))
+            .andExpect(jsonPath("$.content.length()").value(1))
+    }
+}
+```
+
+```kotlin
+@JMicroMvcTest
+class FormSchemaEndpointTest {
+
+    @Autowired lateinit var mockMvc: MockMvc
+
+    @Test
+    fun `book form schema is public`() {
+        mockMvc.perform(get("/books/form-schema"))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.title").value("BookForm"))
+            .andExpect(jsonPath("$.properties.title.maxLength").value(128))
+            .andExpect(jsonPath("$.required").isArray)
+    }
+}
+```
+
+要点：
+
+- 分页接口断言 `$.page.number`/`$.page.size`/`$.page.totalElements` 与 `$.content`（`VIA_DTO` 结构）；
+  `sortQ` 生效可用"首条 id"间接断言，`sort` 参数已不再生效。
+- `form-schema` 的断言用 `title`（类名）、`properties.*`、`required`；`password` 这类"新增必填、修改可空"的字段不会出现在 `required` 中。
+- Service 层的用户/角色/配置测试用 `@JMicroTest` + `@Transactional` + `@WithMockUser(roles = ["admin"])`；
+  写库操作自动回滚，但 Caffeine 缓存（`RolePermissionResolver`、`JMicroConfigService`）要在 `@AfterEach` 里显式清理。
+
 ## 断言 ProblemDetail
 
 ```java
-client.get().uri("/books")
+client.get().uri("/books/page")
     .exchange()
     .expectAll(ProblemDetailMvcConsumer.unLogin().expect());
 // 或
@@ -119,7 +167,7 @@ class AuthFlowTest {
 
     @Test
     fun anonymousGets401() {
-        client.get().uri("/books").exchange()
+        client.get().uri("/books/page").exchange()
             .expectAll(ProblemDetailMvcConsumer.unLogin().expect())
     }
 

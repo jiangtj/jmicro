@@ -46,14 +46,14 @@
     该版本尚未发布到 Maven Central，或拼错了版本号。先用 `maven-metadata.xml` 确认可用版本，换成已发布版本。
     仅在需要未发布版本时，才由使用方本地发布（`publishToMavenLocal`）并加 `mavenLocal()`；jmicro 官方仓库默认开启 PGP 签名，本机无 key 时发布需加
     `-PsignAllPublications=false -PmavenCentralPublishing=false`。
-13. **版本写错**：`micro-dependencies`、`micro-*` 版本必须一致，且与所用 Boot 大版本匹配（0.4.0 → Spring Boot 4.1.1 / Kotlin 2.4.20 / Java 21）。
+13. **版本写错**：`micro-dependencies`、`micro-*` 版本必须一致，且与所用 Boot 大版本匹配（0.4.0 → Spring Boot 4.1.1 / Kotlin 2.4.21 / Java 21）。
     本技能模板针对 0.4.0；用 `--latest` 解析到更旧版本时会出现 `Unresolved reference`（`BCryptUtils`、`common.schema` 等新 API 尚不存在）。
 
 ## 数据相关
 
 14. **Flyway 未生效**：`micro-business` 里 Flyway 是 optional，需自己加 `spring-boot-starter-flyway`；迁移脚本放 `src/main/resources/db/migration/`，命名沿用 `V1.0.0.sql` 或 `V1__init.sql`。
 15. **jOOQ 类不存在**：生成代码依赖真实数据库结构，必须先启动/迁移数据库再跑 `db-generate` 标签的测试。
-    另外 `outputDirectory` 必须与源集一致——Kotlin 项目用 `src/main/kotlin`；jmicro demo 的 `src/main/java` 是早期 Java 项目的历史遗留，不要照搬。
+    生成目录用 demo 的 `detectOutputDirectory()` 自动探测（优先已存在当前包路径的目录），不要把 `src/main/java` 硬编码到 Kotlin 项目里。
 16. **`jmicro.flyway.clean-on-validation-error=true`** 会清库，仅限 dev/test。
 
 ## 其它
@@ -78,6 +78,22 @@
 23. **主代码引用 `*.jooq.*` 生成类导致编译失败**
     生成类来自真实库结构，必须先 `./gradlew test --tests "*DBGenerateTest*"` 生成后再改主代码（模板默认给内存实现，正是为了首次编译能过）。
 
+## 分页/接口契约相关（最新 demo）
+
+24. **分页参数对不上**
+    demo 约定：请求 `page` 从 1 开始、排序参数名为 `sortQ`（pojo 驼峰属性名，如 `sortQ=createTime,desc`），
+    响应为 `{content, page:{size, number, totalElements, totalPages}}`。对应配置：
+    `spring.data.web.pageable.one-indexed-parameters=true`、`spring.data.web.sort.sort-parameter=sortQ`、
+    `spring.data.web.pageable.serialization-mode=VIA_DTO`。少配任一项会表现为"页码错一位 / 传 `sort` 不排序 / 响应结构带 pageable"。
+    另外需要 `org.springframework.boot:spring-boot-data-commons` 依赖，否则 `Pageable` 参数无法解析：
+    `No primary or single unique constructor found for interface Pageable`（500）。
+25. **无分页列表端点已被移除**
+    demo 的 books / roles / users 列表统一为 `GET .../page`（`BookController` 不再有 `GET /books`）。
+    沿用旧接口会 404/405；新写业务也照 `/page` + `@ModelAttribute Query` + 返回 `Page` 的约定走。
+26. **表单 schema 断言/字段对不上**
+    `JsonSchemaGenerator.generate<XxxForm>()` 的 `title` 是类名（如 `BookForm`），必填项在 `required`；
+    可空字段（如 `UserForm.password`）不在 `required` 里，"新增必填、修改可空"的差异要由前端按场景处理。
+
 ## 排查顺序
 
 1. `./gradlew compileKotlin` → 编译/依赖问题（11–13、23）
@@ -86,3 +102,4 @@
 4. 请求 403 → 权限匹配与角色数据（3、20–22）
 5. 请求 5xx 无响应体 → ControllerAdvice（4）
 6. 数据/迁移 → 14–16、22
+7. 分页/接口契约 → 24–26

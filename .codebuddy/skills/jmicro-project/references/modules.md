@@ -59,7 +59,7 @@ Maven 接入用 `dependencyManagement` + `<type>pom</type><scope>import</scope>`
 | --- | --- |
 | jmicro | `0.4.0` |
 | Spring Boot | `4.1.1`（Boot 4 / Servlet 栈） |
-| Kotlin | `2.4.20` |
+| Kotlin | `2.4.21` |
 | Java | 21 |
 
 Boot 大版本与 jmicro 的编译目标不匹配时，会出现自动配置类缺失、`NoSuchMethodError` 等问题，优先对齐上表。
@@ -73,6 +73,11 @@ Boot 大版本与 jmicro 的编译目标不匹配时，会出现自动配置类�
 | RestClient 测试 | `spring-boot-starter-restclient-test` |
 
 `DataSourcesProperties` 等包路径也有变化：Boot 4 为 `org.springframework.boot.jdbc.autoconfigure.DataSourceProperties`。
+
+分页（Spring Data `Pageable`/`Page`）需要 `org.springframework.boot:spring-boot-data-commons`：
+它负责注册 `Pageable` 参数解析与 `PagedModel` 序列化。只加 `org.springframework.data:spring-data-commons`
+会在请求时 500（`No primary or single unique constructor found for interface Pageable`）。
+`micro-sql-jooq` 已 `api` 该模块，所以启用 `db` 的项目自动具备；只用 Web + 鉴权的项目要靠模板 base 里的显式声明。
 
 ## 自动配置清单
 

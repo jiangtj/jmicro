@@ -28,6 +28,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-configuration-processor")
+    // 分页接口直接返回 Spring Data Page/Pageable：Boot 4 的 spring-boot-data-commons
+    // 负责注册 Pageable 参数解析与 PagedModel 序列化（只加 spring-data-commons 不够）
+    implementation("org.springframework.boot:spring-boot-data-commons")
 
     // #if db|config|pic
     implementation("com.jiangtj.micro:micro-business")

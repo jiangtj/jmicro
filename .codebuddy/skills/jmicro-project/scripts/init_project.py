@@ -44,7 +44,7 @@ FEATURES = ("db", "config", "pic")
 # Versions CORS: keep in sync with the jmicro release this skill targets.
 DEFAULT_JMICRO_VERSION = "0.4.0"
 DEFAULT_SPRING_BOOT_VERSION = "4.1.1"
-DEFAULT_KOTLIN_VERSION = "2.4.20"
+DEFAULT_KOTLIN_VERSION = "2.4.21"
 MAVEN_METADATA = "https://repo1.maven.org/maven2/com/jiangtj/micro/micro-dependencies/maven-metadata.xml"
 
 TEXT_SUFFIXES = {".kt", ".kts", ".java", ".properties", ".sql", ".xml", ".json", ".md", ".yml", ".yaml", ".toml", ""}

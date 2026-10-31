@@ -4,7 +4,7 @@
 
 ```kotlin
 implementation("com.jiangtj.micro:micro-business")     // Flyway 扩展在这里，Flyway 本身为 optional
-implementation("com.jiangtj.micro:micro-sql-jooq")     // PageUtils / GenerateHelper
+implementation("com.jiangtj.micro:micro-sql-jooq")     // PageUtils / GenerateHelper（已 api spring-boot-data-commons，提供 Pageable 解析）
 implementation("org.springframework.boot:spring-boot-starter-flyway")
 implementation("org.springframework.boot:spring-boot-starter-jooq")
 runtimeOnly("com.h2database:h2")                       // 或 mysql 驱动
@@ -32,7 +32,7 @@ spring.flyway.locations=classpath:/db/migration
 | `V1.0.0.sql` | `book` 表 + 3 条种子数据（含 `create_time`） |
 | `V1.1.0.sql` | `sys_user` / `sys_role` / `sys_permission` / `sys_user_role` / `sys_role_permission` + `admin/admin123`、`reader/reader123`（bcrypt） |
 | `V1.2.0.sql` | `sys_config`（系统配置覆盖值，配合 `config` 特性） |
-| `R__sys_permission.sql` | 权限字典，脚本内容即权威列表（先 `DELETE` 再 `INSERT`） |
+| `R__sys_permission.sql` | 权限字典，脚本内容即权威列表（先 `DELETE` 再 `INSERT`）；含分组节点 `book`（不带 `:`），仅供前端渲染权限树，后端鉴权仍用 `book:read`/`book:write` |
 
 关联表（`sys_user_role` / `sys_role_permission`）**不建外键**，关系由应用层维护，删角色时要显式清理。
 
@@ -57,8 +57,19 @@ jOOQ 需要从数据库生成表类，流程是"先迁移建表 → 再生成代
 class DBGenerateTest(@Autowired private val properties: DataSourceProperties) {
 
     private val packagePath: String = this::class.java.`package`.name
-    // Kotlin 项目：src/main/kotlin；Java 项目：src/main/java
-    private val outputDirectory: String = "src/main/kotlin"
+    private val outputDirectory: String = detectOutputDirectory()
+
+    /**
+     * 自动识别生成目录：优先选择已存在当前包路径的源码目录，其次选择存在的 src/main/java 或 src/main/kotlin
+     */
+    private fun detectOutputDirectory(): String {
+        val projectDir = Paths.get(System.getProperty("user.dir")).toAbsolutePath()
+        val packageDir = packagePath.replace('.', File.separatorChar)
+        val candidates = listOf("src/main/java", "src/main/kotlin")
+        return candidates.firstOrNull { Files.isDirectory(projectDir.resolve(it).resolve(packageDir)) }
+            ?: candidates.firstOrNull { Files.isDirectory(projectDir.resolve(it)) }
+            ?: "src/main/java"
+    }
 
     @Test
     fun generate() {
@@ -94,7 +105,7 @@ class DBGenerateTest(@Autowired private val properties: DataSourceProperties) {
 ```
 
 - `DataSourceProperties` 在 Boot 4 位于 `org.springframework.boot.jdbc.autoconfigure`。
-- **`outputDirectory` 必须与源集一致**：Kotlin 项目写 `src/main/kotlin`，Java 项目写 `src/main/java`。jmicro demo 用的是 `src/main/java`，那是早期 Java 项目的历史遗留，Kotlin 新项目照搬会让生成代码落在错误的源集目录里（虽然能被 Gradle 编译，但与项目结构不一致，IDE 索引与后续维护都会混乱）。
+- **生成目录必须与源集一致**：demo 的 `detectOutputDirectory()` 会优先选已存在当前包路径的目录，其次回落 `src/main/java` → `src/main/kotlin`；Kotlin 新项目自然落到 `src/main/kotlin`，不要硬编码成 demo 早期的 `src/main/java`。
 - 生成产物（`*.jooq.tables.*`、`tables.daos.*`、`tables.pojos.*`）提交进仓库，`dao` 类带 `@Repository` 可直接注入。
 - 用 `@Tag("db-generate")` 标记，避免 CI 中无数据库时执行；`build.gradle.kts` 可加：
   ```kotlin
@@ -111,6 +122,36 @@ class DBGenerateTest(@Autowired private val properties: DataSourceProperties) {
 - 未指定排序时用 `Pageable.withDefaultSort(...)` 补稳定排序，否则翻页可能出现重复或遗漏记录。
 - 接口直接返回 Spring Data `Page`/`PageImpl`，不包一层自定义 DTO；必须配置 `spring.data.web.pageable.serialization-mode=VIA_DTO`，响应才是稳定的 `{content, page:{size, number, totalElements, totalPages}}`（默认 `DIRECT` 会带 `pageable`、`sort` 等冗余字段且结构不稳定）。
 - 非数据库来源的数据（如系统配置项）用 `List<T>.toPage(pageable)` 在内存切片；若开启 `spring.data.web.pageable.one-indexed-parameters`，接口文档需同时写明"请求 `page` 从 1 开始、响应 `page.number` 从 0 开始"，避免前端页码错位。
+
+### 分页 + 过滤的写法（demo 的 `BookService.page`）
+
+`BookQuery` 的属性名与 jOOQ 生成的 pojo 对齐，等值条件交给 `conditionByExample`，
+模糊/区间条件把对应属性作为忽略字段、再用 `and` 追加：
+
+```kotlin
+// Controller
+@HasPermission("book:read")
+@GetMapping("/page")
+fun page(pageable: Pageable, @ModelAttribute query: BookQuery): Page<Book> =
+    bookService.page(pageable, query)
+
+// Service
+fun page(pageable: Pageable, query: BookQuery = BookQuery()): Page<Book> {
+    val table = BookTable.BOOK
+    return bookDao.fetchPage()
+        .conditionByExample(query, table.TITLE, table.PRICE)   // title/price 单独处理，故忽略
+        .and(query.title?.trim()?.takeIf { it.isNotEmpty() }?.let { table.TITLE.containsIgnoreCase(it) })
+        .and(query.minPrice?.let { table.PRICE.ge(it) })
+        .and(query.maxPrice?.let { table.PRICE.le(it) })
+        .withPageable(pageable)
+        .fetchPage()
+}
+```
+
+- 列表端点统一为 `GET .../page`：demo 的 Controller 不再暴露无分页的 `GET /books`（Service 的 `list()` 只留给测试/内部使用）。
+- `conditionByExample(query, vararg ignore)` 按属性名生成等值条件，模糊/区间查询用到的属性必须放进忽略列表。
+- `common/JooqPageables.kt` 的 `PageableStep.withPageable(pageable)` 把 Spring Data `Pageable` 转成 jOOQ 分页（`SortPropertyStyle.SNAKE_LOWER`，补默认主键倒序）。
+- 关联数据用批量查询再 `page.map {}` 拼装，避免 N+1：用户列表用 `SysUserRepository.findRoleIdsByUserIds(ids)`，角色列表用 `SysRoleRepository.findPermissionCodesByRoleIds(ids)`。
 
 生成 DAO 继承 jOOQ `DAOImpl`，`micro-sql-jooq` 的 `PageDAOImpl`/`KtDao` 额外提供 `fetchPage`：
 

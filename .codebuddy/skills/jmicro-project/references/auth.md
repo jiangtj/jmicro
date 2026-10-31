@@ -93,9 +93,26 @@ demo 的账号体系已从内存改为数据库（迁移脚本见 `references/da
 配套类（demo 中位于 `auth/user`、`auth/role`、`auth/permission`、`dao`）：
 
 - `UserStore`：查用户 → 校验 bcrypt → 查角色 → 按角色解析权限，失败抛 `BaseExceptionUtils.unauthorized("用户名或密码错误")`。
-- `RolePermissionResolver`：按角色编码解析权限并缓存（Caffeine），提供 `resolve(roles)` 与 `invalidate(roleCode)`。
-- `RoleService` / `PermissionService` + `RoleController` / `PermissionController`：角色增删改查（权限绑定整体覆盖）、权限字典查询。
-- `SysRoleRepository` / `SysPermissionRepository`：用 `DSLContext` 写关联查询（按用户查角色、按角色批量查权限、覆盖写绑定、删角色时清理关联），避免 N+1。
+- `RolePermissionResolver`：按角色编码解析权限并缓存（Caffeine），提供 `resolve(roles)` 与 `invalidate(roleCode)`。`micro-auth` 已 `api(caffeine)`，不需要额外声明依赖。
+- `UserService` / `RoleService` / `PermissionService`：用户、角色增删改查（角色绑定整体覆盖、删除时清理关联）与权限字典查询。
+- `UserController` / `RoleController` / `PermissionController`：管理接口，类上 `@HasRole("admin")`；每个新增/修改表单都有 `GET .../form-schema`（`JsonSchemaGenerator.generate<XxxForm>()`）供前端动态生成表单。
+- `SysUserRepository` / `SysRoleRepository` / `SysPermissionRepository`：用 `DSLContext` 写关联查询（按用户查角色、按角色批量查权限、覆盖写绑定、删角色时清理关联），列表查询批量取关联数据避免 N+1。
+
+demo 的用户/角色/权限管理接口（全部 `admin` 角色）：
+
+| 接口 | 说明 |
+| --- | --- |
+| `GET /users/page` | 用户分页（`username`/`enabled` 精确、`nickname` 模糊），返回 `UserDetail`（含 `roleIds`） |
+| `GET /users/roles` | 角色下拉选项 `RoleOption(id, code, name)` |
+| `GET /users/form-schema` | `UserForm` 的 JSON Schema（`password` 不在 `required` 内：新增必填、修改留空不改密码） |
+| `POST/PUT/DELETE /users/{id}` | 用户增删改，密码 bcrypt 存储、只入不出 |
+| `GET /roles/page` | 角色分页（`code` 精确、`name` 模糊），含绑定的 `permissionCodes` |
+| `GET /roles/form-schema` | `RoleForm` 的 JSON Schema |
+| `POST/PUT/DELETE /roles/{id}` | 角色增删改；权限绑定整体覆盖，变更后失效 `RolePermissionResolver` 缓存 |
+| `GET /permissions`、`GET /permissions/{code}` | 权限字典，`keyword` 同时匹配 code 与 name |
+
+表单/详情约定：`UserForm(username, password?, nickname?, enabled, roleIds)`、`RoleForm(code, name, permissionCodes)`；
+用户/角色列表都直接返回 Spring Data `Page`（分页约定见 `references/database.md`）。
 
 ```kotlin
 // 落库版 RolePermissionResolver：按角色缓存，角色权限变更时精确失效

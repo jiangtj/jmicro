@@ -42,7 +42,7 @@ class AuthFlowTest {
 
     @Test
     fun anonymousCannotReadBooks() {
-        client.get().uri("/books")
+        client.get().uri("/books/page")
             .exchange()
             .expectAll(ProblemDetailMvcConsumer.unLogin().expect())
     }
@@ -78,12 +78,13 @@ class AuthFlowTest {
             .exchange()
             .expectStatus().isOk()
 
-        client.get().uri("/books")
+        client.get().uri("/books/page")
             .header(HttpHeaders.AUTHORIZATION, bearer)
             .exchange()
             .expectStatus().isOk()
             .expectBody()
-            .jsonPath("$").isArray()
+            .jsonPath("$.content").isArray()
+            .jsonPath("$.page.totalElements").isNumber()
 
         client.delete().uri("/books/{id}", id)
             .header(HttpHeaders.AUTHORIZATION, bearer)
@@ -100,7 +101,7 @@ class AuthFlowTest {
     fun readerCanReadButNotDelete() {
         val bearer = "Bearer " + login("reader", "reader123")
 
-        client.get().uri("/books")
+        client.get().uri("/books/page")
             .header(HttpHeaders.AUTHORIZATION, bearer)
             .exchange()
             .expectStatus().isOk()
@@ -122,14 +123,55 @@ class AuthFlowTest {
             .jsonPath("$.permissions[0]").isEqualTo("book:read")
     }
 
+    /**
+     * 分页约定来自 `application.properties`：`page` 从 1 开始（响应 `page.number` 从 0 开始），
+     * 排序参数名为 `sortQ`（默认的 `sort` 不再生效）。
+     */
+    @Test
+    fun booksPageUsesOneIndexedPageAndSortQ() {
+        val bearer = "Bearer " + login("admin", "admin123")
+        createBook(bearer, "分页测试一")
+        createBook(bearer, "分页测试二")
+
+        client.get().uri("/books/page?page=1&size=2&sortQ=id,asc")
+            .header(HttpHeaders.AUTHORIZATION, bearer)
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody()
+            .jsonPath("$.page.number").isEqualTo(0)
+            .jsonPath("$.page.size").isEqualTo(2)
+            .jsonPath("$.content.length()").isEqualTo(2)
+
+        client.get().uri("/books/page?page=2&size=2&sortQ=id,asc")
+            .header(HttpHeaders.AUTHORIZATION, bearer)
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody()
+            .jsonPath("$.page.number").isEqualTo(1)
+    }
+
     @Test
     fun bookFormSchema() {
         client.get().uri("/books/form-schema")
             .exchange()
             .expectStatus().isOk()
             .expectBody()
+            .jsonPath("$.title").isEqualTo("BookForm")
             .jsonPath("$.type").isEqualTo("object")
             .jsonPath("$.properties.title.maxLength").isEqualTo(128)
             .jsonPath("$.required").isArray()
+    }
+
+    private fun createBook(bearer: String, title: String): Long {
+        val body = client.post().uri("/books")
+            .header(HttpHeaders.AUTHORIZATION, bearer)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(BookForm(title, "Kent Beck", "9787111639428", BigDecimal("69.00"), 2))
+            .exchange()
+            .expectStatus().isOk()
+            .returnResult(object : ParameterizedTypeReference<Map<String, Any>>() {})
+            .responseBody
+        val created = checkNotNull(body) { "created book is null" }
+        return (created["id"] as Number).toLong()
     }
 }
