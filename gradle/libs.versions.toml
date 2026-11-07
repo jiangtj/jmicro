@@ -22,7 +22,7 @@ lombok = "1.18.44"
 
 # Pic upload providers
 aliyunOss = "3.18.5"
-huaweiObs = "3.26.6"
+huaweiObs = "3.26.9"
 minio = "9.0.3"
 awssdk = "2.42.41"
 
