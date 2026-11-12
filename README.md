@@ -15,6 +15,7 @@ J Micro 是一个基于 Spring Boot 的轻量级基础工具集，帮助开发�
 
 - [模块总览](#模块总览)
 - [快速开始](#快速开始)
+    - [使用 AI 快速创建项目](#使用-ai-快速创建项目)
     - [本地安装](#本地安装)
     - [引入依赖管理](#引入依赖管理)
 - [核心模块](#核心模块)
@@ -45,6 +46,26 @@ J Micro 是一个基于 Spring Boot 的轻量级基础工具集，帮助开发�
 > 所有 `micro-*` 库模块均已发布至 Maven Central；`demo-*` 仅为示例应用，不在发布范围内。
 
 ## 快速开始
+
+### 使用 AI 快速创建项目
+
+仓库内置了 AI 脚手架技能 [`.codebuddy/skills/jmicro-project`](./.codebuddy/skills/jmicro-project/SKILL.md)。配合 AI 编程助手（如 CodeBuddy），可以从零生成一个可运行、可测试的 JMicro 后端项目，结构与 `demo-backend` 等价，无需手动搭建骨架或克隆本仓库（依赖直接取自 Maven Central）。
+
+使用步骤：
+
+1. 将技能目录放到工作区的 `.codebuddy/skills/` 下（AI 编程助手会按需加载，也可直接在克隆本仓库的工作区中使用）；
+2. 用自然语言描述需求，例如：`用 jmicro 创建一个电商后端，包名 com.example.shop，端口 8080，启用 db 和 config 能力`；
+3. 助手会调用技能自带的 `scripts/init_project.py` 生成工程（含 Gradle wrapper），并按 demo 约定完成鉴权、分页与表单 schema 接线，最后执行 `compileKotlin` 与 `test` 验证结果。
+
+可选能力（`--features`，逗号分隔）：
+
+| 取值 | 说明 |
+| --- | --- |
+| `db` | Flyway + jOOQ + H2、jOOQ 代码生成与分页封装 |
+| `config` | `micro-business` 系统配置（Loader/Saver，启用后配置可落 `sys_config`） |
+| `pic` | 图片上传（`PicUploadController` 与各服务商配置项） |
+
+生成的项目默认包含 JWT 登录（`POST /login`、`GET /me`）、基于角色的权限校验、`GET .../page` 分页约定与 `form-schema` 表单描述接口，并自带内置测试与 Gradle wrapper。使用说明与约定细节见技能内的 `SKILL.md` 与 `references/`。
 
 ### 本地安装
 
