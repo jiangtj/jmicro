@@ -97,6 +97,7 @@ demo 的账号体系已从内存改为数据库（迁移脚本见 `references/da
 - `UserService` / `RoleService` / `PermissionService`：用户、角色增删改查（角色绑定整体覆盖、删除时清理关联）与权限字典查询。
 - `UserController` / `RoleController` / `PermissionController`：管理接口，类上 `@HasRole("admin")`；每个新增/修改表单都有 `GET .../form-schema`（`JsonSchemaGenerator.generate<XxxForm>()`）供前端动态生成表单。
 - `SysUserRepository` / `SysRoleRepository` / `SysPermissionRepository`：用 `DSLContext` 写关联查询（按用户查角色、按角色批量查权限、覆盖写绑定、删角色时清理关联），列表查询批量取关联数据避免 N+1。
+  它们统一放在 `dao/` 包下：生成 DAO 覆盖不到的查询优先在 `dao/` 新建 `XxxRepository` 扩展，不要改 jOOQ 生成类（会被重新生成覆盖），约定见 `references/database.md`。
 
 demo 的用户/角色/权限管理接口（全部 `admin` 角色）：
 

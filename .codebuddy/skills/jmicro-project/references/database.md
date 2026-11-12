@@ -106,7 +106,7 @@ class DBGenerateTest(@Autowired private val properties: DataSourceProperties) {
 
 - `DataSourceProperties` 在 Boot 4 位于 `org.springframework.boot.jdbc.autoconfigure`。
 - **生成目录必须与源集一致**：demo 的 `detectOutputDirectory()` 会优先选已存在当前包路径的目录，其次回落 `src/main/java` → `src/main/kotlin`；Kotlin 新项目自然落到 `src/main/kotlin`，不要硬编码成 demo 早期的 `src/main/java`。
-- 生成产物（`*.jooq.tables.*`、`tables.daos.*`、`tables.pojos.*`）提交进仓库，`dao` 类带 `@Repository` 可直接注入。
+- 生成产物（`jooq/tables`、`jooq/tables.daos`、`jooq/tables.pojos`）提交进仓库，生成的 DAO 类带 `@Repository` 可直接注入。**生成目录整块会被重新生成覆盖**，自定义 SQL 不要写进去（见下文 `dao` 目录约定）。
 - 用 `@Tag("db-generate")` 标记，避免 CI 中无数据库时执行；`build.gradle.kts` 可加：
   ```kotlin
   tasks.withType<Test> { useJUnitPlatform { if (project.hasProperty("ai")) excludeTags("db-generate") } }
@@ -171,6 +171,64 @@ PageUtils.selectFrom(create, BOOK)
 List<Book> list = PageUtils.selectLimitList(create.select(BOOK).from(BOOK), pageable, condition);
 int total = PageUtils.selectCount(create.selectCount().from(BOOK), condition);
 ```
+
+## `dao` 目录：自定义 SQL 的默认位置
+
+生成的 DAO 只覆盖单表 CRUD（`fetchOneById`/`findAll`/`insert`/`update`/`deleteById` + `fetchPage`）。**当生成的 DAO 满足不了需求、需要用 `DSLContext` 构建 SQL 时，优先在项目的 `dao/` 包下新建 `XxxRepository` 补充方法，而不是改生成代码（下一次 `DBGenerateTest` 会整体覆盖）或在 Controller 里直接拼 SQL。**
+
+适合放进 `dao/` 的场景：
+
+- 关联查询（按用户查角色、按角色查权限）与跨表 join；
+- 批量 `in` 查询（列表页一次取回关联数据，避免 N+1）；
+- 关联表"先删后插"整体覆盖、删除主表前显式清理关联；
+- `conditionByExample` + `withPageable` 表达不了的复杂条件、`group by`/`having`、子查询、聚合统计。
+
+约定：
+
+- 命名 `XxxRepository`，类上 `@Repository`，构造函数注入 `DSLContext`；不要在 Controller 里注入 `DSLContext` 或拼 SQL。
+- 方法名体现语义与批量性（`findRoleIdsByUserIds`、`replacePermissions`、`deleteRelations`）；对外返回 pojo 或基础类型，不返回 jOOQ `Record`/`Result`，避免生成类泄漏到 Service/Controller。
+- 只做数据访问：事务与业务异常留在 Service 层（多表写入由 Service 的 `@Transactional` 编排）。
+- 与生成的 DAO 混用：单表 CRUD 继续用 `bookDao`/`sysUserDao`，Repository 只补缺，别把同一查询写两遍。
+
+```kotlin
+// dao/SysUserRepository.kt（demo 写法）
+@Repository
+class SysUserRepository(private val dsl: DSLContext) {
+
+    fun findRoleIdsByUserId(userId: Long): List<Long> =
+        dsl.select(SysUserRole.SYS_USER_ROLE.ROLE_ID)
+            .from(SysUserRole.SYS_USER_ROLE)
+            .where(SysUserRole.SYS_USER_ROLE.USER_ID.eq(userId))
+            .orderBy(SysUserRole.SYS_USER_ROLE.ROLE_ID)
+            .fetch(SysUserRole.SYS_USER_ROLE.ROLE_ID)
+            .filterNotNull()
+
+    // 批量版：一次 in 查询后分组，避免列表页 N+1
+    fun findRoleIdsByUserIds(userIds: Collection<Long>): Map<Long, List<Long>> =
+        if (userIds.isEmpty()) emptyMap()
+        else dsl.select(SysUserRole.SYS_USER_ROLE.USER_ID, SysUserRole.SYS_USER_ROLE.ROLE_ID)
+            .from(SysUserRole.SYS_USER_ROLE)
+            .where(SysUserRole.SYS_USER_ROLE.USER_ID.`in`(userIds))
+            .orderBy(SysUserRole.SYS_USER_ROLE.ROLE_ID)
+            .fetch()
+            .mapNotNull { r -> r.value1()?.let { uid -> r.value2()?.let { rid -> uid to rid } } }
+            .groupBy({ it.first }, { it.second })
+
+    fun replaceRoles(userId: Long, roleIds: Collection<Long>) { /* deleteFrom 旧绑定 → insertInto 新绑定 */ }
+
+    fun deleteRelations(userId: Long) { /* 关联表无外键，删除用户前显式清理 */ }
+}
+
+// Service 混用：单表走生成 DAO，关联查询走 Repository
+@Service
+class UserService(
+    private val sysUserDao: SysUserDao,
+    private val userRepository: SysUserRepository,
+) { /* ... */ }
+```
+
+上例的表类来自生成包（如 `<pkg>.jooq.tables.SysUserRole`），`SysUserDao` 是 `tables.daos` 下的生成 DAO。
+自定义分页查询同样返回 Spring Data `Page`（保持 `/page` 接口契约一致）：仓库方法接收 `Pageable`，用 `common/JooqPageables.kt` 的 `withPageable(pageable)` 或 `PageUtils` 转换。
 
 ## 落库改造顺序（重要）
 

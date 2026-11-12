@@ -75,6 +75,7 @@ python scripts/init_project.py --path <目录> --package <包名> --name <项目
     │                           # AppUserStore / RolePermissionResolver / RoleBasedAuthorization
     ├── controller/             # AuthController(login,me) / BookController(page, form-schema, CRUD)
     ├── book/                   # Book / BookForm / BookQuery / BookService（内存实现，替换为真实持久层）
+    ├── dao/                    # 自定义 SQL：XxxRepository(@Repository + DSLContext)，补生成 DAO 覆盖不到的查询
     └── common/                 # ApiExceptionHandler / WebConfig(CORS) / Pageables(withDefaultSort、toPage)
 ```
 
@@ -99,6 +100,9 @@ python scripts/init_project.py --path <目录> --package <包名> --name <项目
   账号/角色/权限表已随迁移建好，落库版 `UserStore` / `UserService` / `RoleService` / `PermissionService` / `RolePermissionResolver`
   与三个管理 Controller 按 `references/auth.md` 的 demo 结构补齐；
   **先生成 jOOQ 代码再改主代码**，否则 `compileKotlin` 会因缺少生成类失败。
+  **自定义 SQL 放 `dao/`**：`*.jooq.tables.daos.*` 只覆盖单表 CRUD（每次重新生成会整体覆盖，不要在其中加方法）；
+  关联查询、批量 `in` 查询、先删后插、聚合统计等需要 `DSLContext` 构建 SQL 时，优先在 `dao/` 下新建 `XxxRepository`
+  （`@Repository` + 构造函数注入 `DSLContext`），Service 里与生成的 DAO 混用。
 - `config` → `references/system-config.md`（`JMicroConfigLoader`/`Saver`、`SystemItemInfo`、`JMicroConfigService`）。
   与 `db` 组合时自带 `sys_config` 落库 Saver，管理接口含 `/{key}/properties` 与公开的 `/system/configs/public`。
 - `pic` → `references/pic-upload.md`（`PicUploadService`、各 provider 配置项、`jmicro.config.enabled` 前置）
@@ -133,13 +137,14 @@ python scripts/init_project.py --path <目录> --package <包名> --name <项目
 | 找不到 `spring-boot-starter-web` | Boot 4 改名为 `spring-boot-starter-webmvc` |
 | 传 `sort` 不排序 / 页码错一位 / 响应结构带 `pageable` | 缺 `spring.data.web.sort.sort-parameter=sortQ`、`spring.data.web.pageable.one-indexed-parameters=true`、`spring.data.web.pageable.serialization-mode=VIA_DTO` |
 | jOOQ 生成的类不存在 | 生成代码需先跑 `db-generate` 标签的测试（需要可连的数据库）；主代码不要先引用生成类 |
+| 重新生成 jOOQ 代码后自定义方法消失 | 自定义 SQL 写进了会被覆盖的 `tables.daos.*`；应放到 `dao/XxxRepository`（见 `references/database.md`） |
 | `Could not find com.jiangtj.micro:micro-*` | 该版本未发布到 Maven Central；改用已发布版本，或 `--local-repo` + 本地发布 |
 
 ## 参考文件
 
 - `references/modules.md` — 模块职责、Maven 坐标、自动配置清单、必配属性
 - `references/auth.md` — 认证上下文契约、注解、`AuthService`、角色/权限分离的 JWT 登录与落库结构
-- `references/database.md` — Flyway 扩展、迁移脚本（含 `R__`）、jOOQ 生成与落库改造顺序、分页
+- `references/database.md` — Flyway 扩展、迁移脚本（含 `R__`）、jOOQ 生成与落库改造顺序、`dao/` 自定义 SQL 约定、分页
 - `references/system-config.md` — 系统配置能力、表单类型、`sys_config` 落库 Saver
 - `references/pic-upload.md` — 图片上传与各 provider 配置
 - `references/testing.md` — `@JMicroTest`、`@WithMockUser`、Service 集成测试、ProblemDetail 断言

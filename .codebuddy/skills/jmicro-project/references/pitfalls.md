@@ -77,6 +77,7 @@
 
 23. **主代码引用 `*.jooq.*` 生成类导致编译失败**
     生成类来自真实库结构，必须先 `./gradlew test --tests "*DBGenerateTest*"` 生成后再改主代码（模板默认给内存实现，正是为了首次编译能过）。
+    另外生成目录整块会被重新生成覆盖：用 `DSLContext` 写的关联/批量/先删后插等自定义方法要放在 `dao/XxxRepository`，写进 `tables.daos.*` 会丢。
 
 ## 分页/接口契约相关（最新 demo）
 
